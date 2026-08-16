@@ -2375,6 +2375,28 @@
       }
     }
 
+    /* Thesis completion view */
+    .toc-project-picker { display: flex; align-items: end; gap: .75rem; flex-wrap: wrap; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 1rem; }
+    .toc-project-picker .form-group { margin: 0; min-width: 260px; flex: 1; }
+    .toc-progress-card { background: #034f31; color: white; border-radius: var(--radius-md); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+    .toc-progress-row { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: .7rem; }
+    .toc-progress-value { font-size: 1.7rem; font-weight: 700; }
+    .toc-progress-track { height: 10px; background: rgba(255,255,255,.2); overflow: hidden; border-radius: 999px; }
+    .toc-progress-fill { height: 100%; width: 0; background: #d6eddf; border-radius: inherit; transition: width .25s ease; }
+    .toc-toolbar { display: flex; justify-content: space-between; align-items: center; gap: .75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .toc-list { display: flex; flex-direction: column; gap: .75rem; }
+    .toc-card { display: grid; grid-template-columns: 42px minmax(180px,1fr) 190px minmax(220px,1.2fr) auto; gap: .75rem; align-items: center; padding: 1rem; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+    .toc-order-controls { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-muted); }
+    .toc-order-btn { border: 0; background: transparent; color: inherit; cursor: pointer; line-height: 1; padding: 1px 5px; }
+    .toc-order-btn:disabled { opacity: .25; cursor: default; }
+    .toc-number { font-size: .72rem; font-weight: 700; }
+    .toc-name-input { width: 100%; border: 0; border-bottom: 1px solid transparent; background: transparent; padding: .4rem .2rem; color: var(--text-main); font-family: inherit; font-size: .95rem; font-weight: 600; }
+    .toc-name-input:focus { border-bottom-color: var(--primary); outline: 0; }
+    .toc-note-input { min-height: 42px; resize: vertical; }
+    .toc-hint { display: inline-block; margin-top: .25rem; font-size: .72rem; color: var(--primary); background: var(--primary-subtle); padding: 2px 6px; border-radius: 999px; }
+    .toc-empty { padding: 3rem 1.25rem; text-align: center; background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-md); }
+    @media (max-width: 900px) { .toc-card { grid-template-columns: 36px 1fr auto; } .toc-card .toc-status, .toc-card .toc-note { grid-column: 2 / -1; } }
+    @media (max-width: 560px) { .toc-card { grid-template-columns: 30px 1fr; } .toc-card .toc-delete { grid-column: 2; justify-self: end; } }
 </style>
 </head>
 <body>
@@ -2406,6 +2428,9 @@
         </button>
         <button type="button" id="nav-tab-papers" class="nav-link" onclick="navigateToPapers()">
           <span>논문 조사</span>
+        </button>
+        <button type="button" id="nav-tab-toc" class="nav-link" onclick="navigateToThesisToc()">
+          <span>논문 완성도</span>
         </button>
         <button type="button" id="nav-tab-manual" class="nav-link" onclick="navigateToManual()">
           <span>사용법</span>
@@ -2456,6 +2481,9 @@
         </button>
         <button type="button" id="mobile-tab-papers" class="mobile-nav-link" onclick="navigateToPapers(); closeMobileDrawer();">
           <span>📚 논문 조사 파이프라인</span>
+        </button>
+        <button type="button" id="mobile-tab-toc" class="mobile-nav-link" onclick="navigateToThesisToc(); closeMobileDrawer();">
+          <span>📑 논문 완성도</span>
         </button>
         <button type="button" id="mobile-tab-manual" class="mobile-nav-link" onclick="navigateToManual(); closeMobileDrawer();">
           <span>📖 사용법 매뉴얼</span>
@@ -3072,6 +3100,34 @@
     <!-- ======================================================================
          7. USER MANUAL VIEW (연구원 사용자 사용법 안내서)
          ====================================================================== -->
+    <div id="thesis-toc-view" class="hidden">
+      <nav class="breadcrumb-bar" aria-label="논문 완성도 위치 경로">
+        <div><button type="button" class="breadcrumb-link" onclick="navigateToDashboard()">← 대시보드</button></div>
+      </nav>
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">논문 완성도</h1>
+          <p class="section-subtitle">실제 논문 목차를 구성하고 챕터별 작성 상태를 관리하세요.</p>
+        </div>
+      </div>
+      <div class="toc-project-picker">
+        <div class="form-group">
+          <label for="toc-project-select" class="form-label">연구 프로젝트</label>
+          <select id="toc-project-select" class="form-control" onchange="handleTocProjectChange(event)"></select>
+        </div>
+        <span id="toc-save-state" style="font-size:.8rem;color:var(--text-muted)" aria-live="polite"></span>
+      </div>
+      <section id="toc-progress-card" class="toc-progress-card hidden" aria-label="논문 전체 진행률">
+        <div class="toc-progress-row"><div><strong>전체 작성 진행률</strong><div id="toc-progress-caption" style="opacity:.78;font-size:.8rem;margin-top:.2rem"></div></div><div id="toc-progress-value" class="toc-progress-value">0%</div></div>
+        <div class="toc-progress-track"><div id="toc-progress-fill" class="toc-progress-fill"></div></div>
+      </section>
+      <div id="toc-toolbar" class="toc-toolbar hidden">
+        <p style="color:var(--text-muted);font-size:.82rem">상태·메모·제목은 변경 즉시 저장됩니다. 화살표로 순서를 조정하세요.</p>
+        <button type="button" class="btn btn-primary btn-sm" onclick="handleAddChapter()">+ 챕터 추가</button>
+      </div>
+      <div id="toc-content"></div>
+    </div>
+
     <div id="manual-view" class="hidden">
       <!-- Breadcrumbs -->
       <nav class="breadcrumb-bar" aria-label="매뉴얼 위치 경로">
@@ -3925,6 +3981,8 @@
     let allTracks = [];
     let allHypotheses = [];
     let allPapers = []; // Saved papers in Supabase
+    let allThesisChapters = [];
+    let tocProjectId = null;
     let allProfiles = {}; // Map of user_id -> profile object
 
     let currentProject = null; // Active project in workspace view
@@ -4187,6 +4245,7 @@
       document.getElementById('projects-view').classList.add('hidden');
       document.getElementById('workspace-view').classList.add('hidden');
       document.getElementById('papers-view').classList.add('hidden');
+      document.getElementById('thesis-toc-view')?.classList.add('hidden');
       document.getElementById('manual-view')?.classList.add('hidden');
       
       document.getElementById('nav-main-menu').classList.add('hidden');
@@ -4217,12 +4276,13 @@
     // =========================================================================
     async function loadAllAppData() {
       try {
-        const [projRes, trackRes, hypoRes, papersRes, profRes] = await Promise.all([
+        const [projRes, trackRes, hypoRes, papersRes, profRes, chaptersRes] = await Promise.all([
           supabaseClient.from('projects').select('*').order('created_at', { ascending: false }),
           supabaseClient.from('tracks').select('*').order('created_at', { ascending: true }),
           supabaseClient.from('hypotheses').select('*, projects(name), tracks(name)').order('updated_at', { ascending: false }),
           supabaseClient.from('papers').select('*, projects(name), hypotheses(title)').order('created_at', { ascending: false }),
-          supabaseClient.from('profiles').select('*')
+          supabaseClient.from('profiles').select('*'),
+          supabaseClient.from('thesis_chapters').select('*').order('chapter_order', { ascending: true })
         ]);
 
         if (projRes.error) throw projRes.error;
@@ -4237,6 +4297,8 @@
         allTracks = trackRes.data || [];
         allHypotheses = hypoRes.data || [];
         allPapers = papersRes.data || [];
+        if (chaptersRes.error) console.warn('Thesis chapters select notice:', chaptersRes.error.message);
+        allThesisChapters = chaptersRes.data || [];
 
         if (profRes.data) {
           allProfiles = {};
@@ -4276,12 +4338,14 @@
       document.getElementById('nav-tab-summary')?.classList.toggle('active', activeTab === 'summary');
       document.getElementById('nav-tab-projects')?.classList.toggle('active', activeTab === 'projects');
       document.getElementById('nav-tab-papers')?.classList.toggle('active', activeTab === 'papers');
+      document.getElementById('nav-tab-toc')?.classList.toggle('active', activeTab === 'toc');
       document.getElementById('nav-tab-manual')?.classList.toggle('active', activeTab === 'manual');
 
       document.getElementById('mobile-tab-dashboard')?.classList.toggle('active', activeTab === 'dashboard');
       document.getElementById('mobile-tab-summary')?.classList.toggle('active', activeTab === 'summary');
       document.getElementById('mobile-tab-projects')?.classList.toggle('active', activeTab === 'projects');
       document.getElementById('mobile-tab-papers')?.classList.toggle('active', activeTab === 'papers');
+      document.getElementById('mobile-tab-toc')?.classList.toggle('active', activeTab === 'toc');
       document.getElementById('mobile-tab-manual')?.classList.toggle('active', activeTab === 'manual');
     }
 
@@ -4295,6 +4359,7 @@
       document.getElementById('projects-view')?.classList.add('hidden');
       document.getElementById('workspace-view')?.classList.add('hidden');
       document.getElementById('papers-view')?.classList.add('hidden');
+      document.getElementById('thesis-toc-view')?.classList.add('hidden');
       document.getElementById('manual-view')?.classList.add('hidden');
       document.getElementById('auth-view')?.classList.add('hidden');
     }
@@ -4423,7 +4488,165 @@
 
 
     // =========================================================================
-    // 7. User Manual Navigation & Helpers
+    // 7. Thesis completion / table of contents
+    // =========================================================================
+    const THESIS_STATUS = {
+      not_started: { label: '미착수', weight: 0 },
+      in_progress: { label: '작성중', weight: 33 },
+      draft_done: { label: '초안완료', weight: 66 },
+      reviewed: { label: '검토완료', weight: 100 }
+    };
+    const STANDARD_THESIS_CHAPTERS = [
+      ['서론', 'Introduction'], ['관련연구', 'Related Work'], ['이론적 배경', 'Theoretical Background'],
+      ['연구방법론', 'Methodology'], ['실험설계 및 구현', 'Experimental Design & Implementation'],
+      ['실험결과 및 분석', 'Results & Analysis'], ['논의', 'Discussion'], ['결론', 'Conclusion'], ['참고문헌', 'References']
+    ];
+
+    async function navigateToThesisToc(projectId = null) {
+      if (currentView !== 'thesis-toc' && currentView !== 'auth') previousView = currentView;
+      currentView = 'thesis-toc';
+      hideAllViews();
+      document.getElementById('thesis-toc-view').classList.remove('hidden');
+      updateNavTabState('toc');
+      await loadAllAppData();
+      if (projectId && allProjects.some(p => p.id === projectId)) tocProjectId = projectId;
+      if (!tocProjectId || !allProjects.some(p => p.id === tocProjectId)) tocProjectId = allProjects[0]?.id || null;
+      renderThesisToc();
+    }
+
+    function handleTocProjectChange(event) {
+      tocProjectId = event.target.value || null;
+      renderThesisToc();
+    }
+
+    function getTocProjectChapters() {
+      return allThesisChapters.filter(c => c.project_id === tocProjectId).sort((a, b) => a.chapter_order - b.chapter_order);
+    }
+
+    function renderThesisToc() {
+      const select = document.getElementById('toc-project-select');
+      const content = document.getElementById('toc-content');
+      select.innerHTML = allProjects.length
+        ? allProjects.map(p => `<option value="${p.id}" ${p.id === tocProjectId ? 'selected' : ''}>${escapeHtml(p.name)}</option>`).join('')
+        : '<option value="">프로젝트 없음</option>';
+      select.disabled = !allProjects.length;
+
+      const chapters = getTocProjectChapters();
+      const hasProject = Boolean(tocProjectId);
+      document.getElementById('toc-progress-card').classList.toggle('hidden', !hasProject || !chapters.length);
+      document.getElementById('toc-toolbar').classList.toggle('hidden', !hasProject || !chapters.length);
+      if (!hasProject) {
+        content.innerHTML = '<div class="toc-empty"><h2 style="font-size:1.05rem">먼저 연구 프로젝트를 생성해 주세요</h2><p style="margin:.5rem 0 1rem;color:var(--text-muted)">프로젝트별로 독립적인 논문 목차를 관리할 수 있습니다.</p><button type="button" class="btn btn-primary" onclick="navigateToProjects()">프로젝트 만들기</button></div>';
+        return;
+      }
+      if (!chapters.length) {
+        content.innerHTML = '<div class="toc-empty"><div style="font-size:2.4rem;margin-bottom:.6rem">📑</div><h2 style="font-size:1.1rem">아직 설정된 논문 목차가 없습니다</h2><p style="margin:.5rem 0 1.2rem;color:var(--text-muted)">건국대 연구 논문에 활용할 수 있는 9개 표준 챕터로 빠르게 시작하세요.</p><button id="btn-start-standard-toc" type="button" class="btn btn-primary" onclick="handleStartStandardToc()">표준 목차로 시작하기</button></div>';
+        return;
+      }
+      updateTocProgress(chapters);
+      content.innerHTML = `<div class="toc-list">${chapters.map((chapter, index) => renderTocChapterCard(chapter, index, chapters.length)).join('')}</div>`;
+    }
+
+    function renderTocChapterCard(chapter, index, total) {
+      const paperHint = chapter.chapter_name.includes('관련연구') ? `저장 논문 ${allPapers.filter(p => p.project_id === tocProjectId).length}건` : '';
+      const accepted = allHypotheses.filter(h => h.project_id === tocProjectId && h.status === 'supported').length;
+      const rejected = allHypotheses.filter(h => h.project_id === tocProjectId && h.status === 'rejected').length;
+      const hypothesisHint = chapter.chapter_name.includes('결론') ? `채택 ${accepted}건 · 기각 ${rejected}건` : '';
+      const hint = paperHint || hypothesisHint;
+      return `<article class="toc-card" data-chapter-id="${chapter.id}">
+        <div class="toc-order-controls">
+          <button type="button" class="toc-order-btn" onclick="handleMoveChapter('${chapter.id}', -1)" ${index === 0 ? 'disabled' : ''} aria-label="${escapeHtml(chapter.chapter_name)} 위로 이동">▲</button>
+          <span class="toc-number">${index + 1}</span>
+          <button type="button" class="toc-order-btn" onclick="handleMoveChapter('${chapter.id}', 1)" ${index === total - 1 ? 'disabled' : ''} aria-label="${escapeHtml(chapter.chapter_name)} 아래로 이동">▼</button>
+        </div>
+        <div><input class="toc-name-input" value="${escapeHtml(chapter.chapter_name)}" onchange="handleChapterFieldChange('${chapter.id}', 'chapter_name', this.value)" aria-label="챕터 제목">${chapter.description ? `<div style="font-size:.75rem;color:var(--text-dim);padding-left:.2rem">${escapeHtml(chapter.description)}</div>` : ''}${hint ? `<span class="toc-hint">${hint}</span>` : ''}</div>
+        <select class="form-control toc-status" onchange="handleChapterFieldChange('${chapter.id}', 'status', this.value)" aria-label="${escapeHtml(chapter.chapter_name)} 작성 상태">${Object.entries(THESIS_STATUS).map(([key, meta]) => `<option value="${key}" ${chapter.status === key ? 'selected' : ''}>${meta.label}</option>`).join('')}</select>
+        <textarea class="form-control toc-note-input toc-note" placeholder="메모를 입력하세요" onchange="handleChapterFieldChange('${chapter.id}', 'notes', this.value)" aria-label="${escapeHtml(chapter.chapter_name)} 메모">${escapeHtml(chapter.notes || '')}</textarea>
+        <button type="button" class="btn btn-danger-outline btn-sm toc-delete" onclick="handleDeleteChapter('${chapter.id}')">삭제</button>
+      </article>`;
+    }
+
+    function updateTocProgress(chapters = getTocProjectChapters()) {
+      const progress = chapters.length ? Math.round(chapters.reduce((sum, c) => sum + (THESIS_STATUS[c.status]?.weight || 0), 0) / chapters.length) : 0;
+      document.getElementById('toc-progress-value').textContent = `${progress}%`;
+      document.getElementById('toc-progress-fill').style.width = `${progress}%`;
+      document.getElementById('toc-progress-caption').textContent = `${chapters.filter(c => c.status === 'reviewed').length}/${chapters.length}개 챕터 검토 완료`;
+    }
+
+    function setTocSaveState(message) { document.getElementById('toc-save-state').textContent = message; }
+
+    async function handleStartStandardToc() {
+      if (!tocProjectId) return;
+      const btn = document.getElementById('btn-start-standard-toc');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 생성 중...';
+      const rows = STANDARD_THESIS_CHAPTERS.map(([name, description], index) => ({ project_id: tocProjectId, chapter_order: index + 1, chapter_name: name, description, status: 'not_started', notes: '', created_by: currentUser.id }));
+      try {
+        const { error } = await supabaseClient.from('thesis_chapters').insert(rows);
+        if (error) throw error;
+        showToast('표준 논문 목차 9개를 생성했습니다.', 'success');
+        await loadAllAppData(); renderThesisToc();
+      } catch (err) { showToast('표준 목차 생성 실패: ' + err.message, 'error'); btn.disabled = false; btn.textContent = '표준 목차로 시작하기'; }
+    }
+
+    async function handleChapterFieldChange(chapterId, field, value) {
+      const chapter = allThesisChapters.find(c => String(c.id) === String(chapterId));
+      if (!chapter) return;
+      const nextValue = field === 'chapter_name' ? value.trim() : value;
+      if (field === 'chapter_name' && !nextValue) { showToast('챕터 제목은 비워둘 수 없습니다.', 'error'); renderThesisToc(); return; }
+      setTocSaveState('저장 중…');
+      try {
+        const { error } = await supabaseClient.from('thesis_chapters').update({ [field]: nextValue, updated_at: new Date().toISOString() }).eq('id', chapterId);
+        if (error) throw error;
+        chapter[field] = nextValue; setTocSaveState('저장됨');
+        if (field === 'status') updateTocProgress();
+        setTimeout(() => { if (document.getElementById('toc-save-state').textContent === '저장됨') setTocSaveState(''); }, 1800);
+      } catch (err) { setTocSaveState('저장 실패'); showToast('챕터 저장 실패: ' + err.message, 'error'); renderThesisToc(); }
+    }
+
+    async function handleAddChapter() {
+      const name = prompt('추가할 챕터 제목을 입력하세요.');
+      if (!name?.trim()) return;
+      const chapters = getTocProjectChapters();
+      try {
+        const { error } = await supabaseClient.from('thesis_chapters').insert([{ project_id: tocProjectId, chapter_order: chapters.length + 1, chapter_name: name.trim(), description: '', status: 'not_started', notes: '', created_by: currentUser.id }]);
+        if (error) throw error;
+        await loadAllAppData(); renderThesisToc(); showToast('챕터를 추가했습니다.', 'success');
+      } catch (err) { showToast('챕터 추가 실패: ' + err.message, 'error'); }
+    }
+
+    async function handleDeleteChapter(chapterId) {
+      if (!confirm('이 챕터를 삭제하시겠습니까?')) return;
+      try {
+        const { error } = await supabaseClient.from('thesis_chapters').delete().eq('id', chapterId);
+        if (error) throw error;
+        allThesisChapters = allThesisChapters.filter(c => String(c.id) !== String(chapterId));
+        await normalizeTocOrder(); renderThesisToc(); showToast('챕터를 삭제했습니다.', 'success');
+      } catch (err) { showToast('챕터 삭제 실패: ' + err.message, 'error'); }
+    }
+
+    async function handleMoveChapter(chapterId, direction) {
+      const chapters = getTocProjectChapters();
+      const index = chapters.findIndex(c => String(c.id) === String(chapterId));
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= chapters.length) return;
+      [chapters[index], chapters[target]] = [chapters[target], chapters[index]];
+      setTocSaveState('순서 저장 중…');
+      try { await persistTocOrder(chapters); renderThesisToc(); setTocSaveState('저장됨'); }
+      catch (err) { await loadAllAppData(); renderThesisToc(); setTocSaveState('저장 실패'); showToast('순서 변경 실패: ' + err.message, 'error'); }
+    }
+
+    async function persistTocOrder(chapters) {
+      for (let i = 0; i < chapters.length; i++) {
+        const { error } = await supabaseClient.from('thesis_chapters').update({ chapter_order: i + 1, updated_at: new Date().toISOString() }).eq('id', chapters[i].id);
+        if (error) throw error;
+        chapters[i].chapter_order = i + 1;
+      }
+    }
+
+    async function normalizeTocOrder() { await persistTocOrder(getTocProjectChapters()); }
+
+    // =========================================================================
+    // 8. User Manual Navigation & Helpers
     // =========================================================================
     function navigateToManual(targetSectionId = null) {
       if (currentView !== 'manual' && currentView !== 'auth') {
