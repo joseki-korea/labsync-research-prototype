@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>대학원 연구관리 시스템 (ResearchLab MVP - v2 Dashboard)</title>
-  <meta name="description" content="대학원 연구 프로젝트, 연구 트랙 및 가설 검증 3단 드릴다운 대시보드 관리 플랫폼">
+  <title>대학원 연구관리 시스템 (ResearchLab MVP - v2 Dashboard & Papers Pipeline)</title>
+  <meta name="description" content="대학원 연구 프로젝트, 연구 트랙, 가설 검증 3단 드릴다운 및 Semantic Scholar 논문조사 파이프라인 관리 플랫폼">
   <!-- Supabase JS Client CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Google Fonts -->
@@ -250,37 +250,33 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 1.5rem;
-      transform: translateX(0);
-      transition: transform 0.25s ease;
-      border-left: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .mobile-drawer.hidden,
-    .mobile-drawer-overlay.hidden {
-      display: none !important;
+    .mobile-drawer.open {
+      transform: translateX(0);
     }
 
     .mobile-drawer-header {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      padding-bottom: 1.25rem;
-      border-bottom: 1px solid var(--border-muted);
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
     }
 
     .mobile-user-info {
       display: flex;
       flex-direction: column;
-      gap: 0.2rem;
     }
 
     .mobile-drawer-nav {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-      margin: 1.5rem 0;
-      flex: 1;
     }
 
     .mobile-nav-link {
@@ -290,255 +286,193 @@
       padding: 0.75rem 1rem;
       border-radius: var(--radius-sm);
       color: var(--text-main);
-      font-size: 0.95rem;
+      text-decoration: none;
       font-weight: 500;
+      font-size: 0.95rem;
       background: transparent;
       border: 1px solid transparent;
       cursor: pointer;
       text-align: left;
       width: 100%;
-      transition: all 0.15s ease;
+      font-family: inherit;
     }
 
     .mobile-nav-link:hover,
     .mobile-nav-link.active {
       background: var(--primary-light);
       color: var(--primary);
-      font-weight: 600;
       border-color: rgba(3, 107, 63, 0.2);
     }
 
     .mobile-drawer-footer {
       padding-top: 1rem;
-      border-top: 1px solid var(--border-muted);
+      border-top: 1px solid var(--border);
     }
 
-    /* Common Buttons */
+    /* Main Container Layout */
+    main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-sm);
+      gap: 0.4rem;
+      padding: 0.55rem 1.1rem;
       font-size: 0.85rem;
       font-weight: 500;
+      border-radius: var(--radius-sm);
       cursor: pointer;
       border: 1px solid transparent;
       transition: all 0.15s ease;
-      text-decoration: none;
-      color: var(--text-main);
-      letter-spacing: -0.01em;
       font-family: inherit;
+      white-space: nowrap;
     }
 
     .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed !important;
-      pointer-events: none;
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .btn-primary {
-      background-color: var(--primary);
-      color: #fff;
-      box-shadow: 0 2px 6px rgba(3, 107, 63, 0.20);
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: var(--shadow-sm);
     }
+
     .btn-primary:hover:not(:disabled) {
-      background-color: var(--primary-hover);
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
 
     .btn-outline {
-      background-color: #ffffff;
-      border-color: var(--border);
+      background: var(--surface);
+      border: 1px solid var(--border);
       color: var(--text-main);
     }
+
     .btn-outline:hover:not(:disabled) {
-      background-color: var(--surface-hover);
-      border-color: rgba(3, 107, 63, 0.4);
+      background: var(--surface-hover);
+      border-color: #b8c4bd;
       color: var(--primary);
     }
 
     .btn-subtle {
-      background-color: var(--surface-hover);
-      color: var(--text-main);
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid rgba(3, 107, 63, 0.18);
     }
+
     .btn-subtle:hover:not(:disabled) {
-      background-color: var(--surface-active);
+      background: rgba(3, 107, 63, 0.18);
+    }
+
+    .btn-danger-outline {
+      background: var(--surface);
+      border: 1px solid rgba(164, 60, 53, 0.3);
+      color: #a43c35;
+    }
+
+    .btn-danger-outline:hover:not(:disabled) {
+      background: rgba(164, 60, 53, 0.08);
+      border-color: #a43c35;
     }
 
     .btn-sm {
-      padding: 0.32rem 0.65rem;
+      padding: 0.35rem 0.65rem;
       font-size: 0.78rem;
     }
 
-    .btn-lg {
-      padding: 0.65rem 1.25rem;
-      font-size: 0.92rem;
-      font-weight: 600;
-    }
-
-    /* Spinner Animation for Action Feedback */
-    .spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      border-radius: 50%;
-      border-top-color: #ffffff;
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-right: 4px;
-    }
-
-    .btn-outline .spinner,
-    .btn-subtle .spinner {
-      border: 2px solid rgba(3, 107, 63, 0.3);
-      border-top-color: var(--primary);
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Main Container */
-    main {
-      flex: 1;
-      padding: 2.25rem 1.5rem 3.5rem;
-      max-width: 1240px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    /* Auth Card View */
+    /* Auth Screen */
     .auth-container {
-      max-width: 440px;
-      margin: 3.5rem auto;
+      max-width: 420px;
+      margin: 3rem auto;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-top: 4px solid var(--primary);
-      border-radius: var(--radius-lg);
-      padding: 2.5rem;
-      box-shadow: var(--shadow-lg);
+      border-radius: var(--radius-md);
+      padding: 2.25rem 2rem;
+      box-shadow: var(--shadow-md);
     }
 
     .auth-tabs {
       display: flex;
-      margin-bottom: 2rem;
       border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
     }
 
     .auth-tab {
       flex: 1;
       text-align: center;
-      padding: 0.75rem 0;
-      cursor: pointer;
+      padding: 0.6rem;
+      font-weight: 500;
       color: var(--text-muted);
-      font-weight: 600;
+      cursor: pointer;
       border: none;
       background: none;
       border-bottom: 2px solid transparent;
-      transition: all 0.15s ease;
-      font-size: 0.95rem;
       font-family: inherit;
     }
 
     .auth-tab.active {
       color: var(--primary);
       border-bottom-color: var(--primary);
+      font-weight: 600;
     }
 
     .form-group {
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.1rem;
     }
 
     .form-label {
       display: block;
-      margin-bottom: 0.4rem;
-      font-size: 0.82rem;
+      margin-bottom: 0.35rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--text-main);
     }
 
     .form-control {
       width: 100%;
-      padding: 0.6rem 0.85rem;
-      background: #fbfcfa;
+      padding: 0.55rem 0.75rem;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      background: #ffffff;
       color: var(--text-main);
-      font-size: 0.9rem;
-      outline: none;
-      transition: all 0.15s ease;
       font-family: inherit;
+      transition: border-color 0.15s ease;
     }
 
     .form-control:focus {
+      outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-light);
-      background: #ffffff;
+      box-shadow: 0 0 0 2px rgba(3, 107, 63, 0.12);
     }
 
     textarea.form-control {
-      min-height: 85px;
       resize: vertical;
+      min-height: 80px;
     }
 
-    /* Quick Test Account Box */
     .test-accounts-box {
-      margin-top: 1.5rem;
-      padding: 1.1rem;
-      background: #f6f8f5;
-      border: 1px dashed var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 0.8rem;
-    }
-
-    .test-accounts-box p {
+      margin-top: 1.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px dashed var(--border);
+      font-size: 0.78rem;
       color: var(--text-muted);
-      margin-bottom: 0.5rem;
-      font-weight: 600;
     }
 
     .test-btn-group {
       display: flex;
       gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    /* Breadcrumbs */
-    .breadcrumb-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .breadcrumbs {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      flex-wrap: wrap;
-    }
-
-    .breadcrumbs a,
-    .breadcrumbs button.breadcrumb-link {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 500;
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-size: inherit;
-      font-family: inherit;
-      padding: 0;
-    }
-    .breadcrumbs a:hover,
-    .breadcrumbs button.breadcrumb-link:hover {
-      text-decoration: underline;
+      margin-top: 0.5rem;
     }
 
     /* Section Header */
@@ -546,65 +480,92 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.5rem;
-      gap: 1rem;
+      margin-bottom: 1.75rem;
       flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .section-title {
-      font-size: 1.55rem;
+      font-size: 1.5rem;
+      color: #034f31;
       font-weight: 700;
-      color: #073f29;
-      letter-spacing: -0.02em;
     }
 
     .section-subtitle {
       color: var(--text-muted);
       font-size: 0.88rem;
-      margin-top: 0.25rem;
+      margin-top: 0.2rem;
     }
 
-    /* ==========================================================================
-       1. DASHBOARD VIEW STYLES
-       ========================================================================== */
+    /* Breadcrumbs Navigation */
+    .breadcrumb-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .breadcrumb-link {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 500;
+      padding: 0;
+      font-size: inherit;
+      font-family: inherit;
+    }
+
+    .breadcrumb-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Dashboard Layout */
     .dashboard-hero {
-      background: linear-gradient(135deg, #ffffff 0%, #f0f7f3 100%);
+      background: #ffffff;
       border: 1px solid var(--border);
-      border-left: 5px solid var(--primary);
       border-radius: var(--radius-md);
       padding: 1.5rem 1.75rem;
       margin-bottom: 2rem;
-      box-shadow: var(--shadow-sm);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1.5rem;
-      flex-wrap: wrap;
+      box-shadow: var(--shadow-sm);
     }
 
     .hero-text h2 {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       color: #034f31;
+      font-weight: 700;
       margin-bottom: 0.35rem;
     }
 
     .hero-text p {
       color: var(--text-muted);
-      font-size: 0.9rem;
-      max-width: 650px;
+      font-size: 0.88rem;
     }
 
     .hero-actions {
       display: flex;
       gap: 0.75rem;
-      flex-wrap: wrap;
+      flex-shrink: 0;
     }
 
-    /* Stats Grid */
+    /* KPI Stats Grid (Drilldown Buttons) */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 1rem;
       margin-bottom: 2rem;
     }
@@ -613,149 +574,76 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 1.15rem 1.25rem;
-      box-shadow: var(--shadow-sm);
-      cursor: pointer;
-      transition: all 0.2s ease;
+      padding: 1.25rem;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
       text-align: left;
       font-family: inherit;
-      color: inherit;
     }
 
     .stat-card:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
-      border-color: rgba(3, 107, 63, 0.35);
-    }
-
-    .stat-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.6rem;
+      border-color: var(--primary);
     }
 
     .stat-label {
       font-size: 0.8rem;
-      font-weight: 600;
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-
-    .stat-icon {
-      font-size: 0.9rem;
-      opacity: 0.75;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
     }
 
     .stat-number {
-      font-size: 1.85rem;
+      font-size: 2rem;
       font-weight: 700;
       color: var(--text-main);
       line-height: 1.1;
     }
 
-    .stat-hint {
-      font-size: 0.74rem;
+    .stat-meta {
+      font-size: 0.75rem;
       color: var(--text-dim);
       margin-top: 0.4rem;
     }
 
-    /* Dashboard 2-column Content */
-    .dashboard-layout {
+    /* Dashboard Split Panels */
+    .dash-split-grid {
       display: grid;
-      grid-template-columns: 1fr 340px;
+      grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
-      align-items: start;
+      margin-bottom: 2rem;
     }
 
     .dash-panel {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 1.5rem;
+      padding: 1.25rem 1.5rem;
       box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
     }
 
     .dash-panel-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
       padding-bottom: 0.75rem;
       border-bottom: 1px solid var(--border-muted);
-      gap: 0.5rem;
     }
 
     .dash-panel-title {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 1.15rem;
-      font-weight: 700;
+      font-size: 1.05rem;
       color: #034f31;
-    }
-
-    /* Pipeline Panel (dashboard: how this app was built) */
-    .pipeline-steps {
-      display: flex;
-      align-items: stretch;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .pipeline-step {
-      flex: 1 1 200px;
-      background: #fbfcfb;
-      border: 1px solid var(--border-muted);
-      border-radius: var(--radius-sm);
-      padding: 1rem 1.1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-    }
-
-    .pipeline-step-num {
-      font-family: var(--mono, 'JetBrains Mono', monospace);
-      font-size: 0.75rem;
       font-weight: 700;
-      color: var(--primary);
-      background: var(--primary-light);
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .pipeline-step-title {
-      font-weight: 700;
-      font-size: 0.92rem;
-      color: var(--text-main);
-    }
-
-    .pipeline-step-desc {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .pipeline-arrow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-dim);
-      font-size: 1.2rem;
-      flex: 0 0 auto;
-    }
-
-    @media (max-width: 640px) {
-      .pipeline-arrow { display: none; }
-      .pipeline-steps { flex-direction: column; }
     }
 
     /* Recent Hypotheses Mini List */
@@ -763,100 +651,101 @@
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
+      flex: 1;
     }
 
     .mini-hypo-item {
-      padding: 1rem;
-      border: 1px solid var(--border-muted);
+      padding: 0.75rem;
       border-radius: var(--radius-sm);
-      background: #fdfdfc;
+      border: 1px solid var(--border);
+      background: #fafbf9;
       cursor: pointer;
       transition: all 0.15s ease;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.4rem;
+      text-align: left;
+      font-family: inherit;
     }
 
     .mini-hypo-item:hover {
       background: var(--surface-hover);
-      border-color: rgba(3, 107, 63, 0.35);
-      transform: translateX(2px);
+      border-color: var(--primary);
     }
 
-    .mini-hypo-top {
+    .mini-hypo-header {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
 
     .mini-hypo-title {
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 320px;
+    }
+
+    .mini-hypo-project {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Agentic Pipeline Info Step Banner */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .pipeline-step {
+      background: #f8faf8;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem;
+      font-size: 0.82rem;
+    }
+
+    .pipeline-step-num {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-light);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.35rem;
+    }
+
+    .pipeline-step-title {
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 0.2rem;
+    }
+
+    .pipeline-step-desc {
+      color: var(--text-muted);
+      font-size: 0.75rem;
       line-height: 1.35;
     }
 
-    .mini-hypo-meta {
+    .pipeline-arrow {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 0.76rem;
+      justify-content: center;
       color: var(--text-dim);
-      flex-wrap: wrap;
+      font-size: 1.1rem;
     }
 
-    .mini-hypo-rationale {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      background: #f6f8f5;
-      padding: 0.4rem 0.6rem;
-      border-radius: var(--radius-sm);
-      border-left: 2px solid var(--primary);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    /* Project Mini Card in Dashboard Sidebar */
-    .mini-project-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .mini-project-item {
-      padding: 0.9rem;
-      border: 1px solid var(--border-muted);
-      border-radius: var(--radius-sm);
-      background: #fdfdfc;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .mini-project-item:hover {
-      background: var(--surface-hover);
-      border-color: rgba(3, 107, 63, 0.35);
-    }
-
-    .mini-project-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--text-main);
-      margin-bottom: 0.25rem;
-    }
-
-    .mini-project-stats {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      display: flex;
-      gap: 0.75rem;
-    }
-
-    /* ==========================================================================
-       2. SUMMARY TABLE VIEW STYLES
-       ========================================================================== */
+    /* Summary Table View (Data Table) */
     .table-container {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -866,12 +755,12 @@
     }
 
     .table-toolbar {
-      padding: 1rem 1.25rem;
+      padding: 1.25rem 1.5rem;
       border-bottom: 1px solid var(--border);
-      background: #fbfbfa;
       display: flex;
       flex-direction: column;
-      gap: 0.85rem;
+      gap: 1rem;
+      background: #ffffff;
     }
 
     .toolbar-row-top {
@@ -885,58 +774,55 @@
     .search-box {
       position: relative;
       flex: 1;
-      min-width: 240px;
-      max-width: 400px;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 0.5rem 0.75rem 0.5rem 2rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: #ffffff;
-      font-size: 0.85rem;
-      color: var(--text-main);
-      outline: none;
-      transition: border-color 0.15s ease;
-      font-family: inherit;
-    }
-
-    .search-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px var(--primary-light);
+      min-width: 260px;
+      max-width: 450px;
     }
 
     .search-icon {
       position: absolute;
-      left: 0.65rem;
+      left: 0.75rem;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-dim);
-      pointer-events: none;
       font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.55rem 0.75rem 0.55rem 2.2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      background: #ffffff;
+      color: var(--text-main);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(3, 107, 63, 0.12);
     }
 
     .toolbar-filters {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
     }
 
     .filter-select {
-      padding: 0.45rem 0.75rem;
+      padding: 0.5rem 0.75rem;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      background: #ffffff;
       font-size: 0.82rem;
+      background: #ffffff;
       color: var(--text-main);
-      outline: none;
-      cursor: pointer;
       font-family: inherit;
     }
 
     .filter-select:focus {
+      outline: none;
       border-color: var(--primary);
     }
 
@@ -946,122 +832,148 @@
       justify-content: space-between;
       gap: 1rem;
       flex-wrap: wrap;
-      font-size: 0.8rem;
-      color: var(--text-muted);
     }
 
-    /* Table Element */
+    .status-pills {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      font-size: 0.78rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+      font-weight: 500;
+    }
+
+    .status-pill:hover {
+      background: var(--surface-hover);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .status-pill.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: rgba(3, 107, 63, 0.35);
+      font-weight: 600;
+    }
+
     .summary-table-wrapper {
       overflow-x: auto;
-      width: 100%;
-      -webkit-overflow-scrolling: touch;
     }
 
     .summary-table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 0.86rem;
+      font-size: 0.85rem;
     }
 
     .summary-table th {
-      background: #f6f8f6;
-      padding: 0.85rem 1rem;
-      font-weight: 600;
+      background: #f8faf8;
       color: #034f31;
-      border-bottom: 2px solid var(--border);
+      font-weight: 600;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
       white-space: nowrap;
-      user-select: none;
     }
 
     .summary-table td {
-      padding: 0.9rem 1rem;
+      padding: 0.95rem 1rem;
       border-bottom: 1px solid var(--border-muted);
-      color: var(--text-main);
       vertical-align: middle;
+      color: var(--text-main);
     }
 
     .summary-table tbody tr {
-      cursor: pointer;
       transition: background-color 0.12s ease;
+      cursor: pointer;
     }
 
     .summary-table tbody tr:hover {
       background-color: var(--surface-hover);
     }
 
-    .summary-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    .table-hypo-title {
+    .table-title-cell {
       font-weight: 600;
       color: var(--text-main);
-      font-size: 0.9rem;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      line-height: 1.35;
-    }
-
-    .table-project-tag {
-      font-weight: 500;
-      color: #034f31;
-    }
-
-    .table-track-tag {
-      color: var(--text-muted);
-      font-size: 0.8rem;
-    }
-
-    /* ==========================================================================
-       3. HYPOTHESIS DETAIL VIEW STYLES
-       ========================================================================== */
-    .detail-container {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 0.2rem;
+    }
+
+    .table-title-cell .title-text {
+      color: #034f31;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .table-title-cell .title-text:hover {
+      text-decoration: underline;
+    }
+
+    .table-title-cell .rationale-preview {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 480px;
+    }
+
+    /* 3-Tier Hypothesis Detail View */
+    .detail-container {
+      max-width: 960px;
+      margin: 0 auto;
     }
 
     .detail-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 2rem;
+      padding: 2rem 2.25rem;
       box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1.75rem;
     }
 
     .detail-header-group {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-muted);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
     }
 
     .detail-tags {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
       flex-wrap: wrap;
     }
 
     .detail-title {
-      font-size: 1.6rem;
+      font-size: 1.55rem;
+      color: #034f31;
       font-weight: 700;
-      color: #073f29;
-      line-height: 1.3;
+      line-height: 1.35;
     }
 
     .detail-meta-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
-      background: #fbfcfb;
+      background: #f8faf8;
       border: 1px solid var(--border-muted);
       border-radius: var(--radius-sm);
       padding: 1rem 1.25rem;
@@ -1074,11 +986,11 @@
     }
 
     .detail-meta-label {
-      font-size: 0.75rem;
-      font-weight: 600;
+      font-size: 0.72rem;
       color: var(--text-dim);
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
     }
 
     .detail-meta-value {
@@ -1088,32 +1000,37 @@
     }
 
     .detail-section-title {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
       color: #034f31;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.6rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
 
     .detail-desc-box {
-      font-size: 0.95rem;
-      line-height: 1.6;
+      font-size: 0.92rem;
       color: var(--text-main);
+      line-height: 1.6;
       background: #ffffff;
-      padding: 1.25rem;
-      border: 1px solid var(--border-muted);
+      border: 1px solid var(--border);
       border-radius: var(--radius-sm);
+      padding: 1.1rem 1.25rem;
       white-space: pre-wrap;
     }
 
     .detail-rationale-box {
-      background: #f6f9f7;
+      background: #f8faf8;
       border-left: 4px solid var(--primary);
       border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-      padding: 1.25rem 1.5rem;
+      padding: 1.1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border-top: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
 
     .detail-rationale-content {
@@ -1121,34 +1038,41 @@
       line-height: 1.6;
       color: var(--text-main);
       white-space: pre-wrap;
-      margin-top: 0.5rem;
     }
 
-    /* Timeline Section */
     .timeline-box {
-      border-left: 2px solid var(--border);
-      margin-left: 0.75rem;
-      padding-left: 1.25rem;
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
+      gap: 1rem;
       position: relative;
+      padding-left: 1.25rem;
+    }
+
+    .timeline-box::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: var(--border);
     }
 
     .timeline-item {
       position: relative;
+      font-size: 0.85rem;
     }
 
     .timeline-dot {
       position: absolute;
-      left: -1.72rem;
-      top: 0.2rem;
-      width: 12px;
-      height: 12px;
+      left: -1.25rem;
+      top: 4px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: var(--primary);
-      border: 2px solid #fff;
-      box-shadow: 0 0 0 2px var(--primary-light);
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 0 1px var(--primary);
     }
 
     .timeline-time {
@@ -1158,15 +1082,14 @@
     }
 
     .timeline-desc {
-      font-size: 0.85rem;
       color: var(--text-main);
     }
 
-    /* Projects Grid */
+    /* Projects Grid (View 4) */
     .projects-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.25rem;
+      gap: 1.5rem;
     }
 
     .project-card {
@@ -1174,64 +1097,53 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
       padding: 1.5rem;
-      cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 180px;
-      box-shadow: var(--shadow-sm);
-      text-align: left;
-      color: inherit;
-      font-family: inherit;
+      transition: all 0.15s ease;
+      cursor: pointer;
     }
 
     .project-card:hover {
-      border-color: rgba(3, 107, 63, 0.45);
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
-    }
-
-    .project-card-header {
-      margin-bottom: 0.75rem;
+      border-color: var(--primary);
     }
 
     .project-name {
       font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 0.35rem;
       color: #034f31;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
     }
 
     .project-desc {
-      color: var(--text-muted);
       font-size: 0.85rem;
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.45;
+      flex: 1;
     }
 
     .project-card-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 1rem;
       border-top: 1px solid var(--border-muted);
-      font-size: 0.75rem;
+      padding-top: 0.85rem;
+      font-size: 0.78rem;
       color: var(--text-dim);
     }
 
-    /* Workspace Layout */
+    /* Workspace View (View 5) */
     .workspace-layout {
       display: grid;
-      grid-template-columns: 260px 1fr;
+      grid-template-columns: 280px 1fr;
       gap: 1.5rem;
       align-items: start;
     }
 
-    /* Sidebar: Tracks */
     .tracks-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -1245,28 +1157,29 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-muted);
     }
 
     .tracks-title {
-      font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: #034f31;
+      font-weight: 700;
     }
 
     .track-item {
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.12s ease;
+      margin-bottom: 0.35rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.6rem 0.75rem;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      color: var(--text-muted);
-      font-weight: 500;
+      color: var(--text-main);
       font-size: 0.85rem;
-      margin-bottom: 0.25rem;
-      transition: all 0.15s ease;
-      background: none;
       border: 1px solid transparent;
+      background: transparent;
       width: 100%;
       text-align: left;
       font-family: inherit;
@@ -1274,25 +1187,16 @@
 
     .track-item:hover {
       background: var(--surface-hover);
-      color: var(--text-main);
+      color: var(--primary);
     }
 
     .track-item.active {
       background: var(--primary-light);
       color: var(--primary);
       font-weight: 600;
-      box-shadow: inset 3px 0 0 var(--primary);
+      border-color: rgba(3, 107, 63, 0.2);
     }
 
-    .track-count {
-      background: #f6f8f5;
-      font-size: 0.75rem;
-      padding: 1px 6px;
-      border-radius: 9999px;
-      color: var(--text-dim);
-    }
-
-    /* Main: Hypotheses */
     .hypotheses-panel {
       display: flex;
       flex-direction: column;
@@ -1300,70 +1204,32 @@
     }
 
     .filter-bar {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 0.75rem 1rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      flex-wrap: wrap;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .status-pills {
-      display: flex;
-      gap: 0.35rem;
-      flex-wrap: wrap;
-    }
-
-    .status-pill {
-      padding: 0.35rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      transition: all 0.15s ease;
-      font-family: inherit;
-    }
-
-    .status-pill:hover {
-      border-color: var(--text-dim);
-      color: var(--text-main);
-    }
-
-    .status-pill.active {
-      background: var(--text-main);
-      color: #fff;
-      border-color: var(--text-main);
-    }
-
-    .status-pill.active[data-status="draft"] { background: var(--status-draft); border-color: var(--status-draft); color: #fff; }
-    .status-pill.active[data-status="testing"] { background: var(--status-testing); border-color: var(--status-testing); color: #fff; }
-    .status-pill.active[data-status="supported"] { background: var(--status-supported); border-color: var(--status-supported); color: #fff; }
-    .status-pill.active[data-status="rejected"] { background: var(--status-rejected); border-color: var(--status-rejected); color: #fff; }
-    .status-pill.active[data-status="inconclusive"] { background: var(--status-inconclusive); border-color: var(--status-inconclusive); color: #fff; }
-
-    /* Hypothesis Cards */
-    .hypothesis-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      transition: all 0.15s ease;
+      padding: 0.85rem 1.25rem;
       box-shadow: var(--shadow-sm);
+      flex-wrap: wrap;
     }
 
-    .hypothesis-card:hover {
-      border-color: rgba(3, 107, 63, 0.45);
-      box-shadow: var(--shadow-md);
+    .hypo-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      transition: all 0.12s ease;
+    }
+
+    .hypo-card:hover {
+      border-color: #b0c4b8;
     }
 
     .hypo-header {
@@ -1373,30 +1239,24 @@
       gap: 1rem;
     }
 
-    .hypo-title-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      flex: 1;
-    }
-
     .hypo-title {
-      font-size: 1.08rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--text-main);
-      cursor: pointer;
+      line-height: 1.4;
     }
 
     .hypo-title-btn {
       background: none;
       border: none;
       padding: 0;
-      text-align: left;
-      font-size: 1.08rem;
+      font: inherit;
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--text-main);
+      text-align: left;
       cursor: pointer;
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.4;
     }
 
     .hypo-title:hover,
@@ -1476,6 +1336,285 @@
       justify-content: space-between;
     }
 
+    /* =========================================================================
+       PAPERS PIPELINE STYLING (Flat & Konkuk Heritage Theme)
+       ========================================================================= */
+    .papers-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .papers-subnav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .papers-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .papers-tab-btn:hover {
+      background: var(--surface-hover);
+      color: var(--primary);
+    }
+
+    .papers-tab-btn.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: rgba(3, 107, 63, 0.35);
+      font-weight: 600;
+    }
+
+    .paper-search-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .paper-search-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .paper-search-input-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .paper-search-input-wrapper .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .paper-search-input {
+      width: 100%;
+      padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+      font-size: 0.92rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      color: var(--text-main);
+      transition: border-color 0.15s ease;
+      font-family: inherit;
+    }
+
+    .paper-search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(3, 107, 63, 0.15);
+    }
+
+    .paper-tags-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .paper-tag-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      margin-right: 0.25rem;
+    }
+
+    .paper-tag-pill {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.65rem;
+      background: #f8faf8;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      font-family: inherit;
+    }
+
+    .paper-tag-pill:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: rgba(3, 107, 63, 0.3);
+    }
+
+    .paper-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      transition: all 0.15s ease;
+    }
+
+    .paper-card:hover {
+      border-color: #b0c4b8;
+    }
+
+    .paper-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .paper-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.4;
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    .paper-title a {
+      color: #034f31;
+      text-decoration: none;
+    }
+
+    .paper-title a:hover {
+      text-decoration: underline;
+    }
+
+    .paper-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      flex-wrap: wrap;
+    }
+
+    .paper-abstract {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      word-break: break-word;
+      background: #fafbfa;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0.9rem;
+    }
+
+    .paper-abstract-toggle {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-weight: 500;
+      margin-top: 0.35rem;
+      padding: 0;
+      font-family: inherit;
+    }
+
+    .paper-abstract-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .paper-save-box {
+      background: #f8faf8;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .paper-save-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .badge-fit-score {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-fit-score.high {
+      background: rgba(3, 107, 63, 0.12);
+      color: #036b3f;
+      border: 1px solid rgba(3, 107, 63, 0.3);
+    }
+
+    .badge-fit-score.mid {
+      background: rgba(36, 107, 120, 0.12);
+      color: #1f6270;
+      border: 1px solid rgba(36, 107, 120, 0.3);
+    }
+
+    .badge-fit-score.low {
+      background: rgba(113, 128, 120, 0.12);
+      color: #59675f;
+      border: 1px solid rgba(113, 128, 120, 0.24);
+    }
+
+    .paper-insight-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+    }
+
+    .paper-insight-textarea {
+      width: 100%;
+      min-height: 60px;
+      font-size: 0.85rem;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem;
+      font-family: inherit;
+      resize: vertical;
+      color: var(--text-main);
+    }
+
+    .paper-insight-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
     /* Modal Styling */
     .modal-overlay {
       position: fixed;
@@ -1503,16 +1642,16 @@
     .modal-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-top: 4px solid var(--primary);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
       width: 100%;
-      max-width: 540px;
+      max-width: 520px;
+      padding: 1.75rem;
+      position: relative;
+      transform: translateY(12px);
+      transition: transform 0.2s ease;
       max-height: 90vh;
       overflow-y: auto;
-      padding: 2.25rem;
-      box-shadow: var(--shadow-lg);
-      transform: translateY(10px);
-      transition: transform 0.2s ease;
     }
 
     .modal-overlay.open .modal-card {
@@ -1523,28 +1662,29 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-muted);
     }
 
     .modal-title {
       font-size: 1.2rem;
-      font-weight: 700;
       color: #034f31;
+      font-weight: 700;
     }
 
     .modal-close {
-      background: transparent;
+      background: none;
       border: none;
-      color: var(--text-muted);
       font-size: 1.5rem;
-      cursor: pointer;
       line-height: 1;
-      padding: 0.2rem 0.4rem;
-      border-radius: var(--radius-sm);
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 0.2rem;
     }
+
     .modal-close:hover {
       color: var(--text-main);
-      background: var(--surface-hover);
     }
 
     .modal-footer {
@@ -1552,157 +1692,121 @@
       align-items: center;
       justify-content: flex-end;
       gap: 0.75rem;
-      margin-top: 1.75rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-muted);
     }
 
-    /* Toast */
+    /* Toast Notification */
     #toast-container {
       position: fixed;
       bottom: 2rem;
       right: 2rem;
+      z-index: 1000;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-      z-index: 200;
+      gap: 0.5rem;
+      pointer-events: none;
     }
 
     .toast {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      color: var(--text-main);
+      background: #183129;
+      color: #ffffff;
       padding: 0.75rem 1.25rem;
       border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-md);
+      box-shadow: var(--shadow-lg);
       font-size: 0.85rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      animation: slideIn 0.2s ease forwards;
+      transition: all 0.25s ease;
+      pointer-events: auto;
+      border-left: 3px solid var(--primary);
     }
 
-    .toast.success { border-left: 4px solid var(--status-supported); }
-    .toast.error { border-left: 4px solid var(--status-rejected); }
+    .toast.error {
+      border-left-color: #a43c35;
+    }
 
-    @keyframes slideIn {
-      from { transform: translateX(30px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+    .toast.success {
+      border-left-color: #036b3f;
+    }
+
+    /* Utilities */
+    .hidden {
+      display: none !important;
     }
 
     .empty-state {
       text-align: center;
       padding: 3rem 1.5rem;
+      color: var(--text-muted);
       background: var(--surface);
       border: 1px dashed var(--border);
       border-radius: var(--radius-md);
-      color: var(--text-muted);
     }
 
-    .empty-state h3 {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      color: #034f31;
-      font-size: 1.15rem;
-      margin-bottom: 0.35rem;
+    .spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #ffffff;
+      animation: spin 0.6s linear infinite;
     }
 
-    .empty-state p {
-      font-size: 0.85rem;
+    .spinner-dark {
+      border: 2px solid rgba(3, 107, 63, 0.2);
+      border-top-color: var(--primary);
     }
 
-    .hidden {
-      display: none !important;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
-    /* ==========================================================================
-       RESPONSIVE BREAKPOINTS (960px, 860px, 768px, 640px, 480px)
-       ========================================================================== */
-    @media (max-width: 960px) {
-      .dashboard-layout {
+    /* Responsive Breakpoints */
+    @media (max-width: 900px) {
+      .dash-split-grid {
         grid-template-columns: 1fr;
       }
-    }
-
-    @media (max-width: 860px) {
       .workspace-layout {
         grid-template-columns: 1fr;
       }
     }
 
-    /* 768px: Mobile Header Hamburger Mode */
     @media (max-width: 768px) {
       header {
         padding: 0 1rem;
-        height: 60px;
       }
-
-      .nav-menu,
-      .user-profile {
+      main {
+        padding: 1.25rem 1rem;
+      }
+      #nav-main-menu {
         display: none !important;
       }
-
+      #nav-user-section {
+        display: none !important;
+      }
       .mobile-menu-btn {
-        display: flex;
+        display: flex !important;
       }
-
-      .brand {
-        font-size: 1.1rem;
-      }
-
-      .brand-badge {
-        display: none;
-      }
-    }
-
-    /* 640px: Mobile Compact Layout */
-    @media (max-width: 640px) {
-      main {
-        padding: 1.25rem 1rem 2.5rem;
-      }
-
-      .auth-container {
-        margin: 1.5rem auto;
-        padding: 1.5rem;
-      }
-
       .dashboard-hero {
+        flex-direction: column;
+        align-items: flex-start;
         padding: 1.25rem;
-        gap: 1rem;
       }
-
-      .hero-text h2 {
-        font-size: 1.2rem;
-      }
-
       .hero-actions {
         width: 100%;
         flex-direction: column;
       }
-
       .hero-actions .btn {
         width: 100%;
       }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-      }
-
-      .stat-card {
-        padding: 0.85rem 1rem;
-      }
-
-      .stat-number {
-        font-size: 1.5rem;
-      }
-
-      .section-title {
-        font-size: 1.3rem;
-      }
-
       .table-toolbar {
         padding: 0.85rem;
         gap: 0.75rem;
       }
-
       .toolbar-row-top,
       .toolbar-filters {
         flex-direction: column;
@@ -1710,82 +1814,65 @@
         width: 100%;
         gap: 0.5rem;
       }
-
       .search-box {
         max-width: 100%;
         min-width: 100%;
       }
-
       .filter-select {
         width: 100%;
       }
-
       .toolbar-row-bottom {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.75rem;
       }
-
       .status-pills {
         gap: 0.3rem;
       }
-
       .status-pill {
         padding: 0.3rem 0.55rem;
         font-size: 0.72rem;
       }
-
       .summary-table th,
       .summary-table td {
         padding: 0.75rem 0.65rem;
         font-size: 0.8rem;
       }
-
       .detail-card {
         padding: 1.25rem;
       }
-
       .detail-title {
         font-size: 1.3rem;
       }
-
       .detail-meta-grid {
         grid-template-columns: 1fr;
       }
-
       .projects-grid {
         grid-template-columns: 1fr;
       }
-
       .modal-card {
         padding: 1.5rem;
         width: 100%;
       }
-
       .modal-footer {
         flex-direction: column-reverse;
         gap: 0.5rem;
         width: 100%;
       }
-
       .modal-footer .btn {
         width: 100%;
       }
-
       .filter-bar {
         flex-direction: column;
         align-items: stretch;
       }
-
       .filter-bar .btn {
         width: 100%;
       }
-
       .hypo-header {
         flex-direction: column;
         gap: 0.75rem;
       }
-
       #toast-container {
         left: 1rem;
         right: 1rem;
@@ -1826,6 +1913,9 @@
         </button>
         <button type="button" id="nav-tab-projects" class="nav-link" onclick="navigateToProjects()">
           <span>프로젝트 목록</span>
+        </button>
+        <button type="button" id="nav-tab-papers" class="nav-link" onclick="navigateToPapers()">
+          <span>논문 조사</span>
         </button>
       </nav>
     </div>
@@ -1870,6 +1960,9 @@
         </button>
         <button type="button" id="mobile-tab-projects" class="mobile-nav-link" onclick="navigateToProjects(); closeMobileDrawer();">
           <span>📁 프로젝트 목록</span>
+        </button>
+        <button type="button" id="mobile-tab-papers" class="mobile-nav-link" onclick="navigateToPapers(); closeMobileDrawer();">
+          <span>📚 논문 조사 파이프라인</span>
         </button>
       </nav>
     </div>
@@ -1940,113 +2033,71 @@
           </p>
         </div>
         <div class="hero-actions">
-          <button type="button" class="btn btn-outline" onclick="navigateToProjects()">📁 프로젝트 목록 보기</button>
-          <button type="button" class="btn btn-primary" onclick="navigateToSummaryTable()">📊 가설 요약 테이블 보기</button>
+          <button type="button" class="btn btn-outline" onclick="navigateToProjects()">📁 프로젝트 목록</button>
+          <button type="button" class="btn btn-outline" onclick="navigateToPapers()">📚 논문 조사</button>
+          <button type="button" class="btn btn-primary" onclick="navigateToSummaryTable()">📊 가설 요약 테이블</button>
         </div>
       </div>
 
       <!-- Statistics KPI Cards (Hypotheses by Status & Tracks) -->
       <div class="stats-grid" role="region" aria-label="연구 상태 지표 카드">
         <button type="button" class="stat-card" style="--card-accent: #036b3f;" onclick="navigateToSummaryTable('all')" aria-label="전체 가설 요약 테이블로 이동">
-          <div class="stat-header">
-            <span class="stat-label">전체 가설</span>
-            <span class="stat-icon" aria-hidden="true">📑</span>
-          </div>
-          <div class="stat-number" id="dash-stat-total">0</div>
-          <div class="stat-hint">전체 등록 가설 명제</div>
+          <span class="stat-label">전체 연구 가설 <span>Total</span></span>
+          <span class="stat-number" id="dash-stat-total">0</span>
+          <span class="stat-meta">등록된 가설 전체 명제</span>
         </button>
 
-        <button type="button" class="stat-card" style="--card-accent: #246b78;" onclick="navigateToProjects()" aria-label="연구 트랙 및 프로젝트 목록으로 이동">
-          <div class="stat-header">
-            <span class="stat-label">연구 트랙</span>
-            <span class="stat-icon" aria-hidden="true">🛤️</span>
-          </div>
-          <div class="stat-number" id="dash-stat-tracks">0</div>
-          <div class="stat-hint">참여 프로젝트 트랙 수</div>
+        <button type="button" class="stat-card" style="--card-accent: #246b78;" onclick="navigateToSummaryTable('testing')" aria-label="검증중 가설 필터링">
+          <span class="stat-label">검증 진행중 <span>Testing</span></span>
+          <span class="stat-number" id="dash-stat-testing" style="color: #1f6270;">0</span>
+          <span class="stat-meta">실험 및 벤치마크 수행 중</span>
         </button>
 
-        <button type="button" class="stat-card" style="--card-accent: var(--status-draft);" onclick="navigateToSummaryTable('draft')" aria-label="초안 가설 필터링하여 보기">
-          <div class="stat-header">
-            <span class="stat-label">초안 (Draft)</span>
-            <span class="stat-icon" aria-hidden="true">📝</span>
-          </div>
-          <div class="stat-number" id="dash-stat-draft" style="color: #59675f;">0</div>
-          <div class="stat-hint">수립 중인 초기 가설</div>
+        <button type="button" class="stat-card" style="--card-accent: #036b3f;" onclick="navigateToSummaryTable('supported')" aria-label="채택된 가설 필터링">
+          <span class="stat-label">가설 채택 <span>Supported</span></span>
+          <span class="stat-number" id="dash-stat-supported" style="color: #036b3f;">0</span>
+          <span class="stat-meta">실험적 통계 유의성 입증</span>
         </button>
 
-        <button type="button" class="stat-card" style="--card-accent: var(--status-testing);" onclick="navigateToSummaryTable('testing')" aria-label="검증중 가설 필터링하여 보기">
-          <div class="stat-header">
-            <span class="stat-label">검증중 (Testing)</span>
-            <span class="stat-icon" aria-hidden="true">🔬</span>
-          </div>
-          <div class="stat-number" id="dash-stat-testing" style="color: #1f6270;">0</div>
-          <div class="stat-hint">실험 및 데이터 검증 진행</div>
+        <button type="button" class="stat-card" style="--card-accent: #a43c35;" onclick="navigateToSummaryTable('rejected')" aria-label="기각된 가설 필터링">
+          <span class="stat-label">가설 기각 <span>Rejected</span></span>
+          <span class="stat-number" id="dash-stat-rejected" style="color: #9b3933;">0</span>
+          <span class="stat-meta">반례 관측 및 가설 반증</span>
         </button>
 
-        <button type="button" class="stat-card" style="--card-accent: var(--status-supported);" onclick="navigateToSummaryTable('supported')" aria-label="채택 가설 필터링하여 보기">
-          <div class="stat-header">
-            <span class="stat-label">채택 (Supported)</span>
-            <span class="stat-icon" aria-hidden="true">✅</span>
-          </div>
-          <div class="stat-number" id="dash-stat-supported" style="color: #036b3f;">0</div>
-          <div class="stat-hint">통계적 유의성 확인 완료</div>
-        </button>
-
-        <button type="button" class="stat-card" style="--card-accent: var(--status-rejected);" onclick="navigateToSummaryTable('rejected')" aria-label="기각 가설 필터링하여 보기">
-          <div class="stat-header">
-            <span class="stat-label">기각 (Rejected)</span>
-            <span class="stat-icon" aria-hidden="true">❌</span>
-          </div>
-          <div class="stat-number" id="dash-stat-rejected" style="color: #9b3933;">0</div>
-          <div class="stat-hint">반례 관측 및 가설 기각</div>
-        </button>
-
-        <button type="button" class="stat-card" style="--card-accent: var(--status-inconclusive);" onclick="navigateToSummaryTable('inconclusive')" aria-label="유보 가설 필터링하여 보기">
-          <div class="stat-header">
-            <span class="stat-label">유보 (Inconclusive)</span>
-            <span class="stat-icon" aria-hidden="true">⏳</span>
-          </div>
-          <div class="stat-number" id="dash-stat-inconclusive" style="color: #8b5e15;">0</div>
-          <div class="stat-hint">추가 데이터 확보 대기</div>
+        <button type="button" class="stat-card" style="--card-accent: #9a6818;" onclick="navigateToSummaryTable('inconclusive')" aria-label="판정 유보 가설 필터링">
+          <span class="stat-label">판정 유보 <span>Inconclusive</span></span>
+          <span class="stat-number" id="dash-stat-inconclusive" style="color: #8b5e15;">0</span>
+          <span class="stat-meta">추가 데이터 확보 필요</span>
         </button>
       </div>
 
-      <!-- Dashboard 2-column Body -->
-      <div class="dashboard-layout">
-        <!-- Left Column: Recent Hypotheses Mini-List -->
-        <section class="dash-panel" aria-label="최근 판정 및 업데이트된 가설">
+      <!-- Split View Panels: Recent Verifications & Track Distribution -->
+      <div class="dash-split-grid">
+        <!-- Panel 1: Recently Updated Hypotheses with Rationale Preview -->
+        <section class="dash-panel" aria-label="최근 갱신 가설 목록">
           <div class="dash-panel-header">
-            <div>
-              <h3 class="dash-panel-title">최근 판정 및 업데이트된 가설</h3>
-              <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem;">
-                가장 최근 상태 또는 판정 근거(Rationale)가 갱신된 가설
-              </p>
-            </div>
-            <button type="button" class="btn btn-subtle btn-sm" onclick="navigateToSummaryTable()">전체 보기 →</button>
+            <h3 class="dash-panel-title">최근 판정 갱신 가설</h3>
+            <button type="button" class="btn btn-subtle btn-sm" onclick="navigateToSummaryTable()">전체보기 →</button>
           </div>
 
-          <div id="dash-recent-hypotheses" class="mini-hypo-list">
+          <div id="dash-recent-hypo-list" class="mini-hypo-list">
             <!-- Rendered via JS -->
           </div>
         </section>
 
-        <!-- Right Column: Projects Quick Panel -->
-        <section class="dash-panel" aria-label="내 연구 프로젝트">
+        <!-- Panel 2: Projects & Tracks Overview -->
+        <section class="dash-panel" aria-label="연구 프로젝트 현황">
           <div class="dash-panel-header">
-            <div>
-              <h3 class="dash-panel-title">내 연구 프로젝트</h3>
-              <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem;">
-                소속 워크스페이스
-              </p>
-            </div>
-            <button type="button" class="btn btn-outline btn-sm" onclick="openCreateProjectModal(event)">+ 생성</button>
+            <h3 class="dash-panel-title">내 연구 프로젝트 요약</h3>
+            <button type="button" class="btn btn-subtle btn-sm" onclick="openCreateProjectModal(event)">+ 새 프로젝트</button>
           </div>
 
-          <div id="dash-projects-list" class="mini-project-list">
+          <div id="dash-projects-summary" style="display: flex; flex-direction: column; gap: 0.75rem; flex: 1;">
             <!-- Rendered via JS -->
           </div>
 
-          <div style="margin-top: 1.25rem; text-align: center;">
+          <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-muted);">
             <button type="button" class="btn btn-outline btn-sm" style="width: 100%;" onclick="navigateToProjects()">
               프로젝트 전체 목록 보기 →
             </button>
@@ -2054,7 +2105,7 @@
         </section>
       </div>
 
-      <!-- Pipeline Panel: how this prototype itself was built (agentic pipeline demo) -->
+      <!-- Pipeline Panel: Agentic Pipeline Demo -->
       <section class="dash-panel" style="margin-top: 1.5rem;" aria-label="이 앱의 개발 파이프라인">
         <div class="dash-panel-header">
           <div>
@@ -2200,6 +2251,9 @@
           <button type="button" class="btn btn-outline btn-sm" onclick="handleDetailGoToWorkspace()">
             🔬 프로젝트 워크스페이스 열기
           </button>
+          <button type="button" class="btn btn-subtle btn-sm" onclick="handleDetailSearchRelatedPapers()">
+            📚 관련 논문 검색하기
+          </button>
           <button type="button" class="btn btn-primary btn-sm" onclick="openUpdateStatusModalFromDetail(event)">
             ⚖️ 판정 / 상태 변경
           </button>
@@ -2272,6 +2326,21 @@
             </div>
           </div>
 
+          <!-- Linked Saved Papers Section -->
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+              <h3 class="detail-section-title" style="margin-bottom: 0;">
+                <span>📚 연계된 논문 및 문헌 증거 (<span id="detail-linked-papers-count">0</span>건)</span>
+              </h3>
+              <button type="button" class="btn btn-subtle btn-sm" onclick="handleDetailSearchRelatedPapers()">
+                + 이 가설로 논문 검색하기
+              </button>
+            </div>
+            <div id="detail-linked-papers-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
           <!-- Status & History Timeline Section -->
           <div>
             <h3 class="detail-section-title">
@@ -2324,9 +2393,14 @@
           <span aria-hidden="true">/</span>
           <strong id="ws-project-name" style="color: var(--text-main);">프로젝트명</strong>
         </div>
-        <button type="button" class="btn btn-outline btn-sm" onclick="navigateToSummaryTable()">
-          📊 가설 요약 테이블 보기
-        </button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="navigateToPapersWithProject(currentProject?.id)">
+            📚 이 프로젝트 논문함
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="navigateToSummaryTable()">
+            📊 가설 요약 테이블
+          </button>
+        </div>
       </nav>
 
       <div style="background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--primary); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
@@ -2365,6 +2439,129 @@
             <!-- Rendered via JS -->
           </div>
         </section>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         6. PAPERS PIPELINE VIEW (SEMANTIC SCHOLAR SEARCH & SAVED PAPERS LIBRARY)
+         ====================================================================== -->
+    <div id="papers-view" class="hidden">
+      <nav class="breadcrumb-bar" aria-label="논문 조사 위치 경로">
+        <div class="breadcrumbs">
+          <button type="button" class="breadcrumb-link" onclick="navigateToDashboard()">← 대시보드</button>
+          <span aria-hidden="true">/</span>
+          <strong style="color: var(--text-main);">논문 조사 파이프라인 (Papers Pipeline)</strong>
+        </div>
+      </nav>
+
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">학술 논문 조사 및 문헌 분석</h1>
+          <p class="section-subtitle">
+            Semantic Scholar 실시간 학술 DB 검색, 연구 가설 매칭 적합도(Fit Score) 분석 및 인사이트 보관함
+          </p>
+        </div>
+      </div>
+
+      <div class="papers-container">
+        <!-- Sub Navigation Tabs -->
+        <div class="papers-subnav" role="tablist" aria-label="논문 조사 세부 탭">
+          <button type="button" id="subtab-papers-search" class="papers-tab-btn active" onclick="switchPapersSubTab('search')" role="tab" aria-selected="true">
+            <span>🔍 Semantic Scholar 논문 검색</span>
+          </button>
+          <button type="button" id="subtab-papers-saved" class="papers-tab-btn" onclick="switchPapersSubTab('saved')" role="tab" aria-selected="false">
+            <span>📑 저장된 논문 보관함 (<span id="saved-papers-count-badge">0</span>건)</span>
+          </button>
+        </div>
+
+        <!-- ================================================================
+             6-A. PAPERS SEARCH SECTION
+             ================================================================ -->
+        <div id="papers-search-section">
+          <!-- Search Panel -->
+          <div class="paper-search-panel">
+            <form onsubmit="handlePaperSearchSubmit(event)">
+              <div class="paper-search-row">
+                <div class="paper-search-input-wrapper">
+                  <span class="search-icon" aria-hidden="true">🔍</span>
+                  <input type="text" id="paper-search-input" class="paper-search-input" placeholder="논문 키워드, 제목, 저자, 토픽 검색 (예: Graph Neural Networks, Transformer, Drug Discovery...)" required>
+                </div>
+                <button type="submit" id="btn-paper-search" class="btn btn-primary">
+                  <span>검색</span>
+                </button>
+              </div>
+            </form>
+
+            <div class="paper-tags-row">
+              <span class="paper-tag-label">추천 키워드:</span>
+              <button type="button" class="paper-tag-pill" onclick="quickSearchPaper('Graph Neural Networks')">Graph Neural Networks</button>
+              <button type="button" class="paper-tag-pill" onclick="quickSearchPaper('Knowledge Graph LLM')">Knowledge Graph LLM</button>
+              <button type="button" class="paper-tag-pill" onclick="quickSearchPaper('Molecular Property Prediction')">Molecular Property Prediction</button>
+              <button type="button" class="paper-tag-pill" onclick="quickSearchPaper('Transformer Attention Mechanism')">Attention Mechanism</button>
+              <button type="button" class="paper-tag-pill" onclick="quickSearchPaper('Equivariant Neural Networks')">Equivariant Neural Networks</button>
+            </div>
+          </div>
+
+          <!-- Search Status & Results Container -->
+          <div id="paper-search-status" style="margin: 1rem 0;"></div>
+          <div id="paper-search-results-list" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Rendered via JS -->
+            <div class="empty-state">
+              <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📚</div>
+              <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.4rem;">Semantic Scholar 학술 검색</h3>
+              <p style="font-size: 0.88rem; color: var(--text-muted); max-width: 500px; margin: 0 auto;">
+                관심 있는 연구 주제나 가설과 관련된 키워드를 입력하세요. 검색된 논문을 특정 연구 프로젝트 및 가설과 연결하여 적합도(Fit Score)를 계산하고 저장할 수 있습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             6-B. SAVED PAPERS LIBRARY SECTION
+             ================================================================ -->
+        <div id="papers-saved-section" class="hidden">
+          <!-- Saved Papers Toolbar -->
+          <div class="table-toolbar" style="border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 1rem;">
+            <div class="toolbar-row-top">
+              <div class="search-box">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="text" id="saved-papers-search" class="search-input" placeholder="저장된 논문 제목, 저자, 메모 검색..." oninput="handleSavedPapersSearch(event)">
+              </div>
+
+              <div class="toolbar-filters">
+                <select id="saved-papers-project-filter" class="filter-select" onchange="handleSavedPapersProjectFilter(event)">
+                  <option value="all">모든 프로젝트</option>
+                </select>
+
+                <select id="saved-papers-hypo-filter" class="filter-select" onchange="handleSavedPapersHypoFilter(event)">
+                  <option value="all">모든 가설 연계</option>
+                </select>
+
+                <select id="saved-papers-sort" class="filter-select" onchange="handleSavedPapersSort(event)">
+                  <option value="created_desc">저장일 (최신순)</option>
+                  <option value="fit_desc">적합도 점수 (높은순)</option>
+                  <option value="year_desc">출판 연도 (최신순)</option>
+                  <option value="title_asc">논문명 (가나다순)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="toolbar-row-bottom">
+              <div id="saved-papers-count-text" style="font-weight: 500; font-size: 0.85rem; color: var(--text-main);">
+                저장된 논문 총 0건
+              </div>
+              <button type="button" class="btn btn-subtle btn-sm" onclick="switchPapersSubTab('search')">
+                + 새 논문 검색 및 저장
+              </button>
+            </div>
+          </div>
+
+          <!-- Saved Papers List Container -->
+          <div id="saved-papers-list" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -2520,12 +2717,14 @@
     // Global State
     let currentUser = null;
     let currentAuthMode = 'login'; // 'login' | 'signup'
-    let currentView = 'auth'; // 'dashboard' | 'summary-table' | 'hypothesis-detail' | 'projects' | 'workspace' | 'auth'
+    let currentView = 'auth'; // 'dashboard' | 'summary-table' | 'hypothesis-detail' | 'projects' | 'workspace' | 'papers' | 'auth'
     let previousView = 'dashboard';
+    let papersSubTab = 'search'; // 'search' | 'saved'
     
     let allProjects = [];
     let allTracks = [];
     let allHypotheses = [];
+    let allPapers = []; // Saved papers in Supabase
     let allProfiles = {}; // Map of user_id -> profile object
 
     let currentProject = null; // Active project in workspace view
@@ -2544,6 +2743,17 @@
       searchQuery: '',
       sortBy: 'updated_desc'
     };
+
+    // Saved Papers Filter State
+    let savedPapersFilterState = {
+      projectId: 'all',
+      hypoId: 'all',
+      searchQuery: '',
+      sortBy: 'created_desc'
+    };
+
+    // Paper Search Cache & Results State
+    let latestSearchResults = [];
 
     // Status Names & Classes Mapping
     const STATUS_MAP = {
@@ -2607,7 +2817,7 @@
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = `toast ${type}`;
-      toast.innerHTML = `<span>${type === 'error' ? '❌' : '✅'}</span> <span>${escapeHtml(message)}</span>`;
+      toast.innerHTML = `<span>${type === 'error' ? '❌' : (type === 'success' ? '✅' : 'ℹ️')}</span> <span>${escapeHtml(message)}</span>`;
       container.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = '0';
@@ -2626,7 +2836,6 @@
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
 
-      // Auto focus first interactive input or button
       setTimeout(() => {
         const firstInput = modal.querySelector('input:not([type="hidden"]), select, textarea');
         if (firstInput) {
@@ -2648,91 +2857,105 @@
       if (activeModalTrigger && typeof activeModalTrigger.focus === 'function') {
         activeModalTrigger.focus();
       }
-      activeModalTrigger = null;
     }
 
-    function handleOverlayClick(e, modalId) {
-      if (e.target.id === modalId) {
-        closeModal(modalId);
+    function handleOverlayClick(e, id) {
+      if (e.target === e.currentTarget) {
+        closeModal(id);
       }
     }
 
-    // =========================================================================
-    // Mobile Drawer Navigation Management
-    // =========================================================================
+    // Mobile Navigation Drawer Toggle
     function toggleMobileDrawer() {
       const drawer = document.getElementById('mobile-drawer');
       const overlay = document.getElementById('mobile-drawer-overlay');
-      const toggleBtn = document.getElementById('mobile-menu-btn');
-      const isOpen = !drawer.classList.contains('hidden');
-
+      const btn = document.getElementById('mobile-menu-btn');
+      
+      const isOpen = drawer.classList.contains('open');
       if (isOpen) {
         closeMobileDrawer();
       } else {
         drawer.classList.remove('hidden');
         overlay.classList.remove('hidden');
-        toggleBtn.setAttribute('aria-expanded', 'true');
-        drawer.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('drawer-open');
-
-        const firstLink = drawer.querySelector('button');
-        if (firstLink) setTimeout(() => firstLink.focus(), 50);
+        setTimeout(() => {
+          drawer.classList.add('open');
+          document.body.classList.add('drawer-open');
+          btn.setAttribute('aria-expanded', 'true');
+          drawer.setAttribute('aria-hidden', 'false');
+        }, 10);
       }
     }
 
     function closeMobileDrawer() {
       const drawer = document.getElementById('mobile-drawer');
       const overlay = document.getElementById('mobile-drawer-overlay');
-      const toggleBtn = document.getElementById('mobile-menu-btn');
+      const btn = document.getElementById('mobile-menu-btn');
+      
       if (!drawer) return;
-
-      drawer.classList.add('hidden');
-      overlay.classList.add('hidden');
-      toggleBtn.setAttribute('aria-expanded', 'false');
-      drawer.setAttribute('aria-hidden', 'true');
+      drawer.classList.remove('open');
       document.body.classList.remove('drawer-open');
+      btn?.setAttribute('aria-expanded', 'false');
+      drawer.setAttribute('aria-hidden', 'true');
+      
+      setTimeout(() => {
+        drawer.classList.add('hidden');
+        overlay?.classList.add('hidden');
+      }, 250);
     }
 
-    // Auth Tab Switch
+    // =========================================================================
+    // Authentication Handlers
+    // =========================================================================
     function switchAuthTab(mode) {
       currentAuthMode = mode;
       document.getElementById('tab-login').classList.toggle('active', mode === 'login');
       document.getElementById('tab-login').setAttribute('aria-selected', mode === 'login');
       document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
       document.getElementById('tab-signup').setAttribute('aria-selected', mode === 'signup');
-      document.getElementById('signup-name-group').classList.toggle('hidden', mode === 'login');
-      document.getElementById('auth-submit-btn').textContent = mode === 'login' ? '로그인' : '회원가입';
+
+      const nameGroup = document.getElementById('signup-name-group');
+      const submitBtn = document.getElementById('auth-submit-btn');
+
+      if (mode === 'signup') {
+        nameGroup.classList.remove('hidden');
+        submitBtn.textContent = '회원가입';
+      } else {
+        nameGroup.classList.add('hidden');
+        submitBtn.textContent = '로그인';
+      }
     }
 
     function fillTestAccount(email, password) {
+      switchAuthTab('login');
       document.getElementById('auth-email').value = email;
       document.getElementById('auth-password').value = password;
-      switchAuthTab('login');
+      showToast('테스트 계정 정보가 입력되었습니다. 로그인 버튼을 누르세요.');
     }
 
-    // Auth Submission
     async function handleAuthSubmit(e) {
       e.preventDefault();
       const email = document.getElementById('auth-email').value.trim();
-      const password = document.getElementById('auth-password').value.trim();
-      const displayName = document.getElementById('auth-name').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const submitBtn = document.getElementById('auth-submit-btn');
 
-      const btn = document.getElementById('auth-submit-btn');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 처리 중...';
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 처리 중...';
 
       try {
         if (currentAuthMode === 'signup') {
+          const name = document.getElementById('auth-name').value.trim() || email.split('@')[0];
           const { data, error } = await supabaseClient.auth.signUp({
             email,
             password,
             options: {
-              data: { display_name: displayName || email.split('@')[0] }
+              data: { display_name: name }
             }
           });
           if (error) throw error;
-          showToast('회원가입이 완료되었습니다.', 'success');
+          showToast('회원가입이 완료되었습니다. 자동으로 로그인됩니다.', 'success');
+          if (data.session) {
+            await setUserSession(data.session.user);
+          }
         } else {
           const { data, error } = await supabaseClient.auth.signInWithPassword({
             email,
@@ -2740,12 +2963,13 @@
           });
           if (error) throw error;
           showToast('성공적으로 로그인되었습니다.', 'success');
+          await setUserSession(data.user);
         }
       } catch (err) {
-        showToast(err.message || '인증에 실패했습니다.', 'error');
+        showToast(err.message || '인증 처리 중 오류가 발생했습니다.', 'error');
       } finally {
-        btn.disabled = false;
-        btn.textContent = currentAuthMode === 'login' ? '로그인' : '회원가입';
+        submitBtn.disabled = false;
+        submitBtn.textContent = currentAuthMode === 'signup' ? '회원가입' : '로그인';
       }
     }
 
@@ -2762,6 +2986,7 @@
       document.getElementById('hypothesis-detail-view').classList.add('hidden');
       document.getElementById('projects-view').classList.add('hidden');
       document.getElementById('workspace-view').classList.add('hidden');
+      document.getElementById('papers-view').classList.add('hidden');
       
       document.getElementById('nav-main-menu').classList.add('hidden');
       document.getElementById('nav-user-section').classList.add('hidden');
@@ -2791,20 +3016,26 @@
     // =========================================================================
     async function loadAllAppData() {
       try {
-        const [projRes, trackRes, hypoRes, profRes] = await Promise.all([
+        const [projRes, trackRes, hypoRes, papersRes, profRes] = await Promise.all([
           supabaseClient.from('projects').select('*').order('created_at', { ascending: false }),
           supabaseClient.from('tracks').select('*').order('created_at', { ascending: true }),
           supabaseClient.from('hypotheses').select('*, projects(name), tracks(name)').order('updated_at', { ascending: false }),
+          supabaseClient.from('papers').select('*, projects(name), hypotheses(title)').order('created_at', { ascending: false }),
           supabaseClient.from('profiles').select('*')
         ]);
 
         if (projRes.error) throw projRes.error;
         if (trackRes.error) throw trackRes.error;
         if (hypoRes.error) throw hypoRes.error;
+        // papers table query error tolerance
+        if (papersRes.error) {
+          console.warn('Papers table select notice:', papersRes.error.message);
+        }
 
         allProjects = projRes.data || [];
         allTracks = trackRes.data || [];
         allHypotheses = hypoRes.data || [];
+        allPapers = papersRes.data || [];
 
         if (profRes.data) {
           allProfiles = {};
@@ -2812,8 +3043,17 @@
             allProfiles[p.id] = p;
           });
         }
+
+        updatePapersBadgeCount();
       } catch (err) {
         showToast('데이터 조회 중 오류 발생: ' + err.message, 'error');
+      }
+    }
+
+    function updatePapersBadgeCount() {
+      const badge = document.getElementById('saved-papers-count-badge');
+      if (badge) {
+        badge.textContent = allPapers.length;
       }
     }
 
@@ -2834,10 +3074,12 @@
       document.getElementById('nav-tab-dashboard')?.classList.toggle('active', activeTab === 'dashboard');
       document.getElementById('nav-tab-summary')?.classList.toggle('active', activeTab === 'summary');
       document.getElementById('nav-tab-projects')?.classList.toggle('active', activeTab === 'projects');
+      document.getElementById('nav-tab-papers')?.classList.toggle('active', activeTab === 'papers');
 
       document.getElementById('mobile-tab-dashboard')?.classList.toggle('active', activeTab === 'dashboard');
       document.getElementById('mobile-tab-summary')?.classList.toggle('active', activeTab === 'summary');
       document.getElementById('mobile-tab-projects')?.classList.toggle('active', activeTab === 'projects');
+      document.getElementById('mobile-tab-papers')?.classList.toggle('active', activeTab === 'papers');
     }
 
     // =========================================================================
@@ -2849,6 +3091,7 @@
       document.getElementById('hypothesis-detail-view').classList.add('hidden');
       document.getElementById('projects-view').classList.add('hidden');
       document.getElementById('workspace-view').classList.add('hidden');
+      document.getElementById('papers-view').classList.add('hidden');
       document.getElementById('auth-view').classList.add('hidden');
     }
 
@@ -2949,118 +3192,154 @@
       workspaceTrackId = 'all';
       workspaceStatusFilter = 'all';
 
-      await loadAllAppData();
       renderTracksList();
-      populateTrackSelect();
       renderHypothesesList();
     }
 
-    // Detail Back Handler
+    // 6. Papers Pipeline View
+    async function navigateToPapers(targetSubTab = 'search') {
+      if (currentView !== 'papers' && currentView !== 'auth') {
+        previousView = currentView;
+      }
+      currentView = 'papers';
+      hideAllViews();
+      document.getElementById('papers-view').classList.remove('hidden');
+      updateNavTabState('papers');
+
+      await loadAllAppData();
+      switchPapersSubTab(targetSubTab);
+    }
+
+    function navigateToPapersWithProject(projectId) {
+      if (projectId) {
+        savedPapersFilterState.projectId = projectId;
+      }
+      navigateToPapers('saved');
+    }
+
+    function switchPapersSubTab(tab) {
+      papersSubTab = tab;
+      const searchBtn = document.getElementById('subtab-papers-search');
+      const savedBtn = document.getElementById('subtab-papers-saved');
+      const searchSec = document.getElementById('papers-search-section');
+      const savedSec = document.getElementById('papers-saved-section');
+
+      if (tab === 'search') {
+        searchBtn?.classList.add('active');
+        searchBtn?.setAttribute('aria-selected', 'true');
+        savedBtn?.classList.remove('active');
+        savedBtn?.setAttribute('aria-selected', 'false');
+        searchSec?.classList.remove('hidden');
+        savedSec?.classList.add('hidden');
+      } else {
+        searchBtn?.classList.remove('active');
+        searchBtn?.setAttribute('aria-selected', 'false');
+        savedBtn?.classList.add('active');
+        savedBtn?.setAttribute('aria-selected', 'true');
+        searchSec?.classList.add('hidden');
+        savedSec?.classList.remove('hidden');
+        renderSavedPapersFilters();
+        renderSavedPapersList();
+      }
+    }
+
     function handleDetailBack() {
       if (previousView === 'summary-table') {
         navigateToSummaryTable();
-      } else if (previousView === 'workspace' && selectedDetailHypo?.project_id) {
-        openProject(selectedDetailHypo.project_id);
-      } else if (previousView === 'projects') {
-        navigateToProjects();
+      } else if (previousView === 'workspace' && currentProject) {
+        openProject(currentProject.id);
+      } else if (previousView === 'papers') {
+        navigateToPapers('saved');
       } else {
         navigateToDashboard();
       }
     }
 
     function handleDetailGoToWorkspace() {
-      if (selectedDetailHypo && selectedDetailHypo.project_id) {
-        openProject(selectedDetailHypo.project_id);
-      }
+      if (!selectedDetailHypo) return;
+      openProject(selectedDetailHypo.project_id);
+    }
+
+    function handleDetailSearchRelatedPapers() {
+      if (!selectedDetailHypo) return;
+      navigateToPapers('search');
+      const query = selectedDetailHypo.title.split(' ').slice(0, 5).join(' ');
+      document.getElementById('paper-search-input').value = query;
+      quickSearchPaper(query, selectedDetailHypo.project_id, selectedDetailHypo.id);
     }
 
     // =========================================================================
-    // 1. DASHBOARD RENDERING
+    // 1. DASHBOARD VIEW RENDERING
     // =========================================================================
     function renderDashboard() {
-      // Statistics Calculation
-      const totalHypo = allHypotheses.length;
-      const totalTracks = allTracks.length;
-      const draftCount = allHypotheses.filter(h => h.status === 'draft').length;
-      const testingCount = allHypotheses.filter(h => h.status === 'testing').length;
-      const supportedCount = allHypotheses.filter(h => h.status === 'supported').length;
-      const rejectedCount = allHypotheses.filter(h => h.status === 'rejected').length;
-      const inconclusiveCount = allHypotheses.filter(h => h.status === 'inconclusive').length;
+      const counts = {
+        total: allHypotheses.length,
+        testing: allHypotheses.filter(h => h.status === 'testing').length,
+        supported: allHypotheses.filter(h => h.status === 'supported').length,
+        rejected: allHypotheses.filter(h => h.status === 'rejected').length,
+        inconclusive: allHypotheses.filter(h => h.status === 'inconclusive').length
+      };
 
-      document.getElementById('dash-stat-total').textContent = totalHypo;
-      document.getElementById('dash-stat-tracks').textContent = totalTracks;
-      document.getElementById('dash-stat-draft').textContent = draftCount;
-      document.getElementById('dash-stat-testing').textContent = testingCount;
-      document.getElementById('dash-stat-supported').textContent = supportedCount;
-      document.getElementById('dash-stat-rejected').textContent = rejectedCount;
-      document.getElementById('dash-stat-inconclusive').textContent = inconclusiveCount;
+      document.getElementById('dash-stat-total').textContent = counts.total;
+      document.getElementById('dash-stat-testing').textContent = counts.testing;
+      document.getElementById('dash-stat-supported').textContent = counts.supported;
+      document.getElementById('dash-stat-rejected').textContent = counts.rejected;
+      document.getElementById('dash-stat-inconclusive').textContent = counts.inconclusive;
 
-      // Recent Hypotheses (Top 7 updated)
-      const recentContainer = document.getElementById('dash-recent-hypotheses');
-      const recentHypotheses = [...allHypotheses]
-        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
-        .slice(0, 7);
+      // Recent Hypotheses Mini List
+      const recentListEl = document.getElementById('dash-recent-hypo-list');
+      const recentHypotheses = [...allHypotheses].slice(0, 5);
 
       if (recentHypotheses.length === 0) {
-        recentContainer.innerHTML = `
-          <div class="empty-state">
-            <h3>등록된 연구 가설이 없습니다</h3>
-            <p>프로젝트 워크스페이스에서 첫 번째 가설을 등록해보세요.</p>
+        recentListEl.innerHTML = `
+          <div class="empty-state" style="padding: 1.5rem;">
+            <p>아직 등록된 가설이 없습니다.</p>
+            <button type="button" class="btn btn-primary btn-sm" style="margin-top: 0.5rem;" onclick="navigateToProjects()">
+              프로젝트 생성 및 가설 등록하기
+            </button>
           </div>
         `;
       } else {
-        recentContainer.innerHTML = recentHypotheses.map(h => {
+        recentListEl.innerHTML = recentHypotheses.map(h => {
           const statusMeta = STATUS_MAP[h.status] || { label: h.status, class: 'draft' };
-          const projName = h.projects?.name || (allProjects.find(p => p.id === h.project_id)?.name) || '프로젝트';
-          const trackName = h.tracks?.name || (allTracks.find(t => t.id === h.track_id)?.name) || '트랙 미지정';
-          const authorName = getAuthorName(h.created_by);
-
+          const projName = h.projects?.name || '프로젝트';
           return `
-            <div class="mini-hypo-item" role="button" tabindex="0" onclick="navigateToHypothesisDetail('${h.id}', 'dashboard')" onkeydown="handleA11yKeydown(event, () => navigateToHypothesisDetail('${h.id}', 'dashboard'))" aria-label="${escapeHtml(h.title)} 가설 상세 보기">
-              <div class="mini-hypo-top">
+            <div class="mini-hypo-item" onclick="navigateToHypothesisDetail('${h.id}', 'dashboard')" role="button" tabindex="0" onkeydown="handleA11yKeydown(event, () => navigateToHypothesisDetail('${h.id}', 'dashboard'))">
+              <div class="mini-hypo-header">
                 <span class="mini-hypo-title">${escapeHtml(h.title)}</span>
-                <span class="badge-status ${statusMeta.class}">${statusMeta.label}</span>
+                <span class="badge-status ${statusMeta.class}" style="font-size: 0.68rem; padding: 1px 6px;">${statusMeta.shortLabel}</span>
               </div>
-
-              ${h.rationale ? `
-                <div class="mini-hypo-rationale">
-                  <strong>최신 근거:</strong> ${escapeHtml(h.rationale)}
-                </div>
-              ` : ''}
-
-              <div class="mini-hypo-meta">
-                <span class="badge-project">${escapeHtml(projName)}</span>
-                <span class="badge-track">${escapeHtml(trackName)}</span>
-                <span>•</span>
-                <span>작성: ${escapeHtml(authorName)}</span>
-                <span>•</span>
-                <span>수정: ${new Date(h.updated_at).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
+                <span class="mini-hypo-project">📁 ${escapeHtml(projName)}</span>
+                <span style="color: var(--text-dim);">${new Date(h.updated_at).toLocaleDateString('ko-KR')}</span>
               </div>
+              ${h.rationale ? `<div style="font-size: 0.73rem; color: var(--primary); background: #f2f7f4; padding: 3px 6px; border-radius: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">💡 근거: ${escapeHtml(h.rationale)}</div>` : ''}
             </div>
           `;
         }).join('');
       }
 
-      // Projects Quick Mini List
-      const projectListContainer = document.getElementById('dash-projects-list');
+      // Projects Summary List
+      const projSummaryEl = document.getElementById('dash-projects-summary');
       if (allProjects.length === 0) {
-        projectListContainer.innerHTML = `
-          <div class="empty-state">
-            <p>등록된 프로젝트가 없습니다.</p>
+        projSummaryEl.innerHTML = `
+          <div class="empty-state" style="padding: 1.5rem;">
+            <p>등록된 연구 프로젝트가 없습니다.</p>
           </div>
         `;
       } else {
-        projectListContainer.innerHTML = allProjects.slice(0, 5).map(p => {
+        projSummaryEl.innerHTML = allProjects.slice(0, 4).map(p => {
           const projectHypoCount = allHypotheses.filter(h => h.project_id === p.id).length;
-          const projectTrackCount = allTracks.filter(t => t.project_id === p.id).length;
-
+          const projectPapersCount = allPapers.filter(paper => paper.project_id === p.id).length;
           return `
-            <div class="mini-project-item" role="button" tabindex="0" onclick="openProject('${p.id}')" onkeydown="handleA11yKeydown(event, () => openProject('${p.id}'))" aria-label="${escapeHtml(p.name)} 프로젝트 열기">
-              <div class="mini-project-name">${escapeHtml(p.name)}</div>
-              <div class="mini-project-stats">
-                <span>📑 가설 ${projectHypoCount}개</span>
-                <span>🛤️ 트랙 ${projectTrackCount}개</span>
+            <div class="mini-hypo-item" onclick="openProject('${p.id}')" role="button" tabindex="0" onkeydown="handleA11yKeydown(event, () => openProject('${p.id}'))">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #034f31; font-size: 0.9rem;">${escapeHtml(p.name)}</strong>
+                <span style="font-size: 0.75rem; color: var(--text-dim);">가설 ${projectHypoCount}건 · 논문 ${projectPapersCount}건</span>
               </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${escapeHtml(p.description || '연구 개요 설명이 없습니다.')}
+              </p>
             </div>
           `;
         }).join('');
@@ -3068,55 +3347,60 @@
     }
 
     // =========================================================================
-    // 2. SUMMARY TABLE RENDERING & FILTERING
+    // 2. SUMMARY TABLE VIEW RENDERING & FILTERING
     // =========================================================================
     function renderSummaryTable() {
       // Update Project Filter Options
-      const projSelect = document.getElementById('summary-project-filter');
-      const currentProjVal = summaryFilterState.projectId;
-      projSelect.innerHTML = `<option value="all">모든 프로젝트 (${allProjects.length})</option>` +
-        allProjects.map(p => `<option value="${p.id}" ${currentProjVal === p.id ? 'selected' : ''}>${escapeHtml(p.name)}</option>`).join('');
+      const projFilterEl = document.getElementById('summary-project-filter');
+      const currentSelectedProj = summaryFilterState.projectId;
+      projFilterEl.innerHTML = '<option value="all">모든 프로젝트</option>' + 
+        allProjects.map(p => `<option value="${p.id}" ${p.id === currentSelectedProj ? 'selected' : ''}>${escapeHtml(p.name)}</option>`).join('');
 
-      // Update Filter Pills
-      document.querySelectorAll('#summary-table-view .status-pill').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-status') === summaryFilterState.status);
+      // Status pill counts & active states
+      const counts = {
+        all: allHypotheses.length,
+        draft: allHypotheses.filter(h => h.status === 'draft').length,
+        testing: allHypotheses.filter(h => h.status === 'testing').length,
+        supported: allHypotheses.filter(h => h.status === 'supported').length,
+        rejected: allHypotheses.filter(h => h.status === 'rejected').length,
+        inconclusive: allHypotheses.filter(h => h.status === 'inconclusive').length
+      };
+
+      document.getElementById('sum-count-all').textContent = counts.all;
+      document.getElementById('sum-count-draft').textContent = counts.draft;
+      document.getElementById('sum-count-testing').textContent = counts.testing;
+      document.getElementById('sum-count-supported').textContent = counts.supported;
+      document.getElementById('sum-count-rejected').textContent = counts.rejected;
+      document.getElementById('sum-count-inconclusive').textContent = counts.inconclusive;
+
+      document.querySelectorAll('#summary-table-view .status-pill').forEach(pill => {
+        const status = pill.getAttribute('data-status');
+        pill.classList.toggle('active', status === summaryFilterState.status);
       });
 
-      // Update Counts on Pills
-      document.getElementById('sum-count-all').textContent = allHypotheses.length;
-      document.getElementById('sum-count-draft').textContent = allHypotheses.filter(h => h.status === 'draft').length;
-      document.getElementById('sum-count-testing').textContent = allHypotheses.filter(h => h.status === 'testing').length;
-      document.getElementById('sum-count-supported').textContent = allHypotheses.filter(h => h.status === 'supported').length;
-      document.getElementById('sum-count-rejected').textContent = allHypotheses.filter(h => h.status === 'rejected').length;
-      document.getElementById('sum-count-inconclusive').textContent = allHypotheses.filter(h => h.status === 'inconclusive').length;
+      // Filter Data
+      let filtered = allHypotheses.filter(h => {
+        if (summaryFilterState.status !== 'all' && h.status !== summaryFilterState.status) {
+          return false;
+        }
+        if (summaryFilterState.projectId !== 'all' && h.project_id !== summaryFilterState.projectId) {
+          return false;
+        }
+        if (summaryFilterState.searchQuery) {
+          const q = summaryFilterState.searchQuery.toLowerCase();
+          const titleMatch = (h.title || '').toLowerCase().includes(q);
+          const descMatch = (h.description || '').toLowerCase().includes(q);
+          const ratMatch = (h.rationale || '').toLowerCase().includes(q);
+          const projMatch = (h.projects?.name || '').toLowerCase().includes(q);
+          const trackMatch = (h.tracks?.name || '').toLowerCase().includes(q);
+          if (!titleMatch && !descMatch && !ratMatch && !projMatch && !trackMatch) {
+            return false;
+          }
+        }
+        return true;
+      });
 
-      // Filtering
-      let filtered = [...allHypotheses];
-
-      // 1. Status Filter
-      if (summaryFilterState.status !== 'all') {
-        filtered = filtered.filter(h => h.status === summaryFilterState.status);
-      }
-
-      // 2. Project Filter
-      if (summaryFilterState.projectId !== 'all') {
-        filtered = filtered.filter(h => h.project_id === summaryFilterState.projectId);
-      }
-
-      // 3. Search Query Filter
-      if (summaryFilterState.searchQuery.trim() !== '') {
-        const q = summaryFilterState.searchQuery.toLowerCase().trim();
-        filtered = filtered.filter(h => {
-          const titleMatch = h.title?.toLowerCase().includes(q);
-          const descMatch = h.description?.toLowerCase().includes(q);
-          const rationaleMatch = h.rationale?.toLowerCase().includes(q);
-          const projName = (h.projects?.name || (allProjects.find(p => p.id === h.project_id)?.name) || '').toLowerCase();
-          const trackName = (h.tracks?.name || (allTracks.find(t => t.id === h.track_id)?.name) || '').toLowerCase();
-          return titleMatch || descMatch || rationaleMatch || projName.includes(q) || trackName.includes(q);
-        });
-      }
-
-      // 4. Sorting
+      // Sort Data
       filtered.sort((a, b) => {
         if (summaryFilterState.sortBy === 'updated_desc') {
           return new Date(b.updated_at) - new Date(a.updated_at);
@@ -3125,24 +3409,23 @@
         } else if (summaryFilterState.sortBy === 'created_desc') {
           return new Date(b.created_at) - new Date(a.created_at);
         } else if (summaryFilterState.sortBy === 'title_asc') {
-          return a.title.localeCompare(b.title, 'ko');
+          return a.title.localeCompare(b.title, 'ko-KR');
         } else if (summaryFilterState.sortBy === 'status') {
           return a.status.localeCompare(b.status);
         }
         return 0;
       });
 
-      document.getElementById('summary-result-count').textContent = `조회 결과 ${filtered.length}건 (전체 ${allHypotheses.length}건)`;
+      // Result count display
+      document.getElementById('summary-result-count').textContent = `조회 결과 ${filtered.length}건`;
 
+      // Render Table Body
       const tbody = document.getElementById('summary-table-body');
       if (filtered.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="6" style="text-align: center; padding: 3rem 1rem;">
-              <div class="empty-state" style="border: none; background: transparent; padding: 0;">
-                <h3>조건에 일치하는 가설이 없습니다</h3>
-                <p>필터 조건을 변경하거나 검색어를 재설정하세요.</p>
-              </div>
+            <td colspan="6" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+              조건에 일치하는 연구 가설이 없습니다. 필터를 변경하거나 새 가설을 등록하십시오.
             </td>
           </tr>
         `;
@@ -3151,32 +3434,24 @@
 
       tbody.innerHTML = filtered.map(h => {
         const statusMeta = STATUS_MAP[h.status] || { label: h.status, class: 'draft' };
-        const projName = h.projects?.name || (allProjects.find(p => p.id === h.project_id)?.name) || '프로젝트';
-        const trackName = h.tracks?.name || (allTracks.find(t => t.id === h.track_id)?.name) || '-';
+        const projName = h.projects?.name || '프로젝트 미지정';
+        const trackName = h.tracks?.name || '트랙 미지정';
         const authorName = getAuthorName(h.created_by);
-        const updatedDate = new Date(h.updated_at).toLocaleDateString('ko-KR');
+        const updatedDateStr = new Date(h.updated_at).toLocaleDateString('ko-KR');
 
         return `
-          <tr tabindex="0" role="button" aria-label="${escapeHtml(h.title)} 가설 상세 보기" onclick="navigateToHypothesisDetail('${h.id}', 'summary-table')" onkeydown="handleA11yKeydown(event, () => navigateToHypothesisDetail('${h.id}', 'summary-table'))">
+          <tr onclick="navigateToHypothesisDetail('${h.id}', 'summary-table')" tabindex="0" onkeydown="handleA11yKeydown(event, () => navigateToHypothesisDetail('${h.id}', 'summary-table'))">
             <td>
-              <div class="table-hypo-title">${escapeHtml(h.title)}</div>
-              ${h.rationale ? `<div style="font-size: 0.76rem; color: var(--text-dim); margin-top: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 420px;"><strong>근거:</strong> ${escapeHtml(h.rationale)}</div>` : ''}
+              <div class="table-title-cell">
+                <span class="title-text">${escapeHtml(h.title)}</span>
+                ${h.rationale ? `<span class="rationale-preview">💡 ${escapeHtml(h.rationale)}</span>` : ''}
+              </div>
             </td>
-            <td>
-              <span class="table-project-tag">${escapeHtml(projName)}</span>
-            </td>
-            <td>
-              <span class="table-track-tag">${escapeHtml(trackName)}</span>
-            </td>
-            <td>
-              <span class="badge-status ${statusMeta.class}">${statusMeta.label}</span>
-            </td>
-            <td>
-              <span style="font-size: 0.82rem; color: var(--text-main);">${escapeHtml(authorName)}</span>
-            </td>
-            <td>
-              <span style="font-size: 0.78rem; color: var(--text-dim);">${updatedDate}</span>
-            </td>
+            <td><span class="badge-project">${escapeHtml(projName)}</span></td>
+            <td><span class="badge-track">${escapeHtml(trackName)}</span></td>
+            <td><span class="badge-status ${statusMeta.class}">${statusMeta.label}</span></td>
+            <td style="color: var(--text-muted); font-size: 0.8rem;">${escapeHtml(authorName)}</td>
+            <td style="color: var(--text-dim); font-size: 0.78rem;">${updatedDateStr}</td>
           </tr>
         `;
       }).join('');
@@ -3193,7 +3468,7 @@
     }
 
     function handleSummarySearch(e) {
-      summaryFilterState.searchQuery = e.target.value;
+      summaryFilterState.searchQuery = e.target.value.trim();
       renderSummaryTable();
     }
 
@@ -3263,6 +3538,48 @@
         rationaleTime.textContent = '판정 대기중';
       }
 
+      // Linked Saved Papers
+      const linkedPapers = allPapers.filter(paper => paper.hypothesis_id === h.id);
+      document.getElementById('detail-linked-papers-count').textContent = linkedPapers.length;
+      const linkedPapersContainer = document.getElementById('detail-linked-papers-container');
+
+      if (linkedPapers.length === 0) {
+        linkedPapersContainer.innerHTML = `
+          <div style="background: #fafbfa; border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 1rem; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+            이 가설에 직접 연계된 논문이 아직 없습니다.
+            <button type="button" class="btn btn-subtle btn-sm" style="margin-left: 0.5rem;" onclick="handleDetailSearchRelatedPapers()">
+              Semantic Scholar에서 논문 검색 →
+            </button>
+          </div>
+        `;
+      } else {
+        linkedPapersContainer.innerHTML = linkedPapers.map(paper => {
+          const fitBadge = paper.fit_score != null ? getFitScoreBadgeHtml(paper.fit_score) : '';
+          return `
+            <div class="paper-card" style="padding: 1rem;">
+              <div class="paper-header">
+                <div>
+                  <h4 class="paper-title" style="font-size: 0.95rem;">
+                    ${paper.source_url ? `<a href="${escapeHtml(paper.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(paper.title)} ↗</a>` : escapeHtml(paper.title)}
+                  </h4>
+                  <div class="paper-meta" style="margin-top: 0.25rem;">
+                    ${paper.authors ? `<span>저자: ${escapeHtml(paper.authors)}</span> • ` : ''}
+                    ${paper.year ? `<span>출판년도: ${paper.year}년</span> • ` : ''}
+                    <span>저장일: ${new Date(paper.created_at).toLocaleDateString('ko-KR')}</span>
+                  </div>
+                </div>
+                ${fitBadge}
+              </div>
+              ${paper.insight_summary ? `
+                <div style="font-size: 0.82rem; color: var(--primary); background: #f2f7f4; padding: 0.4rem 0.6rem; border-radius: 3px; border: 1px solid rgba(3, 107, 63, 0.15);">
+                  <strong>💡 핵심 인사이트 메모:</strong> ${escapeHtml(paper.insight_summary)}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
       // Timeline Section
       const timelineContainer = document.getElementById('detail-timeline-container');
       timelineContainer.innerHTML = `
@@ -3298,8 +3615,14 @@
       if (allProjects.length === 0) {
         container.innerHTML = `
           <div class="empty-state" style="grid-column: 1 / -1;">
-            <h3>등록된 연구 프로젝트가 없습니다</h3>
-            <p>우측 상단의 '+ 새 프로젝트' 버튼을 눌러 연구 워크스페이스를 시작하세요.</p>
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">📁</div>
+            <h3 style="font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.5rem;">생성된 연구 프로젝트가 없습니다</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+              연구실의 첫 번째 연구 프로젝트를 생성하고 트랙과 가설을 등록하십시오.
+            </p>
+            <button type="button" class="btn btn-primary" onclick="openCreateProjectModal(event)">
+              + 새 프로젝트 생성
+            </button>
           </div>
         `;
         return;
@@ -3307,19 +3630,28 @@
 
       container.innerHTML = allProjects.map(p => {
         const projectHypoCount = allHypotheses.filter(h => h.project_id === p.id).length;
-        const projectTrackCount = allTracks.filter(t => t.project_id === p.id).length;
+        const projectPapersCount = allPapers.filter(paper => paper.project_id === p.id).length;
+        const projectTracks = allTracks.filter(t => t.project_id === p.id);
 
         return `
-          <div class="project-card" role="button" tabindex="0" onclick="openProject('${p.id}')" onkeydown="handleA11yKeydown(event, () => openProject('${p.id}'))" aria-label="${escapeHtml(p.name)} 프로젝트 워크스페이스 열기">
-            <div class="project-card-header">
+          <article class="project-card" onclick="openProject('${p.id}')" tabindex="0" onkeydown="handleA11yKeydown(event, () => openProject('${p.id}'))" aria-label="${escapeHtml(p.name)} 프로젝트 열기">
+            <div>
               <h2 class="project-name">${escapeHtml(p.name)}</h2>
-              <p class="project-desc">${escapeHtml(p.description || '설명 없음')}</p>
+              <p class="project-desc">${escapeHtml(p.description || '등록된 프로젝트 연구 개요가 없습니다.')}</p>
             </div>
-            <div class="project-card-footer">
-              <span>가설 ${projectHypoCount}개 · 트랙 ${projectTrackCount}개</span>
-              <span class="btn btn-outline btn-sm">워크스페이스 열기 →</span>
+            
+            <div>
+              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+                <span class="badge-track">트랙 ${projectTracks.length}개</span>
+                <span class="badge-project">가설 ${projectHypoCount}건</span>
+                <span class="badge-track" style="background:#edf6f1; color:#036b3f;">논문 ${projectPapersCount}건</span>
+              </div>
+              <div class="project-card-footer">
+                <span>생성일: ${new Date(p.created_at).toLocaleDateString('ko-KR')}</span>
+                <span style="color: var(--primary); font-weight: 600;">워크스페이스 진입 →</span>
+              </div>
             </div>
-          </div>
+          </article>
         `;
       }).join('');
     }
@@ -3343,17 +3675,23 @@
       try {
         const { data, error } = await supabaseClient
           .from('projects')
-          .insert([{ name, description, created_by: currentUser.id }])
+          .insert([{
+            name,
+            description,
+            created_by: currentUser.id
+          }])
           .select();
 
         if (error) throw error;
+
         closeModal('modal-create-project');
-        showToast('프로젝트가 성공적으로 생성되었습니다.', 'success');
+        showToast('새 프로젝트가 성공적으로 생성되었습니다.', 'success');
+        
         await loadAllAppData();
         if (data && data[0]) {
           openProject(data[0].id);
         } else {
-          navigateToProjects();
+          renderProjectsList();
         }
       } catch (err) {
         showToast('프로젝트 생성 실패: ' + err.message, 'error');
@@ -3364,36 +3702,49 @@
     }
 
     // =========================================================================
-    // 5. WORKSPACE & TRACKS & HYPOTHESES OPERATIONS
+    // 5. WORKSPACE VIEW RENDERING & ACTIONS
     // =========================================================================
     function renderTracksList() {
+      if (!currentProject) return;
       const container = document.getElementById('tracks-list');
-      const projectHypotheses = allHypotheses.filter(h => h.project_id === currentProject.id);
       const projectTracks = allTracks.filter(t => t.project_id === currentProject.id);
 
-      let html = `
+      const allBtn = `
         <button type="button" class="track-item ${workspaceTrackId === 'all' ? 'active' : ''}" onclick="selectWorkspaceTrack('all')">
-          <span>전체 트랙</span>
-          <span class="track-count">${projectHypotheses.length}</span>
+          <span>전체 트랙 보기</span>
+          <span style="font-size: 0.75rem; opacity: 0.8;">(${allHypotheses.filter(h => h.project_id === currentProject.id).length})</span>
         </button>
       `;
 
-      projectTracks.forEach(t => {
-        const count = projectHypotheses.filter(h => h.track_id === t.id).length;
-        html += `
+      const trackBtns = projectTracks.map(t => {
+        const trackHypoCount = allHypotheses.filter(h => h.track_id === t.id).length;
+        return `
           <button type="button" class="track-item ${workspaceTrackId === t.id ? 'active' : ''}" onclick="selectWorkspaceTrack('${t.id}')">
-            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(t.name)}</span>
-            <span class="track-count">${count}</span>
+            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px;">${escapeHtml(t.name)}</span>
+            <span style="font-size: 0.75rem; opacity: 0.8;">(${trackHypoCount})</span>
           </button>
         `;
-      });
+      }).join('');
 
-      container.innerHTML = html;
+      container.innerHTML = allBtn + trackBtns;
+
+      // Update Modal Track Select Options
+      const selectEl = document.getElementById('hypo-track-select');
+      selectEl.innerHTML = '<option value="">-- 트랙 미지정 --</option>' + 
+        projectTracks.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
     }
 
     function selectWorkspaceTrack(trackId) {
       workspaceTrackId = trackId;
       renderTracksList();
+      renderHypothesesList();
+    }
+
+    function filterHypothesesByStatus(status) {
+      workspaceStatusFilter = status;
+      document.querySelectorAll('#workspace-view .status-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.getAttribute('data-status') === status);
+      });
       renderHypothesesList();
     }
 
@@ -3416,87 +3767,90 @@
       try {
         const { error } = await supabaseClient
           .from('tracks')
-          .insert([{ project_id: currentProject.id, name, description, created_by: currentUser.id }]);
+          .insert([{
+            project_id: currentProject.id,
+            name,
+            description
+          }]);
 
         if (error) throw error;
         closeModal('modal-create-track');
         showToast('연구 트랙이 추가되었습니다.', 'success');
         await loadAllAppData();
         renderTracksList();
-        populateTrackSelect();
       } catch (err) {
-        showToast('트랙 추가 실패: ' + err.message, 'error');
+        showToast('트랙 생성 실패: ' + err.message, 'error');
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalHtml;
       }
     }
 
-    function populateTrackSelect() {
-      const select = document.getElementById('hypo-track-select');
-      const projectTracks = allTracks.filter(t => t.project_id === currentProject?.id);
-      select.innerHTML = '<option value="">-- 트랙 미지정 --</option>' + 
-        projectTracks.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-    }
-
-    function updateWorkspaceStatusCounts(projectHypotheses) {
-      document.getElementById('count-all').textContent = projectHypotheses.length;
-      document.getElementById('count-draft').textContent = projectHypotheses.filter(h => h.status === 'draft').length;
-      document.getElementById('count-testing').textContent = projectHypotheses.filter(h => h.status === 'testing').length;
-      document.getElementById('count-supported').textContent = projectHypotheses.filter(h => h.status === 'supported').length;
-      document.getElementById('count-rejected').textContent = projectHypotheses.filter(h => h.status === 'rejected').length;
-      document.getElementById('count-inconclusive').textContent = projectHypotheses.filter(h => h.status === 'inconclusive').length;
-    }
-
-    function filterHypothesesByStatus(status) {
-      workspaceStatusFilter = status;
-      document.querySelectorAll('#workspace-view .status-pill').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-status') === status);
-      });
-      renderHypothesesList();
-    }
-
     function renderHypothesesList() {
+      if (!currentProject) return;
       const container = document.getElementById('hypotheses-list');
-      let projectHypotheses = allHypotheses.filter(h => h.project_id === currentProject.id);
-      updateWorkspaceStatusCounts(projectHypotheses);
 
-      let filtered = projectHypotheses;
+      let list = allHypotheses.filter(h => h.project_id === currentProject.id);
 
+      // Status pill counts for current project
+      const counts = {
+        all: list.length,
+        draft: list.filter(h => h.status === 'draft').length,
+        testing: list.filter(h => h.status === 'testing').length,
+        supported: list.filter(h => h.status === 'supported').length,
+        rejected: list.filter(h => h.status === 'rejected').length,
+        inconclusive: list.filter(h => h.status === 'inconclusive').length
+      };
+
+      document.getElementById('count-all').textContent = counts.all;
+      document.getElementById('count-draft').textContent = counts.draft;
+      document.getElementById('count-testing').textContent = counts.testing;
+      document.getElementById('count-supported').textContent = counts.supported;
+      document.getElementById('count-rejected').textContent = counts.rejected;
+      document.getElementById('count-inconclusive').textContent = counts.inconclusive;
+
+      // Filter by active track
       if (workspaceTrackId !== 'all') {
-        filtered = filtered.filter(h => h.track_id === workspaceTrackId);
+        list = list.filter(h => h.track_id === workspaceTrackId);
       }
 
+      // Filter by active status
       if (workspaceStatusFilter !== 'all') {
-        filtered = filtered.filter(h => h.status === workspaceStatusFilter);
+        list = list.filter(h => h.status === workspaceStatusFilter);
       }
 
-      if (filtered.length === 0) {
+      if (list.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <h3>해당 조건의 가설이 없습니다</h3>
-            <p>우측 상단의 '+ 가설 등록' 버튼을 눌러 새로운 가설을 작성하세요.</p>
+            <p>해당 조건에 해당하는 연구 가설이 없습니다.</p>
+            <button type="button" class="btn btn-primary btn-sm" style="margin-top: 0.75rem;" onclick="openCreateHypothesisModal(event)">
+              + 새 가설 등록하기
+            </button>
           </div>
         `;
         return;
       }
 
-      container.innerHTML = filtered.map(h => {
+      container.innerHTML = list.map(h => {
         const statusMeta = STATUS_MAP[h.status] || { label: h.status, class: 'draft' };
-        const trackName = h.tracks?.name || (allTracks.find(t => t.id === h.track_id)?.name);
-        
+        const track = allTracks.find(t => t.id === h.track_id);
+        const trackName = track ? track.name : '트랙 미지정';
+
         return `
-          <article class="hypothesis-card">
+          <article class="hypo-card">
             <div class="hypo-header">
-              <div class="hypo-title-group">
-                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <div style="flex: 1;">
+                <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap;">
                   <span class="badge-status ${statusMeta.class}">${statusMeta.label}</span>
-                  ${trackName ? `<span class="badge-track">트랙: ${escapeHtml(trackName)}</span>` : ''}
+                  <span class="badge-track">${escapeHtml(trackName)}</span>
                 </div>
-                <button type="button" class="hypo-title-btn" onclick="navigateToHypothesisDetail('${h.id}', 'workspace')">${escapeHtml(h.title)}</button>
+                <button type="button" class="hypo-title-btn" onclick="navigateToHypothesisDetail('${h.id}', 'workspace')">
+                  ${escapeHtml(h.title)}
+                </button>
               </div>
-              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-                <button type="button" class="btn btn-subtle btn-sm" onclick="navigateToHypothesisDetail('${h.id}', 'workspace')">
+
+              <div style="display: flex; gap: 0.4rem; flex-shrink: 0;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="navigateToHypothesisDetail('${h.id}', 'workspace')">
                   상세 보기 →
                 </button>
                 <button type="button" class="btn btn-outline btn-sm" onclick="openUpdateStatusModal('${h.id}', this)">
@@ -3626,7 +3980,6 @@
         
         await loadAllAppData();
 
-        // Refresh current active view
         if (currentView === 'dashboard') {
           renderDashboard();
         } else if (currentView === 'summary-table') {
@@ -3643,6 +3996,604 @@
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalHtml;
+      }
+    }
+
+    // =========================================================================
+    // 6. PAPERS PIPELINE (Semantic Scholar Search & Fit Score & Saved Library)
+    // =========================================================================
+
+    // Fit Score Calculation Algorithm (Keyword Matching & Jaccard Similarity)
+    function calculateFitScore(paperTitle, paperAbstract, hypoTitle, hypoDesc) {
+      if (!hypoTitle) return null;
+
+      const stopWords = new Set([
+        'a', 'an', 'the', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'with', 'by', 'of', 'from',
+        'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did',
+        'that', 'this', 'these', 'those', 'it', 'its', 'as', 'we', 'our', 'their', 'they', 'which',
+        'can', 'could', 'will', 'would', 'should', 'via', 'using', 'based', 'approach', 'method',
+        'paper', 'study', 'model', 'results', 'show', 'proposed', 'novel',
+        '은', '는', '이', '가', '을', '를', '의', '에', '에서', '로', '으로', '와', '과', '도', '및', '통해'
+      ]);
+
+      function tokenize(text) {
+        if (!text) return [];
+        return text.toLowerCase()
+          .replace(/[^\w\s\u3131-\uD79D]/g, ' ')
+          .split(/\s+/)
+          .filter(w => w.length >= 2 && !stopWords.has(w));
+      }
+
+      const paperWords = tokenize((paperTitle || '') + ' ' + (paperAbstract || ''));
+      const hypoWords = tokenize((hypoTitle || '') + ' ' + (hypoDesc || ''));
+
+      if (hypoWords.length === 0 || paperWords.length === 0) return 30;
+
+      const paperSet = new Set(paperWords);
+      const hypoSet = new Set(hypoWords);
+
+      let matchCount = 0;
+      hypoSet.forEach(w => {
+        if (paperSet.has(w)) matchCount++;
+      });
+
+      const hypoCoverage = matchCount / hypoSet.size;
+      const unionSet = new Set([...paperSet, ...hypoSet]);
+      const jaccard = matchCount / (unionSet.size || 1);
+
+      let score = Math.round(hypoCoverage * 75 + Math.min(jaccard * 100, 25));
+      if (matchCount > 0 && score < 42) {
+        score = 40 + matchCount * 12;
+      }
+      score = Math.min(Math.max(score, 15), 98);
+
+      return score;
+    }
+
+    function getFitScoreBadgeHtml(score) {
+      if (score == null) return '';
+      let cls = 'low';
+      if (score >= 70) cls = 'high';
+      else if (score >= 45) cls = 'mid';
+      return `<span class="badge-fit-score ${cls}">🎯 가설 적합도 ${score}점</span>`;
+    }
+
+    function quickSearchPaper(query, targetProjectId = null, targetHypoId = null) {
+      document.getElementById('paper-search-input').value = query;
+      searchSemanticScholar(query, targetProjectId, targetHypoId);
+    }
+
+    function handlePaperSearchSubmit(e) {
+      e.preventDefault();
+      const query = document.getElementById('paper-search-input').value.trim();
+      if (!query) return;
+      searchSemanticScholar(query);
+    }
+
+    async function searchSemanticScholar(query, preselectedProjectId = null, preselectedHypoId = null) {
+      const statusEl = document.getElementById('paper-search-status');
+      const resultsContainer = document.getElementById('paper-search-results-list');
+      const searchBtn = document.getElementById('btn-paper-search');
+
+      searchBtn.disabled = true;
+      searchBtn.innerHTML = '<span class="spinner spinner-dark" aria-hidden="true"></span> 검색 중...';
+
+      statusEl.innerHTML = `
+        <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+          <span class="spinner spinner-dark" aria-hidden="true"></span> Semantic Scholar 학술 데이터베이스에서 "${escapeHtml(query)}" 관련 논문을 검색 중입니다...
+        </div>
+      `;
+
+      try {
+        const endpoint = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&fields=title,authors,year,abstract,url,externalIds&limit=20`;
+        const response = await fetch(endpoint);
+        
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error('Semantic Scholar API 요청 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.');
+          }
+          throw new Error(`검색 API 오류 (HTTP ${response.status})`);
+        }
+
+        const data = await response.json();
+        latestSearchResults = (data.data || []).map(p => ({
+          paperId: p.paperId,
+          title: p.title || 'Untitled Paper',
+          authors: (p.authors || []).map(a => a.name).join(', '),
+          year: p.year || null,
+          abstract: p.abstract || '',
+          url: p.url || (p.externalIds?.DOI ? `https://doi.org/${p.externalIds.DOI}` : (p.externalIds?.ArXiv ? `https://arxiv.org/abs/${p.externalIds.ArXiv}` : ''))
+        }));
+
+        renderSearchResults(latestSearchResults, query, preselectedProjectId, preselectedHypoId);
+        statusEl.innerHTML = `
+          <div style="font-size: 0.85rem; color: var(--primary); font-weight: 500;">
+            ✓ "${escapeHtml(query)}" 검색 결과 ${latestSearchResults.length}건을 성공적으로 불러왔습니다.
+          </div>
+        `;
+      } catch (err) {
+        statusEl.innerHTML = `
+          <div style="font-size: 0.85rem; color: #a43c35; background: #fdf5f5; border: 1px solid rgba(164, 60, 53, 0.2); border-radius: var(--radius-sm); padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <span>⚠️ ${escapeHtml(err.message)}</span>
+            <button type="button" class="btn btn-subtle btn-sm" onclick="loadFallbackDemoPapers('${escapeJsString(query)}')">
+              📖 시연용 학술 논문 프리뷰 불러오기
+            </button>
+          </div>
+        `;
+        resultsContainer.innerHTML = `
+          <div class="empty-state">
+            <p>Semantic Scholar 공용 API 일시적 요청 한도(429) 또는 네트워크 지연이 발생했습니다.</p>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.4rem;">
+              상단의 <strong>[시연용 학술 논문 프리뷰 불러오기]</strong> 버튼을 누르면 검색 및 저장, 가설 연계 적합도 계산 파이프라인을 즉시 테스트하실 수 있습니다.
+            </p>
+          </div>
+        `;
+      } finally {
+        searchBtn.disabled = false;
+        searchBtn.innerHTML = '<span>검색</span>';
+      }
+    }
+
+    function loadFallbackDemoPapers(query) {
+      latestSearchResults = [
+        {
+          paperId: 'ss-gat-2024-001',
+          title: 'Graph Attention Networks for Molecular Property Prediction and Drug Discovery',
+          authors: 'Petar Veličković, Guillem Cucurull, Arantxa Casanova, Yoshua Bengio',
+          year: 2024,
+          abstract: 'We propose a novel graph attention architecture tailored for molecular graphs. By learning dynamic attention weights between atomic nodes and chemical bonds, the model significantly reduces predictive mean squared error on benchmark molecular datasets and identifies key pharmacophore substructures.',
+          url: 'https://arxiv.org/abs/1710.10903'
+        },
+        {
+          paperId: 'ss-gnn-bio-2023-002',
+          title: 'Equivariant 3D Graph Convolutional Networks in Biomolecular Binding Affinity',
+          authors: 'Fabian B. Fuchs, Daniel E. Worrall, Volker Fischer, Max Welling',
+          year: 2023,
+          abstract: 'Equivariant message passing neural networks preserve rotational and translational symmetries in 3D coordinate space. We demonstrate a 16.4% reduction in root mean square error for protein-ligand affinity scoring compared to standard 3D CNN baselines.',
+          url: 'https://arxiv.org/abs/2006.10503'
+        },
+        {
+          paperId: 'ss-kg-llm-2024-003',
+          title: 'Knowledge Graph Augmented Large Language Models for Hypothesis Generation',
+          authors: 'Jiawei Han, Xiang Ren, Jure Leskovec',
+          year: 2024,
+          abstract: 'Integrating structured knowledge graphs with pre-trained large language models enables rigorous scientific hypothesis validation. Our framework grounds model reasoning in verified biomedical literature, minimizing hallucinations in multi-hop inference.',
+          url: 'https://doi.org/10.1145/3580305.3599981'
+        },
+        {
+          paperId: 'ss-tf-bio-2023-004',
+          title: 'Transformer-Based Sequence-to-Structure Prediction in Computational Biology',
+          authors: 'Alexander Rives, Joshua Meier, Tom Sercu, Siddharth Goyal',
+          year: 2023,
+          abstract: 'Biological language models trained on evolutionary protein sequences extract deep structural and functional constraints, predicting contact maps and mutation stability with high accuracy without explicit MSA alignment.',
+          url: 'https://doi.org/10.1101/622878'
+        }
+      ];
+
+      renderSearchResults(latestSearchResults, query);
+      const statusEl = document.getElementById('paper-search-status');
+      statusEl.innerHTML = `
+        <div style="font-size: 0.85rem; color: var(--primary); font-weight: 500;">
+          ✓ "${escapeHtml(query)}" 관련 고품질 학술 논문 프리뷰 4건이 로드되었습니다. 가설을 선택해 적합도를 산출하고 보관함에 저장해 보세요.
+        </div>
+      `;
+    }
+
+    function escapeJsString(str) {
+      if (!str) return '';
+      return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+
+    function renderSearchResults(papers, query, preselectedProjectId = null, preselectedHypoId = null) {
+      const container = document.getElementById('paper-search-results-list');
+      if (papers.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>"${escapeHtml(query)}" 에 대한 검색 결과가 없습니다.</p>
+            <p style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.4rem;">
+              영문 학술 키워드로 검색하면 더 많은 결과를 찾을 수 있습니다.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = papers.map((paper, idx) => {
+        const isSaved = allPapers.some(p => p.semantic_scholar_id === paper.paperId || (p.title.toLowerCase() === paper.title.toLowerCase()));
+        const defaultProjId = preselectedProjectId || (allProjects[0] ? allProjects[0].id : '');
+        
+        return `
+          <article class="paper-card" id="search-paper-card-${idx}">
+            <div class="paper-header">
+              <div style="flex: 1;">
+                <h3 class="paper-title">
+                  ${paper.url ? `<a href="${escapeHtml(paper.url)}" target="_blank" rel="noopener noreferrer" title="원문 링크 새 창 열기">${escapeHtml(paper.title)} ↗</a>` : escapeHtml(paper.title)}
+                </h3>
+                <div class="paper-meta" style="margin-top: 0.35rem;">
+                  ${paper.authors ? `<span>저자: <strong>${escapeHtml(paper.authors)}</strong></span> • ` : ''}
+                  ${paper.year ? `<span>출판연도: <strong>${paper.year}년</strong></span> • ` : ''}
+                  <span>Semantic Scholar ID: <code>${escapeHtml(paper.paperId?.slice(0, 8) || 'N/A')}</code></span>
+                </div>
+              </div>
+              <div id="search-fit-badge-${idx}"></div>
+            </div>
+
+            <!-- Abstract -->
+            ${paper.abstract ? `
+              <div>
+                <p id="abstract-text-${idx}" class="paper-abstract" style="margin-bottom: 0;">${escapeHtml(paper.abstract)}</p>
+              </div>
+            ` : `
+              <div style="font-size: 0.8rem; color: var(--text-dim); font-style: italic;">
+                * 제공된 초록(Abstract) 정보가 없습니다.
+              </div>
+            `}
+
+            <!-- Save Controls Box -->
+            <div class="paper-save-box">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #034f31;">
+                  💾 내 연구 프로젝트 / 가설에 논문 저장 및 적합도 매칭
+                </span>
+                ${isSaved ? `<span class="badge-status supported" style="font-size: 0.72rem; padding: 2px 8px;">✓ 보관함에 이미 저장됨</span>` : ''}
+              </div>
+
+              <div class="paper-save-row">
+                <div style="display: flex; flex-direction: column; gap: 0.25rem; min-width: 180px; flex: 1;">
+                  <label class="form-label" style="font-size: 0.74rem; margin-bottom: 0;">저장할 프로젝트 *</label>
+                  <select id="save-proj-select-${idx}" class="form-control" style="font-size: 0.82rem; padding: 0.4rem;" onchange="handleSaveProjectChange(${idx})">
+                    ${allProjects.map(p => `<option value="${p.id}" ${p.id === defaultProjId ? 'selected' : ''}>📁 ${escapeHtml(p.name)}</option>`).join('')}
+                  </select>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.25rem; min-width: 220px; flex: 1.5;">
+                  <label class="form-label" style="font-size: 0.74rem; margin-bottom: 0;">연결 가설 (선택 시 실시간 적합도 계산)</label>
+                  <select id="save-hypo-select-${idx}" class="form-control" style="font-size: 0.82rem; padding: 0.4rem;" onchange="handleSaveHypoChange(${idx})">
+                    <!-- Populated via JS -->
+                  </select>
+                </div>
+
+                <div style="display: flex; align-items: flex-end;">
+                  <button type="button" id="btn-save-paper-${idx}" class="btn btn-primary btn-sm" style="height: 33px; margin-top: 1.2rem;" onclick="handleSavePaper(${idx})">
+                    <span>${isSaved ? '추가 저장' : '보관함에 저장'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Insight Memo Input -->
+              <div style="margin-top: 0.25rem;">
+                <input type="text" id="save-insight-${idx}" class="form-control" style="font-size: 0.8rem; padding: 0.4rem 0.6rem;" placeholder="인사이트 메모 (선택사항: 이 논문의 핵심 기여점, 가설 연관 근거 등)">
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      // Populate Hypo selects & calculate initial fit scores
+      papers.forEach((p, idx) => {
+        populateSaveHypoSelect(idx, preselectedProjectId, preselectedHypoId);
+      });
+    }
+
+    function populateSaveHypoSelect(idx, preselectedProjectId = null, preselectedHypoId = null) {
+      const projSelect = document.getElementById(`save-proj-select-${idx}`);
+      const hypoSelect = document.getElementById(`save-hypo-select-${idx}`);
+      if (!projSelect || !hypoSelect) return;
+
+      const selectedProjId = projSelect.value;
+      const projectHypotheses = allHypotheses.filter(h => h.project_id === selectedProjId);
+
+      hypoSelect.innerHTML = '<option value="">-- 특정 가설 연결 안 함 (프로젝트 전체 논문) --</option>' + 
+        projectHypotheses.map(h => `<option value="${h.id}" ${h.id === preselectedHypoId ? 'selected' : ''}>🎯 ${escapeHtml(h.title)}</option>`).join('');
+
+      updateSearchFitScoreBadge(idx);
+    }
+
+    function handleSaveProjectChange(idx) {
+      populateSaveHypoSelect(idx);
+    }
+
+    function handleSaveHypoChange(idx) {
+      updateSearchFitScoreBadge(idx);
+    }
+
+    function updateSearchFitScoreBadge(idx) {
+      const hypoSelect = document.getElementById(`save-hypo-select-${idx}`);
+      const badgeContainer = document.getElementById(`search-fit-badge-${idx}`);
+      if (!hypoSelect || !badgeContainer) return;
+
+      const hypoId = hypoSelect.value;
+      const paper = latestSearchResults[idx];
+      if (!paper) return;
+
+      if (!hypoId) {
+        badgeContainer.innerHTML = '';
+        return;
+      }
+
+      const hypo = allHypotheses.find(h => h.id === hypoId);
+      if (!hypo) {
+        badgeContainer.innerHTML = '';
+        return;
+      }
+
+      const fitScore = calculateFitScore(paper.title, paper.abstract, hypo.title, hypo.description);
+      badgeContainer.innerHTML = getFitScoreBadgeHtml(fitScore);
+    }
+
+    async function handleSavePaper(idx) {
+      const paper = latestSearchResults[idx];
+      if (!paper) return;
+
+      const projSelect = document.getElementById(`save-proj-select-${idx}`);
+      const hypoSelect = document.getElementById(`save-hypo-select-${idx}`);
+      const insightInput = document.getElementById(`save-insight-${idx}`);
+      const saveBtn = document.getElementById(`btn-save-paper-${idx}`);
+
+      const projectId = projSelect?.value;
+      const hypoId = hypoSelect?.value || null;
+      const insightSummary = insightInput?.value.trim() || null;
+
+      if (!projectId) {
+        showToast('저장할 프로젝트를 선택해 주세요.', 'error');
+        return;
+      }
+
+      let fitScore = null;
+      if (hypoId) {
+        const hypo = allHypotheses.find(h => h.id === hypoId);
+        if (hypo) {
+          fitScore = calculateFitScore(paper.title, paper.abstract, hypo.title, hypo.description);
+        }
+      }
+
+      const originalHtml = saveBtn.innerHTML;
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 저장 중...';
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('papers')
+          .insert([{
+            project_id: projectId,
+            hypothesis_id: hypoId,
+            semantic_scholar_id: paper.paperId || null,
+            title: paper.title,
+            authors: paper.authors || null,
+            year: paper.year || null,
+            source_url: paper.url || null,
+            abstract: paper.abstract || null,
+            fit_score: fitScore,
+            insight_summary: insightSummary,
+            saved_by: currentUser.id
+          }])
+          .select();
+
+        if (error) throw error;
+
+        showToast('논문이 보관함에 성공적으로 저장되었습니다.', 'success');
+        saveBtn.innerHTML = '✓ 저장 완료';
+        saveBtn.classList.remove('btn-primary');
+        saveBtn.classList.add('btn-subtle');
+
+        await loadAllAppData();
+      } catch (err) {
+        showToast('논문 저장 실패: ' + err.message, 'error');
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalHtml;
+      }
+    }
+
+    // =========================================================================
+    // 6-B. SAVED PAPERS LIBRARY VIEW & ACTIONS
+    // =========================================================================
+    function renderSavedPapersFilters() {
+      // Update Projects Filter
+      const projFilterEl = document.getElementById('saved-papers-project-filter');
+      const curProj = savedPapersFilterState.projectId;
+      projFilterEl.innerHTML = '<option value="all">모든 프로젝트</option>' + 
+        allProjects.map(p => `<option value="${p.id}" ${p.id === curProj ? 'selected' : ''}>📁 ${escapeHtml(p.name)}</option>`).join('');
+
+      // Update Hypotheses Filter
+      const hypoFilterEl = document.getElementById('saved-papers-hypo-filter');
+      const curHypo = savedPapersFilterState.hypoId;
+      let relevantHypos = allHypotheses;
+      if (curProj !== 'all') {
+        relevantHypos = allHypotheses.filter(h => h.project_id === curProj);
+      }
+      hypoFilterEl.innerHTML = '<option value="all">모든 가설 연계</option>' + 
+        relevantHypos.map(h => `<option value="${h.id}" ${h.id === curHypo ? 'selected' : ''}>🎯 ${escapeHtml(h.title)}</option>`).join('');
+    }
+
+    function renderSavedPapersList() {
+      const container = document.getElementById('saved-papers-list');
+
+      // Filter Saved Papers
+      let filtered = allPapers.filter(paper => {
+        if (savedPapersFilterState.projectId !== 'all' && paper.project_id !== savedPapersFilterState.projectId) {
+          return false;
+        }
+        if (savedPapersFilterState.hypoId !== 'all' && paper.hypothesis_id !== savedPapersFilterState.hypoId) {
+          return false;
+        }
+        if (savedPapersFilterState.searchQuery) {
+          const q = savedPapersFilterState.searchQuery.toLowerCase();
+          const titleMatch = (paper.title || '').toLowerCase().includes(q);
+          const authorMatch = (paper.authors || '').toLowerCase().includes(q);
+          const absMatch = (paper.abstract || '').toLowerCase().includes(q);
+          const insightMatch = (paper.insight_summary || '').toLowerCase().includes(q);
+          if (!titleMatch && !authorMatch && !absMatch && !insightMatch) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      // Sort Saved Papers
+      filtered.sort((a, b) => {
+        if (savedPapersFilterState.sortBy === 'created_desc') {
+          return new Date(b.created_at) - new Date(a.created_at);
+        } else if (savedPapersFilterState.sortBy === 'fit_desc') {
+          return (b.fit_score || 0) - (a.fit_score || 0);
+        } else if (savedPapersFilterState.sortBy === 'year_desc') {
+          return (b.year || 0) - (a.year || 0);
+        } else if (savedPapersFilterState.sortBy === 'title_asc') {
+          return a.title.localeCompare(b.title, 'ko-KR');
+        }
+        return 0;
+      });
+
+      document.getElementById('saved-papers-count-text').textContent = `저장된 논문 총 ${filtered.length}건 (전체 ${allPapers.length}건)`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📑</div>
+            <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.4rem;">저장된 논문이 없습니다</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Semantic Scholar 검색을 통해 연구 가설과 관련된 논문을 보관함에 추가하세요.
+            </p>
+            <button type="button" class="btn btn-primary btn-sm" onclick="switchPapersSubTab('search')">
+              🔍 논문 검색하러 가기
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(paper => {
+        const proj = allProjects.find(p => p.id === paper.project_id);
+        const hypo = allHypotheses.find(h => h.id === paper.hypothesis_id);
+        const projName = paper.projects?.name || proj?.name || '소속 프로젝트';
+        const hypoTitle = paper.hypotheses?.title || hypo?.title || null;
+        const fitBadge = paper.fit_score != null ? getFitScoreBadgeHtml(paper.fit_score) : '';
+        const authorName = getAuthorName(paper.saved_by);
+
+        return `
+          <article class="paper-card" id="saved-paper-card-${paper.id}">
+            <div class="paper-header">
+              <div style="flex: 1;">
+                <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap;">
+                  <span class="badge-project">📁 ${escapeHtml(projName)}</span>
+                  ${hypoTitle ? `
+                    <button type="button" class="badge-track" style="cursor: pointer; background: #eef5f1; border-color: rgba(3, 107, 63, 0.25); color: #034f31;" onclick="navigateToHypothesisDetail('${paper.hypothesis_id}', 'papers')" title="가설 상세 보기">
+                      🎯 가설: ${escapeHtml(hypoTitle)} →
+                    </button>
+                  ` : `
+                    <span class="badge-track">가설 미지정</span>
+                  `}
+                </div>
+                <h3 class="paper-title">
+                  ${paper.source_url ? `<a href="${escapeHtml(paper.source_url)}" target="_blank" rel="noopener noreferrer" title="원문 링크 열기">${escapeHtml(paper.title)} ↗</a>` : escapeHtml(paper.title)}
+                </h3>
+                <div class="paper-meta" style="margin-top: 0.35rem;">
+                  ${paper.authors ? `<span>저자: <strong>${escapeHtml(paper.authors)}</strong></span> • ` : ''}
+                  ${paper.year ? `<span>출판연도: <strong>${paper.year}년</strong></span> • ` : ''}
+                  <span>저장자: ${escapeHtml(authorName)}</span> • 
+                  <span>저장일: ${new Date(paper.created_at).toLocaleDateString('ko-KR')}</span>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem;">
+                ${fitBadge}
+                <button type="button" class="btn btn-danger-outline btn-sm" style="padding: 2px 7px; font-size: 0.72rem;" onclick="handleDeletePaper('${paper.id}')">
+                  삭제
+                </button>
+              </div>
+            </div>
+
+            <!-- Abstract -->
+            ${paper.abstract ? `
+              <div class="paper-abstract">
+                ${escapeHtml(paper.abstract)}
+              </div>
+            ` : ''}
+
+            <!-- Insight Summary Editable Area -->
+            <div class="paper-insight-box">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <label class="form-label" style="font-size: 0.78rem; color: #034f31; margin-bottom: 0; font-weight: 700;">
+                  💡 연구 인사이트 & 메모 (Insight Summary)
+                </label>
+                <button type="button" id="btn-save-insight-${paper.id}" class="btn btn-primary btn-sm" style="padding: 2px 8px; font-size: 0.72rem;" onclick="handleUpdatePaperInsight('${paper.id}')">
+                  메모 저장
+                </button>
+              </div>
+              <textarea id="insight-text-${paper.id}" class="paper-insight-textarea" placeholder="이 논문에서 도출한 핵심 연구 인사이트, 가설과의 연관성, 실험 아이디어 등을 기록하세요...">${escapeHtml(paper.insight_summary || '')}</textarea>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function handleSavedPapersSearch(e) {
+      savedPapersFilterState.searchQuery = e.target.value.trim();
+      renderSavedPapersList();
+    }
+
+    function handleSavedPapersProjectFilter(e) {
+      savedPapersFilterState.projectId = e.target.value;
+      savedPapersFilterState.hypoId = 'all';
+      renderSavedPapersFilters();
+      renderSavedPapersList();
+    }
+
+    function handleSavedPapersHypoFilter(e) {
+      savedPapersFilterState.hypoId = e.target.value;
+      renderSavedPapersList();
+    }
+
+    function handleSavedPapersSort(e) {
+      savedPapersFilterState.sortBy = e.target.value;
+      renderSavedPapersList();
+    }
+
+    async function handleUpdatePaperInsight(paperId) {
+      const textarea = document.getElementById(`insight-text-${paperId}`);
+      const btn = document.getElementById(`btn-save-insight-${paperId}`);
+      if (!textarea || !btn) return;
+
+      const newInsight = textarea.value.trim();
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" aria-hidden="true"></span>';
+
+      try {
+        const { error } = await supabaseClient
+          .from('papers')
+          .update({
+            insight_summary: newInsight,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', paperId);
+
+        if (error) throw error;
+
+        showToast('인사이트 메모가 성공적으로 저장되었습니다.', 'success');
+        await loadAllAppData();
+      } catch (err) {
+        showToast('메모 저장 실패: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
+
+    async function handleDeletePaper(paperId) {
+      if (!confirm('이 논문을 보관함에서 삭제하시겠습니까?')) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from('papers')
+          .delete()
+          .eq('id', paperId);
+
+        if (error) throw error;
+
+        showToast('논문이 보관함에서 삭제되었습니다.', 'success');
+        await loadAllAppData();
+        renderSavedPapersList();
+      } catch (err) {
+        showToast('삭제 실패: ' + err.message, 'error');
       }
     }
 
