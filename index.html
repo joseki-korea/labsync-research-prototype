@@ -1903,7 +1903,479 @@
         grid-template-columns: 1fr;
       }
     }
-  </style>
+  
+    /* ======================================================================
+       USER MANUAL VIEW STYLES (Konkuk Heritage Theme & Flat Card Design)
+       ====================================================================== */
+    .manual-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+      padding-bottom: 4rem;
+    }
+
+    .manual-hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.75rem 2rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .manual-hero-left {
+      max-width: 800px;
+    }
+
+    .manual-hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
+      margin-bottom: 0.6rem;
+      border: 1px solid rgba(3, 107, 63, 0.2);
+    }
+
+    .manual-hero-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #034f31;
+      margin-bottom: 0.4rem;
+      line-height: 1.3;
+    }
+
+    .manual-hero-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .manual-hero-actions {
+      display: flex;
+      gap: 0.6rem;
+      flex-shrink: 0;
+    }
+
+    .manual-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.75rem;
+      align-items: start;
+    }
+
+    /* Sticky Table of Contents Sidebar */
+    .manual-toc-sidebar {
+      position: sticky;
+      top: 84px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .manual-toc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #034f31;
+      margin-bottom: 0.4rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-muted);
+    }
+
+    .manual-toc-link {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+      cursor: pointer;
+      background: none;
+      text-align: left;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .manual-toc-link:hover {
+      background: var(--surface-hover);
+      color: var(--primary);
+    }
+
+    .manual-toc-link.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+      border-color: rgba(3, 107, 63, 0.2);
+    }
+
+    .manual-toc-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary-subtle);
+      color: var(--primary);
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Manual Main Content */
+    .manual-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    /* Section Flat Card (No colored accent bar) */
+    .manual-section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.75rem 2rem;
+      box-shadow: var(--shadow-sm);
+      scroll-margin-top: 84px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .manual-section-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-muted);
+    }
+
+    .manual-section-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .manual-section-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+      border: 1px solid rgba(3, 107, 63, 0.2);
+    }
+
+    .manual-section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #034f31;
+    }
+
+    .manual-section-subtitle {
+      font-size: 0.84rem;
+      color: var(--text-dim);
+      margin-top: 0.15rem;
+    }
+
+    .manual-section-actions {
+      flex-shrink: 0;
+    }
+
+    .manual-prose {
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: var(--text-main);
+    }
+
+    .manual-prose p {
+      margin-bottom: 0.75rem;
+    }
+
+    .manual-prose p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Grids inside manual */
+    .manual-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .manual-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .manual-feature-box {
+      background: #fbfbf9;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .manual-feature-box.highlight {
+      background: #f2f7f4;
+      border-color: rgba(3, 107, 63, 0.25);
+    }
+
+    .manual-feature-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .manual-feature-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Callout Boxes */
+    .manual-callout {
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1.15rem;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      border: 1px solid transparent;
+    }
+
+    .manual-callout.tip {
+      background: rgba(3, 107, 63, 0.07);
+      border-color: rgba(3, 107, 63, 0.2);
+      color: #034f31;
+    }
+
+    .manual-callout.info {
+      background: rgba(36, 107, 120, 0.08);
+      border-color: rgba(36, 107, 120, 0.22);
+      color: #1a515c;
+    }
+
+    .manual-callout.warning {
+      background: rgba(154, 104, 24, 0.08);
+      border-color: rgba(154, 104, 24, 0.25);
+      color: #724c0f;
+    }
+
+    .manual-callout-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      line-height: 1.2;
+    }
+
+    /* Code Snippet Box */
+    .manual-code-box {
+      background: #183129;
+      border: 1px solid #23473b;
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      color: #d6ede1;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      overflow-x: auto;
+    }
+
+    .manual-code-content {
+      white-space: pre;
+    }
+
+    .manual-copy-btn {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 2px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+      font-family: 'Pretendard', sans-serif;
+    }
+
+    .manual-copy-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Steps List */
+    .manual-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .manual-step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      padding: 0.85rem 1rem;
+      background: #fbfbf9;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+    }
+
+    .manual-step-num-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .manual-step-body {
+      flex: 1;
+    }
+
+    .manual-step-body-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      margin-bottom: 0.2rem;
+    }
+
+    .manual-step-body-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* FAQ List */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .faq-card {
+      background: #fdfdfb;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .faq-question {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #034f31;
+    }
+
+    .faq-q-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      border: 1px solid rgba(3, 107, 63, 0.2);
+    }
+
+    .faq-answer {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      padding-left: 0.15rem;
+    }
+
+    .faq-a-badge {
+      background: #eef2ef;
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 900px) {
+      .manual-layout {
+        grid-template-columns: 1fr;
+      }
+      .manual-toc-sidebar {
+        position: static;
+        margin-bottom: 0.5rem;
+      }
+      .manual-grid-2,
+      .manual-grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .manual-hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .manual-hero-actions {
+        width: 100%;
+      }
+      .manual-hero-actions .btn {
+        flex: 1;
+      }
+      .manual-section-card {
+        padding: 1.25rem 1.25rem;
+      }
+      .manual-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+</style>
 </head>
 <body>
 
@@ -1934,6 +2406,9 @@
         </button>
         <button type="button" id="nav-tab-papers" class="nav-link" onclick="navigateToPapers()">
           <span>논문 조사</span>
+        </button>
+        <button type="button" id="nav-tab-manual" class="nav-link" onclick="navigateToManual()">
+          <span>사용법</span>
         </button>
       </nav>
     </div>
@@ -1981,6 +2456,9 @@
         </button>
         <button type="button" id="mobile-tab-papers" class="mobile-nav-link" onclick="navigateToPapers(); closeMobileDrawer();">
           <span>📚 논문 조사 파이프라인</span>
+        </button>
+        <button type="button" id="mobile-tab-manual" class="mobile-nav-link" onclick="navigateToManual(); closeMobileDrawer();">
+          <span>📖 사용법 매뉴얼</span>
         </button>
       </nav>
     </div>
@@ -2590,6 +3068,710 @@
        ====================================================================== -->
 
   <!-- Modal 1: Create Project -->
+
+    <!-- ======================================================================
+         7. USER MANUAL VIEW (연구원 사용자 사용법 안내서)
+         ====================================================================== -->
+    <div id="manual-view" class="hidden">
+      <!-- Breadcrumbs -->
+      <nav class="breadcrumb-bar" aria-label="매뉴얼 위치 경로">
+        <div class="breadcrumbs">
+          <button type="button" class="breadcrumb-link" onclick="navigateToDashboard()">← 대시보드</button>
+          <span aria-hidden="true">/</span>
+          <strong style="color: var(--text-main);">사용법 매뉴얼 (User Guide)</strong>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="navigateToDashboard()">📊 대시보드</button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="navigateToPapers()">📚 논문 조사</button>
+        </div>
+      </nav>
+
+      <div class="manual-container">
+        <!-- Hero Header -->
+        <div class="manual-hero">
+          <div class="manual-hero-left">
+            <div class="manual-hero-tag">🎓 LabSync 연구원 가이드북</div>
+            <h1 class="manual-hero-title">LabSync 연구 관리 시스템 사용법</h1>
+            <p class="manual-hero-desc">
+              대학원 연구 과제의 기획부터 3단 계층(프로젝트·트랙·가설) 관리, 실험 판정 근거 기록, Semantic Scholar 논문 조사 및 로컬 AI 인사이트 연계까지 실무 전 과정을 한눈에 안내합니다.
+            </p>
+          </div>
+          <div class="manual-hero-actions">
+            <button type="button" class="btn btn-outline" onclick="navigateToSummaryTable()">📑 가설 요약 테이블</button>
+            <button type="button" class="btn btn-primary" onclick="navigateToProjects()">📁 프로젝트 목록</button>
+          </div>
+        </div>
+
+        <!-- 2-Column Layout: Sticky Sidebar TOC + Content Sections -->
+        <div class="manual-layout">
+          <!-- Left Sticky Sidebar: Table of Contents -->
+          <aside class="manual-toc-sidebar" aria-label="매뉴얼 목차">
+            <div class="manual-toc-header">
+              <span>목차 (Contents)</span>
+              <span style="font-size: 0.75rem; color: var(--text-dim);">8개 항목</span>
+            </div>
+            <button type="button" class="manual-toc-link" onclick="scrollToManualSection('sec-getting-started')">
+              <span class="manual-toc-num">1</span>
+              <span>시작하기 & 테스트 계정</span>
+            </button>
+            <button type="button" class="manual-toc-link" onclick="scrollToManualSection('sec-dashboard')">
+              <span class="manual-toc-num">2</span>
+              <span>대시보드 보는 법</span>
+            </button>
+            <button type="button" class="manual-toc-link" onclick="scrollToManualSection('sec-hierarchy')">
+              <span class="manual-toc-num">3</span>
+              <span>프로젝트·트랙·가설 생성</span>
+            </button>
+            <button type="button" class="manual-toc-link" onclick="scrollToManualSection('sec-hypothesis-status')">
+              <span class="manual-toc-num">4</span>
+              <span>가설 판정 & 상태 변경</span>
+            </button>
+            <button type="button" class="manual-toc-link" onclick="scrollToManualSection('sec-summary-table')">
+              <span class="manual-toc-num">5</span>
+              <span>가설 요약 테이블 활용</span>
+            </button>
+            <button type="button" class="manual-toc-link" onclick="scrollToManualSection('sec-papers-pipeline')">
+              <span class="manual-toc-num">6</span>
+              <span>논문 조사 & 적합도 점수</span>
+            </button>
+            <button type="button" class="manual-toc-link" onclick="scrollToManualSection('sec-local-ai')">
+              <span class="manual-toc-num">7</span>
+              <span>로컬 AI 연구 인사이트</span>
+            </button>
+            <button type="button" class="manual-toc-link" onclick="scrollToManualSection('sec-faq')">
+              <span class="manual-toc-num">8</span>
+              <span>자주 묻는 질문 (FAQ)</span>
+            </button>
+          </aside>
+
+          <!-- Right Content Area -->
+          <div class="manual-content">
+
+            <!-- ============================================================
+                 Section 1: 시작하기 — 로그인/회원가입, 빠른테스트계정
+                 ============================================================ -->
+            <section id="sec-getting-started" class="manual-section-card">
+              <div class="manual-section-header">
+                <div class="manual-section-header-left">
+                  <span class="manual-section-badge">1</span>
+                  <div>
+                    <h2 class="manual-section-title">시작하기 (로그인 · 회원가입 · 빠른 테스트 계정)</h2>
+                    <p class="manual-section-subtitle">계정 등록 및 사전 구성된 테스트 계정을 통한 원클릭 시연 방법</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="manual-prose">
+                <p>
+                  LabSync는 대학원 연구실 구성원들이 연구 프로젝트와 가설 검증 내역을 안전하게 공유하고 기록할 수 있도록 설계된 플랫폼입니다.
+                </p>
+              </div>
+
+              <div class="manual-grid-2">
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>🔑</span>
+                    <span>회원가입 및 로그인</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    기관 이메일(예: <code>researcher@lab.ac.kr</code>)과 6자 이상의 비밀번호를 입력해 가입합니다. 회원가입 시 입력하는 <strong>이름(표시용)</strong>은 가설 작성자, 판정 갱신자, 인사이트 작성자로 자동 표기됩니다.
+                  </div>
+                </div>
+
+                <div class="manual-feature-box highlight">
+                  <div class="manual-feature-title">
+                    <span>⚡</span>
+                    <span>원클릭 빠른 테스트 계정</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    회원가입 없이 즉시 기능을 둘러보고 싶을 때, 로그인 화면 하단의 <strong>[원클릭 계정 입력]</strong> 버튼을 누르면 이메일과 비밀번호가 자동 입력되어 즉시 로그인할 수 있습니다.
+                  </div>
+                </div>
+              </div>
+
+              <div class="manual-callout info">
+                <span class="manual-callout-icon">💡</span>
+                <div>
+                  <strong>사전 구성된 테스트 계정 정보:</strong>
+                  <ul style="margin-top: 0.35rem; padding-left: 1.2rem; font-size: 0.85rem;">
+                    <li><strong>계정 A (NLP Lead)</strong>: <code>test_user_a@research-lab.ac.kr</code> (비밀번호: <code>Password123!</code>) — 자연어처리 및 지식그래프 추론 연구 담당</li>
+                    <li><strong>계정 B (Bio Lead)</strong>: <code>test_user_b@research-lab.ac.kr</code> (비밀번호: <code>Password123!</code>) — 단백질 구조 및 신약 후보물질 탐색 연구 담당</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================================
+                 Section 2: 대시보드 보는법 — 통계카드 의미, 최근가설, 내 프로젝트
+                 ============================================================ -->
+            <section id="sec-dashboard" class="manual-section-card">
+              <div class="manual-section-header">
+                <div class="manual-section-header-left">
+                  <span class="manual-section-badge">2</span>
+                  <div>
+                    <h2 class="manual-section-title">대시보드 보는 법 (통계 지표 · 최근 가설 · 프로젝트 요약)</h2>
+                    <p class="manual-section-subtitle">연구실 전체 가설의 실시간 검증 현황 파악 및 드릴다운 탐색</p>
+                  </div>
+                </div>
+                <div class="manual-section-actions">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="navigateToDashboard()">대시보드 바로가기 →</button>
+                </div>
+              </div>
+
+              <div class="manual-prose">
+                <p>
+                  로그인 후 처음 마주하는 <strong>대시보드</strong>는 연구실 내 모든 연구 가설의 상태를 종합 집계하는 중앙 관제탑입니다.
+                </p>
+              </div>
+
+              <!-- 5 Status KPI Cards Explanation -->
+              <div>
+                <h3 style="font-size: 0.95rem; font-weight: 700; color: #034f31; margin-bottom: 0.6rem;">📊 5가지 통계 카드(KPI)의 의미</h3>
+                <div class="manual-grid-3">
+                  <div class="manual-feature-box">
+                    <div class="manual-feature-title" style="color: var(--text-main);">
+                      <span>Total</span>
+                      <span>전체 연구 가설</span>
+                    </div>
+                    <div class="manual-feature-desc">
+                      연구실에 등록된 모든 가설 명제의 총수입니다. 카드를 클릭하면 가설 요약 테이블의 '전체' 보기로 이동합니다.
+                    </div>
+                  </div>
+
+                  <div class="manual-feature-box">
+                    <div class="manual-feature-title" style="color: #1f6270;">
+                      <span>Testing</span>
+                      <span>검증 진행중</span>
+                    </div>
+                    <div class="manual-feature-desc">
+                      현재 벤치마크 실험 수행, 데이터 측정, 모델 학습이 진행 중인 활성 가설입니다.
+                    </div>
+                  </div>
+
+                  <div class="manual-feature-box">
+                    <div class="manual-feature-title" style="color: #036b3f;">
+                      <span>Supported</span>
+                      <span>가설 채택</span>
+                    </div>
+                    <div class="manual-feature-desc">
+                      실험 결과와 통계적 유의성이 검증되어 연구팀에서 타당성을 공식 인정한 가설입니다.
+                    </div>
+                  </div>
+
+                  <div class="manual-feature-box">
+                    <div class="manual-feature-title" style="color: #9b3933;">
+                      <span>Rejected</span>
+                      <span>가설 기각</span>
+                    </div>
+                    <div class="manual-feature-desc">
+                      실험 결과 반례가 발생하거나 유의미한 성능 개선이 없어 기각 처리된 가설입니다.
+                    </div>
+                  </div>
+
+                  <div class="manual-feature-box">
+                    <div class="manual-feature-title" style="color: #8b5e15;">
+                      <span>Inconclusive</span>
+                      <span>판정 유보</span>
+                    </div>
+                    <div class="manual-feature-desc">
+                      실험 데이터가 부족하거나 결과가 모호하여 추가 실험이 요구되는 보류 가설입니다.
+                    </div>
+                  </div>
+
+                  <div class="manual-feature-box highlight">
+                    <div class="manual-feature-title" style="color: var(--primary);">
+                      <span>⚡ 원클릭 필터</span>
+                      <span>스마트 바로가기</span>
+                    </div>
+                    <div class="manual-feature-desc">
+                      각 통계 카드를 클릭하면 해당 검증 상태의 가설만 즉시 필터링된 요약 테이블로 이동합니다.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panels Explanation -->
+              <div class="manual-grid-2" style="margin-top: 0.5rem;">
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>🕒</span>
+                    <span>최근 판정 갱신 가설 패널</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    가장 최근에 상태나 판정 근거(Rationale)가 업데이트된 가설 5건을 실시간 표시합니다. 가설명을 클릭하면 3단 상세 뷰로 이동하여 판정 근거와 연결된 논문을 즉시 열람할 수 있습니다.
+                  </div>
+                </div>
+
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>📁</span>
+                    <span>내 연구 프로젝트 요약 패널</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    참여 중인 연구 프로젝트와 소속 트랙 수를 한눈에 파악합니다. <code>+ 새 프로젝트</code> 버튼으로 신규 프로젝트를 생성하거나, 프로젝트 카드를 클릭해 워크스페이스로 이동합니다.
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================================
+                 Section 3: 프로젝트·트랙·가설 만들기 — 워크스페이스에서 어떻게 생성하는지
+                 ============================================================ -->
+            <section id="sec-hierarchy" class="manual-section-card">
+              <div class="manual-section-header">
+                <div class="manual-section-header-left">
+                  <span class="manual-section-badge">3</span>
+                  <div>
+                    <h2 class="manual-section-title">프로젝트 · 트랙 · 가설 만들기 (3단계 계층 구조)</h2>
+                    <p class="manual-section-subtitle">연구 과제의 체계적인 구조화와 워크스페이스 내 생성 절차</p>
+                  </div>
+                </div>
+                <div class="manual-section-actions">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="navigateToProjects()">프로젝트 목록 →</button>
+                </div>
+              </div>
+
+              <div class="manual-prose">
+                <p>
+                  복잡한 대학원 연구를 명확하게 관리하기 위해 LabSync는 <strong>3단계 계층 구조(3-Tier Hierarchy)</strong>를 채택하고 있습니다.
+                </p>
+              </div>
+
+              <!-- Hierarchy Box -->
+              <div class="manual-grid-3">
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>1️⃣ 프로젝트 (Project)</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    연구 과제의 최상위 대주제입니다.<br>
+                    <em>예: "멀티모달 지식그래프 추론 모델 개발", "단백질 표적 발굴 AI"</em>
+                  </div>
+                </div>
+
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>2️⃣ 트랙 (Track)</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    프로젝트 내 세부 연구 방향 및 분과입니다.<br>
+                    <em>예: "트랙 A: 그래프 임베딩 기법", "트랙 B: 경량화 어텐션 구조"</em>
+                  </div>
+                </div>
+
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>3️⃣ 가설 (Hypothesis)</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    실험을 통해 검증할 구체적인 학술 명제입니다.<br>
+                    <em>예: "GNN 깊이를 8로 확장 시 소분자 결합 친화도 예측 오차가 12% 감소할 것이다"</em>
+                  </div>
+                </div>
+              </div>
+
+              <!-- How to create in Workspace -->
+              <div>
+                <h3 style="font-size: 0.95rem; font-weight: 700; color: #034f31; margin-bottom: 0.6rem;">🛠️ 워크스페이스에서 생성하는 단계별 절차</h3>
+                <div class="manual-steps-list">
+                  <div class="manual-step-item">
+                    <span class="manual-step-num-badge">1</span>
+                    <div class="manual-step-body">
+                      <div class="manual-step-body-title">프로젝트 진입 또는 신규 생성</div>
+                      <div class="manual-step-body-desc">
+                        상단 메뉴 <strong>프로젝트 목록</strong>에서 작업할 프로젝트 카드를 클릭하여 워크스페이스를 엽니다. 새 프로젝트가 필요한 경우 <code>+ 새 프로젝트</code> 버튼을 누르고 프로젝트 이름과 설명을 작성합니다.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="manual-step-item">
+                    <span class="manual-step-num-badge">2</span>
+                    <div class="manual-step-body">
+                      <div class="manual-step-body-title">연구 트랙 (Track) 추가</div>
+                      <div class="manual-step-body-desc">
+                        워크스페이스 좌측 <strong>연구 트랙</strong> 패널의 <code>+ 트랙</code> 버튼을 클릭합니다. 트랙명(예: "데이터 전처리 파이프라인")과 설명을 입력하여 연구 분과를 추가합니다.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="manual-step-item">
+                    <span class="manual-step-num-badge">3</span>
+                    <div class="manual-step-body">
+                      <div class="manual-step-body-title">연구 가설 (Hypothesis) 등록</div>
+                      <div class="manual-step-body-desc">
+                        우측 <strong>가설 목록</strong> 패널의 <code>+ 가설 등록</code> 버튼을 클릭합니다. 가설 명제(Title), 세부 배경 및 실험 계획(Description), 소속 트랙을 지정하여 생성합니다. 생성된 가설은 초기 <code>초안 (Draft)</code> 상태로 등록됩니다.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================================
+                 Section 4: 가설 판정/상태변경 — draft→testing→supported/rejected/inconclusive, 판정근거 왜 필수인지
+                 ============================================================ -->
+            <section id="sec-hypothesis-status" class="manual-section-card">
+              <div class="manual-section-header">
+                <div class="manual-section-header-left">
+                  <span class="manual-section-badge">4</span>
+                  <div>
+                    <h2 class="manual-section-title">가설 판정 및 상태 변경 (라이프사이클 & 판정 근거 필수)</h2>
+                    <p class="manual-section-subtitle">검증 단계별 상태 전이 규칙과 판정 근거(Rationale) 의무화의 이유</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="manual-prose">
+                <p>
+                  연구 가설은 실험 진행 상황에 따라 체계적인 라이프사이클을 거치며 상태가 업데이트됩니다.
+                </p>
+              </div>
+
+              <!-- Lifecycle Flow -->
+              <div class="manual-callout info">
+                <span class="manual-callout-icon">🔄</span>
+                <div>
+                  <strong>가설 상태 라이프사이클 (State Lifecycle):</strong>
+                  <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
+                    <span class="status-badge draft">초안 (Draft)</span>
+                    <span>→ 실험 착수 →</span>
+                    <span class="status-badge testing">검증중 (Testing)</span>
+                    <span>→ 실험 및 통계 검증 후 →</span>
+                    <span class="status-badge supported">채택 (Supported)</span>
+                    <span>/</span>
+                    <span class="status-badge rejected">기각 (Rejected)</span>
+                    <span>/</span>
+                    <span class="status-badge inconclusive">유보 (Inconclusive)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rationale Mandatory Explanation -->
+              <div class="manual-callout tip">
+                <span class="manual-callout-icon">💡</span>
+                <div>
+                  <strong style="font-size: 0.92rem;">판정 근거 (Rationale) 작성이 필수인 이유</strong>
+                  <p style="margin-top: 0.35rem; font-size: 0.86rem; line-height: 1.6;">
+                    학술 연구에서는 단순한 '채택/기각' 버튼 클릭보다 <strong>"어떤 정량적 실험 수치(Accuracy, F1-score, p-value, RMSE 등), 데이터셋 조건, 대조군 비교, 또는 관측된 반례에 의해 결론이 내려졌는가"</strong>가 연구실의 핵심 자산입니다.<br>
+                    판정 근거 작성을 필수로 제한함으로써 연구의 <strong>재현성(Reproducibility)</strong>을 보장하고, 연구 노트 작성 및 논문 초안 작성 시 결과(Results) 섹션의 근거 자료로 즉시 활용할 수 있습니다.
+                  </p>
+                </div>
+              </div>
+
+              <!-- How to change status -->
+              <div class="manual-feature-box">
+                <div class="manual-feature-title">
+                  <span>⚙️</span>
+                  <span>상태 변경 방법</span>
+                </div>
+                <div class="manual-feature-desc">
+                  가설 카드 또는 가설 상세 페이지에서 <strong>[판정 / 상태 변경]</strong> 버튼을 누릅니다. 변경할 상태를 선택하고, 실험 측정 수치와 판정 근거를 텍스트 박스에 상세히 작성한 후 <strong>[판정 저장]</strong>을 클릭합니다.
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================================
+                 Section 5: 가설 요약 테이블 — 필터·정렬·검색 사용법
+                 ============================================================ -->
+            <section id="sec-summary-table" class="manual-section-card">
+              <div class="manual-section-header">
+                <div class="manual-section-header-left">
+                  <span class="manual-section-badge">5</span>
+                  <div>
+                    <h2 class="manual-section-title">가설 요약 테이블 (필터 · 정렬 · 실시간 검색)</h2>
+                    <p class="manual-section-subtitle">전체 프로젝트 가설 통합 조회와 강력한 다중 필터링 활용법</p>
+                  </div>
+                </div>
+                <div class="manual-section-actions">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="navigateToSummaryTable()">요약 테이블 열기 →</button>
+                </div>
+              </div>
+
+              <div class="manual-prose">
+                <p>
+                  상단 네비게이션의 <strong>가설 요약 테이블</strong>은 여러 프로젝트와 트랙에 흩어져 있는 수십 개의 가설을 하나의 스프레드시트 형태로 집계하여 빠르게 탐색할 수 있는 뷰입니다.
+                </p>
+              </div>
+
+              <div class="manual-grid-2">
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>🔍</span>
+                    <span>실시간 통합 검색</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    검색창에 가설 명제, 프로젝트명, 트랙명뿐만 아니라 연구원이 작성한 <strong>판정 근거(💡 Rationale) 본문 키워드</strong>까지 실시간으로 매칭되어 원하는 가설을 즉시 찾아냅니다.
+                  </div>
+                </div>
+
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>🏷️</span>
+                    <span>상태별 탭 필터링</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    <code>전체</code>, <code>초안</code>, <code>검증중</code>, <code>채택</code>, <code>기각</code>, <code>유보</code> 상태 알약 버튼을 원클릭하여 특정 검증 단계에 위치한 가설들만 모아볼 수 있습니다.
+                  </div>
+                </div>
+
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>📁</span>
+                    <span>프로젝트 선택 필터</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    우측 상단 프로젝트 드롭다운 메뉴에서 특정 연구 과제를 선택하여 해당 과제에 소속된 가설들만 집중 조회할 수 있습니다.
+                  </div>
+                </div>
+
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>↕️</span>
+                    <span>다각도 정렬 및 드릴다운</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    최근 판정 갱신일(최신순/오래된순), 가설명(가나다순), 검증 상태순으로 테이블을 정렬할 수 있으며, 가설명을 클릭하면 3단 상세 페이지로 즉시 진입합니다.
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================================
+                 Section 6: 논문조사 — Semantic Scholar 검색, 저장, 적합도점수 의미, 인사이트메모
+                 ============================================================ -->
+            <section id="sec-papers-pipeline" class="manual-section-card">
+              <div class="manual-section-header">
+                <div class="manual-section-header-left">
+                  <span class="manual-section-badge">6</span>
+                  <div>
+                    <h2 class="manual-section-title">논문 조사 파이프라인 (Semantic Scholar 검색 · 적합도 점수 · 인사이트)</h2>
+                    <p class="manual-section-subtitle">실시간 학술 DB 검색, 가설 연계 적합도(Fit Score) 산출, 연구 보관함 관리</p>
+                  </div>
+                </div>
+                <div class="manual-section-actions">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="navigateToPapers()">논문 조사 열기 →</button>
+                </div>
+              </div>
+
+              <div class="manual-prose">
+                <p>
+                  <strong>논문 조사</strong> 뷰는 전 세계 최대 오픈 학술 데이터베이스인 <strong>Semantic Scholar</strong>와 실시간 연동되어 선행 연구를 탐색하고 연구 가설과 매칭하는 파이프라인을 제공합니다.
+                </p>
+              </div>
+
+              <div class="manual-grid-2">
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>🔎</span>
+                    <span>1. Semantic Scholar 실시간 검색</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    검색창에 영문/한글 키워드, 논문명, 저자명을 입력하거나 추천 키워드 태그(Graph Neural Networks, Attention Mechanism 등)를 클릭합니다. 논문 제목, 저자, 발표연도, 인용수, 초록(Abstract), DOI 원문 링크가 실시간 로드됩니다.
+                  </div>
+                </div>
+
+                <div class="manual-feature-box">
+                  <div class="manual-feature-title">
+                    <span>💾</span>
+                    <span>2. 가설 매칭 논문 저장</span>
+                  </div>
+                  <div class="manual-feature-desc">
+                    검색 결과 카드 하단에서 논문을 수집할 <strong>소속 프로젝트</strong>와 <strong>연결 가설</strong>을 선택한 후 <code>[💾 이 가설에 논문 저장]</code> 버튼을 누르면 연구실 보관함에 영구 저장됩니다.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fit score explanation -->
+              <div class="manual-callout info">
+                <span class="manual-callout-icon">🎯</span>
+                <div>
+                  <strong style="font-size: 0.92rem;">가설 적합도 점수 (Fit Score)의 원리와 의미</strong>
+                  <p style="margin-top: 0.35rem; font-size: 0.86rem; line-height: 1.6;">
+                    선택한 가설의 명제·설명과 논문의 초록·제목 간의 <strong>학술 전문 키워드 일치율(Coverage, 75% 가중치) 및 자카드 유사도(Jaccard Similarity, 25% 가중치)</strong>를 알고리즘으로 자동 분석하여 15~98점 점수로 환산합니다.
+                  </p>
+                  <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.82rem;">
+                    <span class="badge-fit-score high">🎯 가설 적합도 70점 이상 (High)</span>
+                    <span style="color: var(--text-muted);">: 가설 주제 및 방법론과 직접 일치하는 핵심 선행 논문</span>
+                  </div>
+                  <div style="margin-top: 0.3rem; display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.82rem;">
+                    <span class="badge-fit-score mid">🎯 가설 적합도 45~69점 (Mid)</span>
+                    <span style="color: var(--text-muted);">: 기반 도메인이나 선행 기법을 다루는 참고 논문</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Saved Papers Library & Insight Memo -->
+              <div class="manual-feature-box">
+                <div class="manual-feature-title">
+                  <span>📑</span>
+                  <span>3. 저장된 논문 보관함 & 인사이트 메모</span>
+                </div>
+                <div class="manual-feature-desc">
+                  <strong>저장된 논문 보관함</strong> 탭에서는 프로젝트별/가설별로 수집된 논문들을 한눈에 모아보고, 연구원이 직접 읽고 분석한 요약 및 실험 아이디어를 <strong>인사이트 메모 (Insight Summary)</strong>에 기록하여 동료들과 공유할 수 있습니다.
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================================
+                 Section 7: 로컬 AI 인사이트 — 왜 별도 로컬서버가 필요한지(보안상 이유 한줄), 어떻게 켜는지(local-ai-server 폴더 안내), AI인사이트 버튼 사용법
+                 ============================================================ -->
+            <section id="sec-local-ai" class="manual-section-card">
+              <div class="manual-section-header">
+                <div class="manual-section-header-left">
+                  <span class="manual-section-badge">7</span>
+                  <div>
+                    <h2 class="manual-section-title">로컬 AI 연구 인사이트 (보안 이유 · 로컬 서버 실행 · 활용법)</h2>
+                    <p class="manual-section-subtitle">연구 가설과 논문 초록을 로컬 환경에서 안전하게 교차 분석하는 방법</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Security Reason (One Line Requirement) -->
+              <div class="manual-callout warning">
+                <span class="manual-callout-icon">🔒</span>
+                <div>
+                  <strong style="font-size: 0.92rem;">왜 별도의 로컬 AI 서버가 필요한가요? (보안상 이유)</strong>
+                  <p style="margin-top: 0.3rem; font-size: 0.86rem; line-height: 1.6;">
+                    대학원 연구실의 <strong>미발표 연구 가설과 핵심 아이디어가 외부 클라우드나 상용 AI 서버로 유출되는 것을 원천 차단</strong>하기 위해, 연구원 PC 로컬 환경(<code>127.0.0.1:8787</code>)에서만 실행되는 독립 AI 파이프라인을 사용합니다.
+                  </p>
+                </div>
+              </div>
+
+              <!-- How to turn on local server -->
+              <div>
+                <h3 style="font-size: 0.95rem; font-weight: 700; color: #034f31; margin-bottom: 0.6rem;">💻 로컬 AI 서버 구동 방법 (local-ai-server 폴더 안내)</h3>
+                <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 0.6rem;">
+                  터미널을 열고 프로젝트 내 <code>local-ai-server</code> 디렉토리로 이동한 뒤 아래 명령어를 실행합니다 (Node.js 18 이상 및 Claude CLI 환경 필요).
+                </p>
+
+                <div class="manual-code-box">
+                  <div class="manual-code-content">cd local-ai-server &amp;&amp; npm install &amp;&amp; node server.js</div>
+                  <button type="button" id="btn-copy-server-cmd" class="manual-copy-btn" onclick="copyCommand('cd local-ai-server && npm install && node server.js', 'btn-copy-server-cmd')">
+                    복사
+                  </button>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.4rem;">
+                  ✓ 실행 후 터미널에 <code>ResearchLab Local AI Server running on http://127.0.0.1:8787</code> 문구가 표시되면 정상 실행된 상태입니다.
+                </p>
+              </div>
+
+              <!-- AI Insight Button Usage -->
+              <div>
+                <h3 style="font-size: 0.95rem; font-weight: 700; color: #034f31; margin-bottom: 0.6rem;">✨ AI 인사이트 버튼 사용법</h3>
+                <div class="manual-steps-list">
+                  <div class="manual-step-item">
+                    <span class="manual-step-num-badge">1</span>
+                    <div class="manual-step-body">
+                      <div class="manual-step-body-title">가설에 연결된 저장 논문 확인</div>
+                      <div class="manual-step-body-desc">
+                        상단 메뉴 <strong>논문 조사</strong> → <strong>저장된 논문 보관함</strong> 탭으로 이동합니다.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="manual-step-item">
+                    <span class="manual-step-num-badge">2</span>
+                    <div class="manual-step-body">
+                      <div class="manual-step-body-title">AI 인사이트 생성 클릭</div>
+                      <div class="manual-step-body-desc">
+                        논문 카드 우측의 <code>✨ AI 인사이트 생성 (로컬 Claude)</code> 버튼을 클릭합니다. 로컬 AI가 논문 초록과 가설 명제를 정밀 대조하여 가설 검증 포인트 및 연구 시사점을 분석합니다.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="manual-step-item">
+                    <span class="manual-step-num-badge">3</span>
+                    <div class="manual-step-body">
+                      <div class="manual-step-body-title">인사이트 검토 및 메모 저장</div>
+                      <div class="manual-step-body-desc">
+                        텍스트 영역에 자동 생성된 분석 내용을 검토·수정한 뒤 <code>[메모 저장]</code> 버튼을 누르면 연구실 데이터베이스에 영구 보관됩니다.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============================================================
+                 Section 8: FAQ 3~4개 정도
+                 ============================================================ -->
+            <section id="sec-faq" class="manual-section-card">
+              <div class="manual-section-header">
+                <div class="manual-section-header-left">
+                  <span class="manual-section-badge">8</span>
+                  <div>
+                    <h2 class="manual-section-title">자주 묻는 질문 (FAQ)</h2>
+                    <p class="manual-section-subtitle">연구원들이 자주 마주치는 의문점과 해결 가이드</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="faq-list">
+                <!-- FAQ 1 -->
+                <div class="faq-card">
+                  <div class="faq-question">
+                    <span class="faq-q-badge">Q1</span>
+                    <span>저장된 논문에서 [AI 인사이트 생성] 버튼을 눌렀는데 오류 메시지가 나오거나 동작하지 않아요.</span>
+                  </div>
+                  <div class="faq-answer">
+                    <span class="faq-a-badge">A</span>
+                    <div>
+                      다음 두 가지 사항을 확인해 주세요:<br>
+                      <strong>1. 연결 가설 존재 여부:</strong> 해당 논문이 특정 연구 가설에 연결되어 있는지 확인하세요. 연결된 가설이 없으면 비교 분석할 기준 명제가 없어 생성이 제한됩니다.<br>
+                      <strong>2. 로컬 AI 서버 실행 여부:</strong> PC 터미널에서 <code>cd local-ai-server && node server.js</code> 명령어로 서버(포트 8787)가 실행 중인지 확인하세요. 로컬 서버가 꺼져 있으면 연결 오류가 발생합니다.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="faq-card">
+                  <div class="faq-question">
+                    <span class="faq-q-badge">Q2</span>
+                    <span>가설 적합도 점수(Fit Score)는 어떻게 산출되며 점수를 높이려면 어떻게 해야 하나요?</span>
+                  </div>
+                  <div class="faq-answer">
+                    <span class="faq-a-badge">A</span>
+                    <div>
+                      논문 초록/제목의 학술 전문 단어들과 연구 가설의 제목/설명 간의 키워드 매칭률(75%) 및 자카드 텍스트 유사도(25%)를 바탕으로 계산됩니다. 가설을 등록할 때 연구 방법론, 타겟 분자명, 모델 아키텍처 등 구체적인 전문 용어를 상세히 작성할수록 더욱 정확하고 높은 적합도 점수가 도출됩니다.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="faq-card">
+                  <div class="faq-question">
+                    <span class="faq-q-badge">Q3</span>
+                    <span>가설 상태를 변경할 때 판정 근거(Rationale)를 빈칸으로 둘 수 없나요?</span>
+                  </div>
+                  <div class="faq-answer">
+                    <span class="faq-a-badge">A</span>
+                    <div>
+                      빈칸으로 둘 수 없습니다. 대학원 연구의 신뢰성과 재현성을 보장하기 위해, '왜 이 가설이 채택/기각/유보되었는지'에 대한 정량적 수치(정확도, F1-score, p-value 등)나 실험 반례를 필수로 남기도록 시스템적으로 의무화되어 있습니다.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="faq-card">
+                  <div class="faq-question">
+                    <span class="faq-q-badge">Q4</span>
+                    <span>Semantic Scholar 검색 결과가 빈 화면으로 나오거나 지연될 때는 어떻게 하나요?</span>
+                  </div>
+                  <div class="faq-answer">
+                    <span class="faq-a-badge">A</span>
+                    <div>
+                      Semantic Scholar 해외 학술 API의 네트워크 상황에 따라 일시적으로 응답이 지연될 수 있습니다. 너무 긴 자연어 문장보다는 핵심 영문 키워드(예: <code>Graph Neural Networks</code>, <code>Transformer Attention</code>)로 검색하시거나, 검색창 하단의 '추천 키워드 태그'를 클릭해 시연해 보세요.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
   <div id="modal-create-project" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-create-project-title" aria-hidden="true" onclick="handleOverlayClick(event, 'modal-create-project')">
     <div class="modal-card">
       <div class="modal-header">
@@ -3005,6 +4187,7 @@
       document.getElementById('projects-view').classList.add('hidden');
       document.getElementById('workspace-view').classList.add('hidden');
       document.getElementById('papers-view').classList.add('hidden');
+      document.getElementById('manual-view')?.classList.add('hidden');
       
       document.getElementById('nav-main-menu').classList.add('hidden');
       document.getElementById('nav-user-section').classList.add('hidden');
@@ -3093,24 +4276,27 @@
       document.getElementById('nav-tab-summary')?.classList.toggle('active', activeTab === 'summary');
       document.getElementById('nav-tab-projects')?.classList.toggle('active', activeTab === 'projects');
       document.getElementById('nav-tab-papers')?.classList.toggle('active', activeTab === 'papers');
+      document.getElementById('nav-tab-manual')?.classList.toggle('active', activeTab === 'manual');
 
       document.getElementById('mobile-tab-dashboard')?.classList.toggle('active', activeTab === 'dashboard');
       document.getElementById('mobile-tab-summary')?.classList.toggle('active', activeTab === 'summary');
       document.getElementById('mobile-tab-projects')?.classList.toggle('active', activeTab === 'projects');
       document.getElementById('mobile-tab-papers')?.classList.toggle('active', activeTab === 'papers');
+      document.getElementById('mobile-tab-manual')?.classList.toggle('active', activeTab === 'manual');
     }
 
     // =========================================================================
     // View Navigation Handlers
     // =========================================================================
     function hideAllViews() {
-      document.getElementById('dashboard-view').classList.add('hidden');
-      document.getElementById('summary-table-view').classList.add('hidden');
-      document.getElementById('hypothesis-detail-view').classList.add('hidden');
-      document.getElementById('projects-view').classList.add('hidden');
-      document.getElementById('workspace-view').classList.add('hidden');
-      document.getElementById('papers-view').classList.add('hidden');
-      document.getElementById('auth-view').classList.add('hidden');
+      document.getElementById('dashboard-view')?.classList.add('hidden');
+      document.getElementById('summary-table-view')?.classList.add('hidden');
+      document.getElementById('hypothesis-detail-view')?.classList.add('hidden');
+      document.getElementById('projects-view')?.classList.add('hidden');
+      document.getElementById('workspace-view')?.classList.add('hidden');
+      document.getElementById('papers-view')?.classList.add('hidden');
+      document.getElementById('manual-view')?.classList.add('hidden');
+      document.getElementById('auth-view')?.classList.add('hidden');
     }
 
     // 1. Dashboard View
@@ -3233,6 +4419,90 @@
         savedPapersFilterState.projectId = projectId;
       }
       navigateToPapers('saved');
+    }
+
+
+    // =========================================================================
+    // 7. User Manual Navigation & Helpers
+    // =========================================================================
+    function navigateToManual(targetSectionId = null) {
+      if (currentView !== 'manual' && currentView !== 'auth') {
+        previousView = currentView;
+      }
+      currentView = 'manual';
+      hideAllViews();
+      const manualEl = document.getElementById('manual-view');
+      if (manualEl) {
+        manualEl.classList.remove('hidden');
+      }
+      updateNavTabState('manual');
+
+      if (targetSectionId) {
+        setTimeout(() => {
+          scrollToManualSection(targetSectionId);
+        }, 50);
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function scrollToManualSection(sectionId) {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Update active class on TOC sidebar links
+        document.querySelectorAll('.manual-toc-link').forEach(btn => {
+          const onclickAttr = btn.getAttribute('onclick') || '';
+          btn.classList.toggle('active', onclickAttr.includes(sectionId));
+        });
+      }
+    }
+
+    function copyCommand(text, btnId) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.getElementById(btnId);
+          if (btn) {
+            const orig = btn.textContent;
+            btn.textContent = '복사됨 ✓';
+            btn.style.background = 'var(--primary)';
+            btn.style.borderColor = 'var(--primary)';
+            setTimeout(() => {
+              btn.textContent = orig;
+              btn.style.background = '';
+              btn.style.borderColor = '';
+            }, 2000);
+          }
+          showToast('명령어가 클립보드에 복사되었습니다.', 'success');
+        }).catch(() => {
+          fallbackCopyText(text, btnId);
+        });
+      } else {
+        fallbackCopyText(text, btnId);
+      }
+    }
+
+    function fallbackCopyText(text, btnId) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        const btn = document.getElementById(btnId);
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = '복사됨 ✓';
+          setTimeout(() => { btn.textContent = orig; }, 2000);
+        }
+        showToast('명령어가 클립보드에 복사되었습니다.', 'success');
+      } catch (err) {
+        showToast('클립보드 복사 실패: ' + err.message, 'error');
+      }
+      document.body.removeChild(textArea);
     }
 
     function switchPapersSubTab(tab) {
