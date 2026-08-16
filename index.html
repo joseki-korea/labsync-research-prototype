@@ -699,6 +699,65 @@
       color: #034f31;
     }
 
+    /* Pipeline Panel (dashboard: how this app was built) */
+    .pipeline-steps {
+      display: flex;
+      align-items: stretch;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .pipeline-step {
+      flex: 1 1 200px;
+      background: #fbfcfb;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .pipeline-step-num {
+      font-family: var(--mono, 'JetBrains Mono', monospace);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-light);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pipeline-step-title {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--text-main);
+    }
+
+    .pipeline-step-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .pipeline-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 640px) {
+      .pipeline-arrow { display: none; }
+      .pipeline-steps { flex-direction: column; }
+    }
+
     /* Recent Hypotheses Mini List */
     .mini-hypo-list {
       display: flex;
@@ -1994,6 +2053,47 @@
           </div>
         </section>
       </div>
+
+      <!-- Pipeline Panel: how this prototype itself was built (agentic pipeline demo) -->
+      <section class="dash-panel" style="margin-top: 1.5rem;" aria-label="이 앱의 개발 파이프라인">
+        <div class="dash-panel-header">
+          <div>
+            <h3 class="dash-panel-title">이 앱은 이렇게 만들어졌습니다 — 에이전틱 파이프라인 예시</h3>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem;">
+              웹 챗봇 한 개가 아니라, CLI 기반 에이전트 여러 개가 같은 파일을 공유하며 서로 작업을 이어받는 방식으로 제작됨
+            </p>
+          </div>
+        </div>
+
+        <div class="pipeline-steps">
+          <div class="pipeline-step">
+            <div class="pipeline-step-num">1</div>
+            <div class="pipeline-step-title">기획 · 조율 (Claude)</div>
+            <div class="pipeline-step-desc">요구사항을 작업지시서로 정리하고, 각 에이전트에게 독립 작업을 배분</div>
+          </div>
+          <div class="pipeline-arrow" aria-hidden="true">→</div>
+          <div class="pipeline-step">
+            <div class="pipeline-step-num">2</div>
+            <div class="pipeline-step-title">병렬 실행 (Codex + Antigravity)</div>
+            <div class="pipeline-step-desc">같은 작업지시서를 받고 서로 결과물을 보지 않은 채 독립적으로 구현</div>
+          </div>
+          <div class="pipeline-arrow" aria-hidden="true">→</div>
+          <div class="pipeline-step">
+            <div class="pipeline-step-num">3</div>
+            <div class="pipeline-step-title">교차 검증 · 팩트체크</div>
+            <div class="pipeline-step-desc">한쪽 결과물을 다른 쪽이 실제 코드 대조로 검증(허위 주장 여부 확인)</div>
+          </div>
+          <div class="pipeline-arrow" aria-hidden="true">→</div>
+          <div class="pipeline-step">
+            <div class="pipeline-step-num">4</div>
+            <div class="pipeline-step-title">통합 · 배포</div>
+            <div class="pipeline-step-desc">더 나은 결과물을 선택해 통합하고, 실제 라이브 검증 후 배포</div>
+          </div>
+        </div>
+        <p style="font-size: 0.78rem; color: var(--text-dim); margin-top: 1rem;">
+          연구 파이프라인도 같은 구조로 설계할 수 있습니다 — 문헌리뷰·데이터처리·통계분석·초안작성처럼 성격이 다른 작업을 에이전트별로 병렬 분담하고, 결론이 중요한 단계일수록 교차검증을 거치는 방식.
+        </p>
+      </section>
     </div>
 
     <!-- ======================================================================
