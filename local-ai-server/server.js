@@ -16,7 +16,93 @@ app.use((req, res, next) => {
 });
 app.use(express.json({ limit: '256kb' }));
 
-app.post('/api/ai-insight', (req, res) => {
+// 이미 구독중인 CLI AI 에이전트가 있으면 그걸 그대로 씀 — 하나만 강제하지 않음.
+// AI_CLI 환경변수로 명시 지정 가능(claude|codex|gemini). 안 정하면 이 순서로 자동감지.
+const CLI_PROFILES = {
+  claude: { bin: 'claude', args: (prompt) => ['-p', prompt] },
+  codex: { bin: 'codex', args: (prompt) => ['exec', prompt] },
+  gemini: { bin: 'gemini', args: (prompt) => ['-p', prompt] }
+};
+const AUTO_DETECT_ORDER = ['claude', 'codex', 'gemini'];
+
+let cachedCli = null; // { name, bin, args } | null(미탐지) — 서버 실행중 1회만 감지
+let cliDetectPromise = null;
+
+function probeCli(name) {
+  return new Promise((resolve) => {
+    const profile = CLI_PROFILES[name];
+    if (!profile) return resolve(false);
+    execFile(profile.bin, ['--version'], { timeout: 5000 }, (error) => {
+      resolve(!error || error.code !== 'ENOENT');
+    });
+  });
+}
+
+async function detectCli() {
+  const forced = (process.env.AI_CLI || '').trim().toLowerCase();
+  if (forced && CLI_PROFILES[forced]) {
+    const ok = await probeCli(forced);
+    if (ok) return { name: forced, ...CLI_PROFILES[forced] };
+    console.warn(`AI_CLI=${forced} 로 지정됐지만 실행파일을 찾을 수 없습니다. 자동감지로 대체합니다.`);
+  }
+  for (const name of AUTO_DETECT_ORDER) {
+    // eslint-disable-next-line no-await-in-loop
+    if (await probeCli(name)) return { name, ...CLI_PROFILES[name] };
+  }
+  return null;
+}
+
+async function getCli() {
+  if (cachedCli) return cachedCli;
+  if (!cliDetectPromise) cliDetectPromise = detectCli();
+  cachedCli = await cliDetectPromise;
+  return cachedCli;
+}
+
+function runPrompt(prompt) {
+  return new Promise((resolve) => {
+    getCli().then((cli) => {
+      if (!cli) {
+        return resolve({
+          error: '사용 가능한 AI CLI를 찾을 수 없습니다. claude / codex / gemini 중 하나를 설치·로그인 후 다시 시도하세요(또는 AI_CLI 환경변수로 지정).'
+        });
+      }
+      const child = execFile(cli.bin, cli.args(prompt), {
+        timeout: 120000,
+        maxBuffer: 1024 * 1024,
+        encoding: 'utf8'
+      }, (error, stdout, stderr) => {
+        if (error) {
+          const isMissing = error.code === 'ENOENT';
+          return resolve({
+            error: isMissing
+              ? `${cli.name} CLI를 찾을 수 없습니다. 설치 및 PATH 등록을 확인하세요.`
+              : `${cli.name} CLI 실행에 실패했습니다: ${(stderr || error.message).trim()}`
+          });
+        }
+        const text = stdout.trim();
+        if (!text) {
+          return resolve({ error: `${cli.name} CLI가 빈 응답을 반환했습니다.` });
+        }
+        return resolve({ text, cliName: cli.name });
+      });
+      // 일부 CLI(codex 등)는 stdin이 안 닫혀있으면 추가입력을 기다리며 무한 대기함 — 즉시 닫아줌
+      if (child.stdin) child.stdin.end();
+    });
+  });
+}
+
+app.get('/api/health', (req, res) => {
+  getCli().then((cli) => {
+    res.json({
+      status: 'ok',
+      port: PORT,
+      detectedCli: cli ? cli.name : null
+    });
+  });
+});
+
+app.post('/api/ai-insight', async (req, res) => {
   const {
     paperTitle,
     paperAbstract,
@@ -41,29 +127,12 @@ app.post('/api/ai-insight', (req, res) => {
     `[가설 설명]\n${String(hypothesisDescription || '상세 설명 없음')}`
   ].join('\n');
 
-  execFile('claude', ['-p', prompt], {
-    timeout: 120000,
-    maxBuffer: 1024 * 1024,
-    encoding: 'utf8'
-  }, (error, stdout, stderr) => {
-    if (error) {
-      const isMissing = error.code === 'ENOENT';
-      return res.status(500).json({
-        error: isMissing
-          ? 'claude CLI를 찾을 수 없습니다. Claude Code를 설치하고 claude 명령이 PATH에 등록되었는지 확인하세요.'
-          : `claude CLI 실행에 실패했습니다: ${(stderr || error.message).trim()}`
-      });
-    }
-
-    const insight = stdout.trim();
-    if (!insight) {
-      return res.status(502).json({ error: 'claude CLI가 빈 응답을 반환했습니다.' });
-    }
-    return res.json({ insight });
-  });
+  const result = await runPrompt(prompt);
+  if (result.error) return res.status(500).json({ error: result.error });
+  return res.json({ insight: result.text, cli: result.cliName });
 });
 
-app.post('/api/ai-chat', (req, res) => {
+app.post('/api/ai-chat', async (req, res) => {
   const { context, question } = req.body || {};
 
   if (!String(context || '').trim() || !String(question || '').trim()) {
@@ -78,27 +147,9 @@ app.post('/api/ai-chat', (req, res) => {
     '연구자에게 도움되는 답변을 한국어로 작성해줘'
   ].join('\n');
 
-  execFile('claude', ['-p', prompt], {
-    timeout: 120000,
-    maxBuffer: 1024 * 1024,
-    encoding: 'utf8'
-  }, (error, stdout, stderr) => {
-    if (error) {
-      const isMissing = error.code === 'ENOENT';
-      return res.status(500).json({
-        success: false,
-        error: isMissing
-          ? 'claude CLI를 찾을 수 없습니다. Claude Code를 설치하고 claude 명령이 PATH에 등록되었는지 확인하세요.'
-          : `claude CLI 실행에 실패했습니다: ${(stderr || error.message).trim()}`
-      });
-    }
-
-    const answer = stdout.trim();
-    if (!answer) {
-      return res.status(502).json({ success: false, error: 'claude CLI가 빈 응답을 반환했습니다.' });
-    }
-    return res.json({ success: true, answer });
-  });
+  const result = await runPrompt(prompt);
+  if (result.error) return res.status(500).json({ success: false, error: result.error });
+  return res.json({ success: true, answer: result.text, cli: result.cliName });
 });
 
 app.use((error, req, res, next) => {
@@ -111,4 +162,7 @@ app.use((error, req, res, next) => {
 
 app.listen(PORT, HOST, () => {
   console.log(`ResearchLab 로컬 AI 서버: http://localhost:${PORT}`);
+  getCli().then((cli) => {
+    console.log(cli ? `사용할 CLI: ${cli.name}` : '⚠ 사용 가능한 AI CLI를 못 찾았습니다(claude/codex/gemini 확인 필요)');
+  });
 });
