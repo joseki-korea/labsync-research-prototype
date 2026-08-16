@@ -1,0 +1,1 @@
+-- see schema.sql for full commented version; applied via Supabase MCP on 2026-08-16
