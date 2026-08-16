@@ -363,3 +363,12 @@ CREATE POLICY "thesis_chapters_delete_policy" ON public.thesis_chapters
 -- Papers is_demo flag (added 2026-08-16: 시연데이터 표시)
 -- ============================================================
 ALTER TABLE public.papers ADD COLUMN IF NOT EXISTS is_demo boolean NOT NULL DEFAULT false;
+
+-- ============================================================
+-- Paper file attachments (added 2026-08-16: PDF 저장)
+-- ============================================================
+ALTER TABLE public.papers ADD COLUMN IF NOT EXISTS file_path text;
+ALTER TABLE public.papers ADD COLUMN IF NOT EXISTS file_name text;
+ALTER TABLE public.papers ADD COLUMN IF NOT EXISTS file_size_bytes bigint;
+-- storage bucket 'paper-files' (private, PDF only, 25MB한도) + RLS 정책은
+-- Supabase 대시보드/API로 직접 적용됨(storage.objects는 supabase CLI 마이그레이션 관례상 별도 관리)
