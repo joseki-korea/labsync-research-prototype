@@ -3726,9 +3726,10 @@
               <div class="manual-callout warning">
                 <span class="manual-callout-icon">🔒</span>
                 <div>
-                  <strong style="font-size: 0.92rem;">왜 별도의 로컬 AI 서버가 필요한가요? (보안상 이유)</strong>
+                  <strong style="font-size: 0.92rem;">왜 별도의 로컬 AI 서버가 필요한가요?</strong>
                   <p style="margin-top: 0.3rem; font-size: 0.86rem; line-height: 1.6;">
-                    대학원 연구실의 <strong>미발표 연구 가설과 핵심 아이디어가 외부 클라우드나 상용 AI 서버로 유출되는 것을 원천 차단</strong>하기 위해, 연구원 PC 로컬 환경(<code>127.0.0.1:8787</code>)에서만 실행되는 독립 AI 파이프라인을 사용합니다.
+                    이 앱(정적 웹페이지)에는 서버가 없어서 AI API 키를 안전하게 보관할 곳이 없습니다. 그래서 연구원 PC에서 직접 실행하는 로컬 서버(<code>127.0.0.1:8787</code>)가 이미 로그인된 Claude CLI를 대신 호출하는 방식을 씁니다.
+                    <br><strong>주의:</strong> 이 방식은 API 키 노출은 막지만, 논문 초록·가설 내용이 로컬을 벗어나지 않는다는 뜻은 아닙니다 — Claude CLI 자체는 일반적인 클라우드 모델 호출이므로, 프롬프트 내용은 Anthropic 서버로 전송됩니다. 완전한 오프라인·비공개 처리가 필요하면 로컬 LLM(Ollama 등) 연동으로 별도 교체가 필요합니다.
                   </p>
                 </div>
               </div>
@@ -5720,12 +5721,13 @@
           url: 'https://doi.org/10.1101/622878'
         }
       ];
+      latestSearchResults.forEach(p => { p.isDemo = true; });
 
       renderSearchResults(latestSearchResults, query);
       const statusEl = document.getElementById('paper-search-status');
       statusEl.innerHTML = `
         <div style="font-size: 0.85rem; color: var(--primary); font-weight: 500;">
-          ✓ "${escapeHtml(query)}" 관련 고품질 학술 논문 프리뷰 4건이 로드되었습니다. 가설을 선택해 적합도를 산출하고 보관함에 저장해 보세요.
+          ⚠ 시연용 샘플 논문 4건이 로드되었습니다(실제 "${escapeHtml(query)}" 검색결과 아님, 파이프라인 테스트용). 저장하면 "DEMO" 표시가 함께 남습니다.
         </div>
       `;
     }
@@ -5916,7 +5918,8 @@
             abstract: paper.abstract || null,
             fit_score: fitScore,
             insight_summary: insightSummary,
-            saved_by: currentUser.id
+            saved_by: currentUser.id,
+            is_demo: !!paper.isDemo
           }])
           .select();
 
@@ -6025,6 +6028,7 @@
             <div class="paper-header">
               <div style="flex: 1;">
                 <div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap;">
+                  ${paper.is_demo ? `<span class="badge-project" style="background: #fbeee7; border-color: rgba(181, 80, 46, 0.3); color: #b5502e;" title="시연용 샘플 데이터입니다, 실제 검색결과 아님">⚠ DEMO</span>` : ''}
                   <span class="badge-project">📁 ${escapeHtml(projName)}</span>
                   ${hypoTitle ? `
                     <button type="button" class="badge-track" style="cursor: pointer; background: #eef5f1; border-color: rgba(3, 107, 63, 0.25); color: #034f31;" onclick="navigateToHypothesisDetail('${paper.hypothesis_id}', 'papers')" title="가설 상세 보기">

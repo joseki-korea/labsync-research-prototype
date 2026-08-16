@@ -358,3 +358,8 @@ CREATE POLICY "thesis_chapters_delete_policy" ON public.thesis_chapters
     SELECT 1 FROM public.project_members
     WHERE project_id = thesis_chapters.project_id AND user_id = auth.uid() AND role IN ('owner', 'admin')
   ));
+
+-- ============================================================
+-- Papers is_demo flag (added 2026-08-16: 시연데이터 표시)
+-- ============================================================
+ALTER TABLE public.papers ADD COLUMN IF NOT EXISTS is_demo boolean NOT NULL DEFAULT false;
