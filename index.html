@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>대학원 연구관리 시스템 (ResearchLab MVP - v2 Dashboard & Papers Pipeline)</title>
   <meta name="description" content="대학원 연구 프로젝트, 연구 트랙, 가설 검증 3단 드릴다운 및 Semantic Scholar 논문조사 파이프라인 관리 플랫폼">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23036b3f'/%3E%3Cg fill='none' stroke='white' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 9c1 4 4 4 8 4s7 0 8-4'/%3E%3Cpath d='M9 8 5 6c0 4 2 7 6 8M23 8l4-2c0 4-2 7-6 8'/%3E%3Cpath d='M11 13v6c0 4 2 6 5 7 3-1 5-3 5-7v-6M13.5 19h.01M18.5 19h.01M14 23h4'/%3E%3C/g%3E%3C/svg%3E">
   <!-- Supabase JS Client CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Google Fonts -->
@@ -31,17 +32,21 @@
       --primary-hover: #025431;
       --primary-light: rgba(3, 107, 63, 0.10);
       --primary-subtle: rgba(3, 107, 63, 0.05);
+
+      --spirit-blue: #2567a9;
+      --creative-purple: #7047a8;
+      --insight-orange: #c76624;
       
       --status-draft: #718078;
       --status-draft-bg: rgba(113, 128, 120, 0.12);
-      --status-testing: #246b78;
-      --status-testing-bg: rgba(36, 107, 120, 0.12);
+      --status-testing: var(--spirit-blue);
+      --status-testing-bg: rgba(37, 103, 169, 0.11);
       --status-supported: #036b3f;
       --status-supported-bg: rgba(3, 107, 63, 0.12);
-      --status-rejected: #a43c35;
-      --status-rejected-bg: rgba(164, 60, 53, 0.12);
-      --status-inconclusive: #9a6818;
-      --status-inconclusive-bg: rgba(154, 104, 24, 0.12);
+      --status-rejected: var(--creative-purple);
+      --status-rejected-bg: rgba(112, 71, 168, 0.11);
+      --status-inconclusive: var(--insight-orange);
+      --status-inconclusive-bg: rgba(199, 102, 36, 0.11);
 
       --radius-sm: 2px;
       --radius-md: 3px;
@@ -146,6 +151,32 @@
       font-family: 'Pretendard', sans-serif;
       font-weight: 600;
     }
+
+    .brand-mark {
+      flex: 0 0 auto;
+      color: var(--primary);
+      filter: drop-shadow(0 1px 0 rgba(3, 107, 63, 0.12));
+    }
+
+    .auth-brand-intro {
+      text-align: center;
+      margin: -0.3rem 0 1.5rem;
+    }
+
+    .auth-brand-symbol {
+      display: inline-grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      margin-bottom: 0.55rem;
+      border: 1px solid rgba(3, 107, 63, 0.2);
+      border-radius: 50%;
+      color: var(--primary);
+      background: var(--primary-subtle);
+    }
+
+    .auth-brand-intro strong { display: block; color: #034f31; font-size: 1rem; }
+    .auth-brand-intro p { margin-top: 0.2rem; color: var(--text-muted); font-size: 0.76rem; }
 
     .nav-menu {
       display: flex;
@@ -1286,10 +1317,10 @@
     }
 
     .badge-status.draft { background: var(--status-draft-bg); color: #59675f; border: 1px solid rgba(89, 103, 95, 0.24); }
-    .badge-status.testing { background: var(--status-testing-bg); color: #1f6270; border: 1px solid rgba(31, 98, 112, 0.24); }
+    .badge-status.testing { background: var(--status-testing-bg); color: var(--spirit-blue); border: 1px solid rgba(37, 103, 169, 0.25); }
     .badge-status.supported { background: var(--status-supported-bg); color: #036b3f; border: 1px solid rgba(3, 107, 63, 0.24); }
-    .badge-status.rejected { background: var(--status-rejected-bg); color: #9b3933; border: 1px solid rgba(155, 57, 51, 0.24); }
-    .badge-status.inconclusive { background: var(--status-inconclusive-bg); color: #8b5e15; border: 1px solid rgba(139, 94, 21, 0.24); }
+    .badge-status.rejected { background: var(--status-rejected-bg); color: var(--creative-purple); border: 1px solid rgba(112, 71, 168, 0.25); }
+    .badge-status.inconclusive { background: var(--status-inconclusive-bg); color: var(--insight-orange); border: 1px solid rgba(199, 102, 36, 0.27); }
 
     .badge-track {
       background: #f5f8f6;
@@ -2405,14 +2436,14 @@
   <header>
     <div class="nav-left">
       <button type="button" class="brand" onclick="navigateToDashboard()" aria-label="LabSync 대시보드 홈으로 이동">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);" aria-hidden="true">
-          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
-          <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
-          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
-          <path d="M12 9V4s3.03.55 4 2c1.08 1.62 0 5 0 5"></path>
+        <svg class="brand-mark" width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 9c1 4 4 4 8 4s7 0 8-4"></path>
+          <path d="M9 8 5 6c0 4 2 7 6 8M23 8l4-2c0 4-2 7-6 8"></path>
+          <path d="M11 13v6c0 4 2 6 5 7 3-1 5-3 5-7v-6"></path>
+          <path d="M13.5 19h.01M18.5 19h.01M14 23h4"></path>
         </svg>
         <span>LabSync</span>
-        <span class="brand-badge">Konkuk Heritage</span>
+        <span class="brand-badge">Konkuk · Bull Spirit</span>
       </button>
 
       <!-- Main Navigation Menu (Desktop) -->
@@ -2505,6 +2536,15 @@
          0. AUTH SCREEN (VIEW)
          ====================================================================== -->
     <div id="auth-view" class="auth-container">
+      <div class="auth-brand-intro">
+        <span class="auth-brand-symbol" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 9c1 4 4 4 8 4s7 0 8-4"></path><path d="M9 8 5 6c0 4 2 7 6 8M23 8l4-2c0 4-2 7-6 8"></path><path d="M11 13v6c0 4 2 6 5 7 3-1 5-3 5-7v-6"></path><path d="M13.5 19h.01M18.5 19h.01M14 23h4"></path>
+          </svg>
+        </span>
+        <strong>통찰에서 도전으로, 연구를 연결합니다.</strong>
+        <p>건국대학교의 성·신·의 정신을 잇는 연구관리 워크스페이스</p>
+      </div>
       <div class="auth-tabs" role="tablist" aria-label="인증 모드 선택">
         <button type="button" role="tab" id="tab-login" aria-selected="true" class="auth-tab active" onclick="switchAuthTab('login')">로그인</button>
         <button type="button" role="tab" id="tab-signup" aria-selected="false" class="auth-tab" onclick="switchAuthTab('signup')">회원가입</button>
@@ -2571,9 +2611,9 @@
           <span class="stat-meta">등록된 가설 전체 명제</span>
         </button>
 
-        <button type="button" class="stat-card" style="--card-accent: #246b78;" onclick="navigateToSummaryTable('testing')" aria-label="검증중 가설 필터링">
+        <button type="button" class="stat-card" style="--card-accent: var(--spirit-blue);" onclick="navigateToSummaryTable('testing')" aria-label="검증중 가설 필터링">
           <span class="stat-label">검증 진행중 <span>Testing</span></span>
-          <span class="stat-number" id="dash-stat-testing" style="color: #1f6270;">0</span>
+          <span class="stat-number" id="dash-stat-testing" style="color: var(--spirit-blue);">0</span>
           <span class="stat-meta">실험 및 벤치마크 수행 중</span>
         </button>
 
@@ -2583,15 +2623,15 @@
           <span class="stat-meta">실험적 통계 유의성 입증</span>
         </button>
 
-        <button type="button" class="stat-card" style="--card-accent: #a43c35;" onclick="navigateToSummaryTable('rejected')" aria-label="기각된 가설 필터링">
+        <button type="button" class="stat-card" style="--card-accent: var(--creative-purple);" onclick="navigateToSummaryTable('rejected')" aria-label="기각된 가설 필터링">
           <span class="stat-label">가설 기각 <span>Rejected</span></span>
-          <span class="stat-number" id="dash-stat-rejected" style="color: #9b3933;">0</span>
+          <span class="stat-number" id="dash-stat-rejected" style="color: var(--creative-purple);">0</span>
           <span class="stat-meta">반례 관측 및 가설 반증</span>
         </button>
 
-        <button type="button" class="stat-card" style="--card-accent: #9a6818;" onclick="navigateToSummaryTable('inconclusive')" aria-label="판정 유보 가설 필터링">
+        <button type="button" class="stat-card" style="--card-accent: var(--insight-orange);" onclick="navigateToSummaryTable('inconclusive')" aria-label="판정 유보 가설 필터링">
           <span class="stat-label">판정 유보 <span>Inconclusive</span></span>
-          <span class="stat-number" id="dash-stat-inconclusive" style="color: #8b5e15;">0</span>
+          <span class="stat-number" id="dash-stat-inconclusive" style="color: var(--insight-orange);">0</span>
           <span class="stat-meta">추가 데이터 확보 필요</span>
         </button>
       </div>
