@@ -2428,7 +2428,16 @@
     .toc-empty { padding: 3rem 1.25rem; text-align: center; background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-md); }
     @media (max-width: 900px) { .toc-card { grid-template-columns: 36px 1fr auto; } .toc-card .toc-status, .toc-card .toc-note { grid-column: 2 / -1; } }
     @media (max-width: 560px) { .toc-card { grid-template-columns: 30px 1fr; } .toc-card .toc-delete { grid-column: 2; justify-self: end; } }
-</style>
+    .collab-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1.5rem; }
+    .collab-panel { background:var(--surface); border:1px solid var(--border); border-top:3px solid var(--primary); border-radius:var(--radius-md); padding:1.1rem; box-shadow:var(--shadow-sm); }
+    .collab-row { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+    .collab-list { display:flex; flex-direction:column; gap:.65rem; margin-top:.85rem; }
+    .collab-item { padding:.75rem; border:1px solid var(--border-muted); border-radius:6px; background:#fafbfa; font-size:.84rem; }
+    .readonly-notice { display:none; padding:.65rem .85rem; margin-bottom:1rem; background:#fff8e7; color:#72530b; border:1px solid #ead596; border-radius:6px; font-size:.84rem; }
+    .readonly-notice.show { display:block; }
+    .comment-body { white-space:pre-wrap; margin-top:.3rem; color:var(--text-main); }
+    @media(max-width:760px){.collab-grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
 
@@ -2669,6 +2678,11 @@
         </section>
       </div>
 
+      <section class="dash-panel" style="margin-top:1.5rem" aria-label="최근 팀 활동">
+        <div class="dash-panel-header"><h3 class="dash-panel-title">최근 팀 활동</h3><span style="font-size:.78rem;color:var(--text-dim)">최근 10건</span></div>
+        <div id="activity-feed" class="collab-list"><div class="collab-item">활동을 불러오는 중입니다…</div></div>
+      </section>
+
       <!-- Pipeline Panel: Agentic Pipeline Demo -->
       <section class="dash-panel" style="margin-top: 1.5rem;" aria-label="이 앱의 개발 파이프라인">
         <div class="dash-panel-header">
@@ -2900,9 +2914,18 @@
                 + 이 가설로 논문 검색하기
               </button>
             </div>
-            <div id="detail-linked-papers-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div id="detail-linked-papers-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
               <!-- Rendered via JS -->
             </div>
+          </div>
+
+          <div>
+            <h3 class="detail-section-title"><span>💬 연구 댓글</span></h3>
+            <div id="detail-comments" class="collab-list"></div>
+            <form class="collab-row" style="margin-top:.8rem" onsubmit="handleAddComment(event)">
+              <textarea id="new-comment-body" class="form-input" rows="2" style="flex:1;min-width:240px" placeholder="의견이나 검토 메모를 남겨주세요" required></textarea>
+              <button type="submit" class="btn btn-primary collab-write">댓글 작성</button>
+            </form>
           </div>
 
           <!-- Status & History Timeline Section -->
@@ -2971,6 +2994,16 @@
         <h2 id="ws-header-title" style="font-size: 1.35rem; margin-bottom: 0.4rem; color: #034f31; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;"></h2>
         <p id="ws-header-desc" style="color: var(--text-muted); font-size: 0.9rem;"></p>
       </div>
+      <div id="workspace-readonly" class="readonly-notice">읽기 전용 권한입니다. 저장·수정·삭제 기능을 사용할 수 없습니다.</div>
+      <section class="collab-panel" style="margin-bottom:1.5rem">
+        <div class="dash-panel-header"><h3 class="dash-panel-title">팀원 초대</h3><span id="workspace-role-badge" class="badge-track">역할 확인 중</span></div>
+        <form class="collab-row" onsubmit="handleInviteSubmit(event)">
+          <input id="invite-email" class="form-input" type="email" style="flex:1;min-width:220px" placeholder="team@konkuk.ac.kr" required>
+          <select id="invite-role" class="filter-select"><option value="member">멤버</option><option value="admin">관리자</option><option value="viewer">뷰어</option></select>
+          <button type="submit" class="btn btn-primary collab-write">팀원 초대</button>
+        </form>
+        <div id="pending-invites" class="collab-list"></div>
+      </section>
 
       <div class="workspace-layout">
         <!-- Sidebar: Tracks -->
@@ -4022,6 +4055,12 @@
     let allTracks = [];
     let allHypotheses = [];
     let allPapers = []; // Saved papers in Supabase
+    let allPaperHypotheses = [];
+    let allActivity = [];
+    let allProjectMembers = [];
+    let allInvites = [];
+    let detailHistory = [];
+    let detailComments = [];
     let allThesisChapters = [];
     let tocProjectId = null;
     let allProfiles = {}; // Map of user_id -> profile object
@@ -4317,13 +4356,16 @@
     // =========================================================================
     async function loadAllAppData() {
       try {
-        const [projRes, trackRes, hypoRes, papersRes, profRes, chaptersRes] = await Promise.all([
+        const [projRes, trackRes, hypoRes, papersRes, profRes, chaptersRes, activityRes, memberRes, linkRes] = await Promise.all([
           supabaseClient.from('projects').select('*').order('created_at', { ascending: false }),
           supabaseClient.from('tracks').select('*').order('created_at', { ascending: true }),
           supabaseClient.from('hypotheses').select('*, projects(name), tracks(name)').order('updated_at', { ascending: false }),
           supabaseClient.from('papers').select('*, projects(name), hypotheses(title)').order('created_at', { ascending: false }),
           supabaseClient.from('profiles').select('*'),
-          supabaseClient.from('thesis_chapters').select('*').order('chapter_order', { ascending: true })
+          supabaseClient.from('thesis_chapters').select('*').order('chapter_order', { ascending: true }),
+          supabaseClient.from('activity_log').select('*').order('created_at', { ascending:false }).limit(10),
+          supabaseClient.from('project_members').select('*'),
+          supabaseClient.from('paper_hypotheses').select('*')
         ]);
 
         if (projRes.error) throw projRes.error;
@@ -4338,6 +4380,9 @@
         allTracks = trackRes.data || [];
         allHypotheses = hypoRes.data || [];
         allPapers = papersRes.data || [];
+        allActivity = activityRes.data || [];
+        allProjectMembers = memberRes.data || [];
+        allPaperHypotheses = linkRes.data || [];
         if (chaptersRes.error) console.warn('Thesis chapters select notice:', chaptersRes.error.message);
         allThesisChapters = chaptersRes.data || [];
 
@@ -4461,6 +4506,7 @@
       document.getElementById('hypothesis-detail-view').classList.remove('hidden');
       updateNavTabState('');
 
+      await loadHypothesisCollaboration(hypoId);
       renderHypothesisDetail();
     }
 
@@ -4504,6 +4550,7 @@
 
       renderTracksList();
       renderHypothesesList();
+      await loadWorkspaceCollaboration();
     }
 
     // 6. Papers Pipeline View
@@ -4896,6 +4943,7 @@
           `;
         }).join('');
       }
+      renderActivityFeed();
     }
 
     // =========================================================================
@@ -5091,7 +5139,8 @@
       }
 
       // Linked Saved Papers
-      const linkedPapers = allPapers.filter(paper => paper.hypothesis_id === h.id);
+      const linkedIds = new Set(allPaperHypotheses.filter(link => link.hypothesis_id === h.id).map(link => String(link.paper_id)));
+      const linkedPapers = allPapers.filter(paper => paper.hypothesis_id === h.id || linkedIds.has(String(paper.id)));
       document.getElementById('detail-linked-papers-count').textContent = linkedPapers.length;
       const linkedPapersContainer = document.getElementById('detail-linked-papers-container');
 
@@ -5120,7 +5169,7 @@
                     <span>저장일: ${new Date(paper.created_at).toLocaleDateString('ko-KR')}</span>
                   </div>
                 </div>
-                ${fitBadge}
+                <div class="collab-row">${fitBadge}<button type="button" class="btn btn-subtle btn-sm collab-write" onclick="linkPaperToAnotherHypothesis('${paper.id}')">다른 가설에도 연결</button></div>
               </div>
               ${paper.insight_summary ? `
                 <div style="font-size: 0.82rem; color: var(--primary); background: #f2f7f4; padding: 0.4rem 0.6rem; border-radius: 3px; border: 1px solid rgba(3, 107, 63, 0.15);">
@@ -5132,25 +5181,9 @@
         }).join('');
       }
 
-      // Timeline Section
-      const timelineContainer = document.getElementById('detail-timeline-container');
-      timelineContainer.innerHTML = `
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-time">${new Date(h.updated_at).toLocaleString('ko-KR')}</div>
-          <div class="timeline-desc">
-            <strong>현재 상태:</strong> <span class="badge-status ${statusMeta.class}" style="font-size: 0.7rem; padding: 1px 6px;">${statusMeta.label}</span>
-            ${h.rationale ? `<div style="margin-top: 0.35rem; font-size: 0.82rem; color: var(--text-muted); background: #fdfdfc; padding: 0.4rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-muted);"><em>" ${escapeHtml(h.rationale)} "</em></div>` : ''}
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot" style="background: var(--text-dim);"></div>
-          <div class="timeline-time">${new Date(h.created_at).toLocaleString('ko-KR')}</div>
-          <div class="timeline-desc">
-            <strong>가설 최초 등록:</strong> 작성자 ${escapeHtml(authorName)}
-          </div>
-        </div>
-      `;
+      renderDetailHistory(h, authorName);
+      renderDetailComments();
+      applyReadonlyUI(h.project_id);
     }
 
     function openUpdateStatusModalFromDetail(e) {
@@ -5473,6 +5506,7 @@
 
         if (error) throw error;
         closeModal('modal-create-hypo');
+        await logActivity(currentProject.id, 'hypothesis_created', 'hypothesis', null, `가설 “${title}”을 생성`);
         showToast('연구 가설이 성공적으로 등록되었습니다.', 'success');
         await loadAllAppData();
         renderTracksList();
@@ -5517,6 +5551,7 @@
       submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 판정 확정 중...';
 
       try {
+        const previous = allHypotheses.find(h => h.id === hypoId);
         const { error } = await supabaseClient
           .from('hypotheses')
           .update({
@@ -5527,6 +5562,7 @@
           .eq('id', hypoId);
 
         if (error) throw error;
+        await logActivity(previous.project_id, 'hypothesis_status_changed', 'hypothesis', hypoId, `가설 “${previous.title}”을 ${STATUS_MAP[status]?.label || status}(으)로 변경`);
         closeModal('modal-update-status');
         showToast('가설 상태 및 판정 근거가 업데이트되었습니다.', 'success');
         
@@ -5538,6 +5574,7 @@
           renderSummaryTable();
         } else if (currentView === 'hypothesis-detail') {
           selectedDetailHypo = allHypotheses.find(h => h.id === hypoId);
+          await loadHypothesisCollaboration(hypoId);
           renderHypothesisDetail();
         } else if (currentView === 'workspace') {
           renderTracksList();
@@ -5925,6 +5962,8 @@
 
         if (error) throw error;
 
+        await logActivity(projectId, 'paper_saved', 'paper', data?.[0]?.id || null, `논문 “${paper.title}”을 저장`);
+
         showToast('논문이 보관함에 성공적으로 저장되었습니다.', 'success');
         saveBtn.innerHTML = '✓ 저장 완료';
         saveBtn.classList.remove('btn-primary');
@@ -6050,9 +6089,10 @@
               </div>
               <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem;">
                 ${fitBadge}
-                <button type="button" class="btn btn-danger-outline btn-sm" style="padding: 2px 7px; font-size: 0.72rem;" onclick="handleDeletePaper('${paper.id}')">
+                <button type="button" class="btn btn-danger-outline btn-sm" ${canWrite(paper.project_id) ? '' : 'disabled title="읽기 전용"'} style="padding: 2px 7px; font-size: 0.72rem;" onclick="handleDeletePaper('${paper.id}')">
                   삭제
                 </button>
+                <button type="button" class="btn btn-subtle btn-sm collab-write" ${canWrite(paper.project_id) ? '' : 'disabled title="읽기 전용"'} style="padding:2px 7px;font-size:.72rem" onclick="linkPaperToAnotherHypothesis('${paper.id}')">다른 가설 연결</button>
               </div>
             </div>
 
@@ -6166,6 +6206,8 @@
       const textarea = document.getElementById(`insight-text-${paperId}`);
       const btn = document.getElementById(`btn-save-insight-${paperId}`);
       if (!textarea || !btn) return;
+      const paper = allPapers.find(p => String(p.id) === String(paperId));
+      if (!paper || !canWrite(paper.project_id)) return showToast('읽기 전용 사용자는 수정할 수 없습니다.', 'error');
 
       const newInsight = textarea.value.trim();
       const originalHtml = btn.innerHTML;
@@ -6194,6 +6236,8 @@
     }
 
     async function handleDeletePaper(paperId) {
+      const paper = allPapers.find(p => String(p.id) === String(paperId));
+      if (!paper || !canWrite(paper.project_id)) return showToast('읽기 전용 사용자는 삭제할 수 없습니다.', 'error');
       if (!confirm('이 논문을 보관함에서 삭제하시겠습니까?')) return;
 
       try {
@@ -6210,6 +6254,121 @@
       } catch (err) {
         showToast('삭제 실패: ' + err.message, 'error');
       }
+    }
+
+    // =========================================================================
+    // Collaboration: roles, invites, history, activity, comments and N:M links
+    // =========================================================================
+    function currentRole(projectId) {
+      const row = allProjectMembers.find(m => m.project_id === projectId && m.user_id === currentUser?.id);
+      const project = allProjects.find(p => p.id === projectId);
+      return row?.role || (project?.owner_id === currentUser?.id || project?.created_by === currentUser?.id ? 'admin' : 'viewer');
+    }
+
+    function canWrite(projectId) { return currentRole(projectId) !== 'viewer'; }
+
+    function applyReadonlyUI(projectId) {
+      const readonly = !canWrite(projectId);
+      document.getElementById('workspace-readonly')?.classList.toggle('show', readonly);
+      document.querySelectorAll('.collab-write').forEach(el => el.disabled = readonly);
+      document.querySelectorAll('#workspace-view button[onclick^="openCreate"], #hypothesis-detail-view button[onclick^="openUpdate"], #papers-view button[onclick^="handleUpdate"], #papers-view button[onclick^="handleDelete"], #papers-view button[id^="btn-save-paper"]')
+        .forEach(el => el.disabled = readonly);
+    }
+
+    async function loadWorkspaceCollaboration() {
+      if (!currentProject) return;
+      const { data, error } = await supabaseClient.from('project_invites').select('*').eq('project_id', currentProject.id).eq('status', 'pending').order('created_at', { ascending:false });
+      if (error) console.warn('Invites:', error.message);
+      allInvites = data || [];
+      const role = currentRole(currentProject.id);
+      document.getElementById('workspace-role-badge').textContent = {admin:'관리자',member:'멤버',viewer:'뷰어'}[role] || role;
+      document.getElementById('pending-invites').innerHTML = allInvites.length ? allInvites.map(inv => `<div class="collab-item"><strong>${escapeHtml(inv.invited_email)}</strong> · ${escapeHtml(inv.invited_role)} <span style="float:right;color:var(--text-dim)">대기 중</span></div>`).join('') : '<div class="collab-item" style="color:var(--text-dim)">대기 중인 초대가 없습니다.</div>';
+      applyReadonlyUI(currentProject.id);
+    }
+
+    async function handleInviteSubmit(event) {
+      event.preventDefault();
+      if (!currentProject || !canWrite(currentProject.id)) return showToast('읽기 전용 사용자는 초대할 수 없습니다.', 'error');
+      const email = document.getElementById('invite-email').value.trim().toLowerCase();
+      const role = document.getElementById('invite-role').value;
+      const { error } = await supabaseClient.from('project_invites').insert({ project_id:currentProject.id, invited_email:email, invited_role:role, invited_by:currentUser.id, status:'pending' });
+      if (error) return showToast('초대 실패: ' + error.message, 'error');
+      event.target.reset();
+      await logActivity(currentProject.id, 'member_invited', 'project_invite', null, `${email}님을 ${role} 역할로 초대`);
+      await loadWorkspaceCollaboration();
+      showToast('초대가 대기 목록에 추가되었습니다.', 'success');
+    }
+
+    async function loadHypothesisCollaboration(hypothesisId) {
+      const [historyRes, commentsRes] = await Promise.all([
+        supabaseClient.from('hypothesis_history').select('*').eq('hypothesis_id', hypothesisId).order('created_at', { ascending:false }),
+        supabaseClient.from('comments').select('*').eq('hypothesis_id', hypothesisId).order('created_at', { ascending:true })
+      ]);
+      detailHistory = historyRes.data || [];
+      detailComments = commentsRes.data || [];
+    }
+
+    function renderDetailHistory(h, authorName) {
+      const box = document.getElementById('detail-timeline-container');
+      const rows = detailHistory.map(item => {
+        const oldStatus = STATUS_MAP[item.old_status]?.label || item.old_status || '없음';
+        const newStatus = STATUS_MAP[item.new_status]?.label || item.new_status || '없음';
+        const actor = getAuthorName(item.changed_by || item.actor_id);
+        return `<div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-time">${new Date(item.created_at).toLocaleString('ko-KR')} · ${escapeHtml(actor)}</div><div class="timeline-desc"><strong>${escapeHtml(oldStatus)} → ${escapeHtml(newStatus)}</strong><div class="collab-item" style="margin-top:.35rem">이전 근거: ${escapeHtml(item.old_rationale || '없음')}<br>새 근거: ${escapeHtml(item.new_rationale || '없음')}</div></div></div>`;
+      });
+      rows.push(`<div class="timeline-item"><div class="timeline-dot" style="background:var(--text-dim)"></div><div class="timeline-time">${new Date(h.created_at).toLocaleString('ko-KR')}</div><div class="timeline-desc"><strong>가설 최초 등록</strong> · ${escapeHtml(authorName)}</div></div>`);
+      box.innerHTML = rows.join('');
+    }
+
+    function renderDetailComments() {
+      const box = document.getElementById('detail-comments');
+      box.innerHTML = detailComments.length ? detailComments.map(c => `<article class="collab-item"><strong>${escapeHtml(getAuthorName(c.author_id))}</strong><time style="margin-left:.5rem;color:var(--text-dim)">${new Date(c.created_at).toLocaleString('ko-KR')}</time><div class="comment-body">${escapeHtml(c.body)}</div></article>`).join('') : '<div class="collab-item" style="color:var(--text-dim)">아직 댓글이 없습니다. 첫 의견을 남겨보세요.</div>';
+    }
+
+    async function handleAddComment(event) {
+      event.preventDefault();
+      if (!selectedDetailHypo || !canWrite(selectedDetailHypo.project_id)) return showToast('읽기 전용 사용자는 댓글을 작성할 수 없습니다.', 'error');
+      const input = document.getElementById('new-comment-body');
+      const body = input.value.trim();
+      const { error } = await supabaseClient.from('comments').insert({ project_id:selectedDetailHypo.project_id, hypothesis_id:selectedDetailHypo.id, author_id:currentUser.id, body });
+      if (error) return showToast('댓글 작성 실패: ' + error.message, 'error');
+      await logActivity(selectedDetailHypo.project_id, 'comment_created', 'hypothesis', selectedDetailHypo.id, `가설 “${selectedDetailHypo.title}”에 댓글 작성`);
+      input.value = '';
+      await loadHypothesisCollaboration(selectedDetailHypo.id);
+      renderDetailComments();
+    }
+
+    function renderActivityFeed() {
+      const box = document.getElementById('activity-feed');
+      if (!box) return;
+      box.innerHTML = allActivity.length ? allActivity.slice(0,10).map(a => `<div class="collab-item"><strong>${escapeHtml(getAuthorName(a.actor_id))}</strong>님이 ${escapeHtml(a.summary || a.action_type)}<span style="float:right;color:var(--text-dim)">${formatRelativeTime(a.created_at)}</span></div>`).join('') : '<div class="collab-item" style="color:var(--text-dim)">아직 기록된 팀 활동이 없습니다.</div>';
+    }
+
+    function formatRelativeTime(value) {
+      const seconds = Math.max(0, Math.floor((Date.now() - new Date(value)) / 1000));
+      if (seconds < 60) return '방금'; if (seconds < 3600) return `${Math.floor(seconds/60)}분 전`; if (seconds < 86400) return `${Math.floor(seconds/3600)}시간 전`; return new Date(value).toLocaleDateString('ko-KR');
+    }
+
+    async function logActivity(projectId, actionType, targetType, targetId, summary) {
+      const { error } = await supabaseClient.from('activity_log').insert({ project_id:projectId, actor_id:currentUser.id, action_type:actionType, target_type:targetType, target_id:targetId, summary });
+      if (error) console.warn('Activity log:', error.message);
+    }
+
+    async function linkPaperToAnotherHypothesis(paperId) {
+      const paper = allPapers.find(p => String(p.id) === String(paperId));
+      if (!paper || !canWrite(paper.project_id)) return showToast('읽기 전용 사용자는 논문을 연결할 수 없습니다.', 'error');
+      const choices = allHypotheses.filter(h => h.project_id === paper.project_id && h.id !== paper.hypothesis_id).map((h,i) => `${i+1}. ${h.title}`);
+      if (!choices.length) return showToast('연결할 다른 가설이 없습니다.', 'error');
+      const answer = prompt(`연결할 가설 번호를 입력하세요:\n${choices.join('\n')}`);
+      const target = allHypotheses.filter(h => h.project_id === paper.project_id && h.id !== paper.hypothesis_id)[Number(answer)-1];
+      if (!target) return;
+      const fit = calculateFitScore(paper.title, paper.abstract, target.title, target.description);
+      const { error } = await supabaseClient.from('paper_hypotheses').upsert({ paper_id:paper.id, hypothesis_id:target.id, fit_score:fit, linked_by:currentUser.id }, { onConflict:'paper_id,hypothesis_id' });
+      if (error) return showToast('논문 연결 실패: ' + error.message, 'error');
+      await logActivity(paper.project_id, 'paper_linked', 'paper', paper.id, `논문 “${paper.title}”을 가설 “${target.title}”에 연결`);
+      await loadAllAppData();
+      if (currentView === 'hypothesis-detail') renderHypothesisDetail(); else renderSavedPapersList();
+      showToast('논문을 다른 가설에도 연결했습니다.', 'success');
     }
 
     // Utility: HTML Escaping
