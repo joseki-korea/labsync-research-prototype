@@ -72,8 +72,18 @@
       font-size: 14px;
     }
 
+    body.drawer-open {
+      overflow: hidden;
+    }
+
     code, pre {
       font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Accessibility Focus Ring */
+    :focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
     }
 
     .brand,
@@ -120,6 +130,10 @@
       font-weight: 700;
       font-size: 1.2rem;
       cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      text-align: left;
     }
 
     .brand-badge {
@@ -152,6 +166,8 @@
       transition: all 0.15s ease;
       cursor: pointer;
       border: 1px solid transparent;
+      background: none;
+      font-family: inherit;
     }
 
     .nav-link:hover {
@@ -189,6 +205,114 @@
       color: var(--text-muted);
     }
 
+    /* Mobile Hamburger Menu Button */
+    .mobile-menu-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: all 0.15s ease;
+    }
+
+    .mobile-menu-btn:hover {
+      background: var(--surface-hover);
+      color: var(--primary);
+    }
+
+    /* Mobile Navigation Drawer */
+    .mobile-drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(13, 35, 27, 0.5);
+      backdrop-filter: blur(2px);
+      z-index: 90;
+      transition: opacity 0.2s ease;
+    }
+
+    .mobile-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 280px;
+      max-width: 85vw;
+      background: var(--surface);
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.5rem;
+      transform: translateX(0);
+      transition: transform 0.25s ease;
+      border-left: 1px solid var(--border);
+    }
+
+    .mobile-drawer.hidden,
+    .mobile-drawer-overlay.hidden {
+      display: none !important;
+    }
+
+    .mobile-drawer-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-muted);
+    }
+
+    .mobile-user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .mobile-drawer-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+      flex: 1;
+    }
+
+    .mobile-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-weight: 500;
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      transition: all 0.15s ease;
+    }
+
+    .mobile-nav-link:hover,
+    .mobile-nav-link.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+      border-color: rgba(3, 107, 63, 0.2);
+    }
+
+    .mobile-drawer-footer {
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-muted);
+    }
+
     /* Common Buttons */
     .btn {
       display: inline-flex;
@@ -205,11 +329,13 @@
       text-decoration: none;
       color: var(--text-main);
       letter-spacing: -0.01em;
+      font-family: inherit;
     }
 
     .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+      opacity: 0.6;
+      cursor: not-allowed !important;
+      pointer-events: none;
     }
 
     .btn-primary {
@@ -251,6 +377,29 @@
       font-weight: 600;
     }
 
+    /* Spinner Animation for Action Feedback */
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      border-top-color: #ffffff;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    .btn-outline .spinner,
+    .btn-subtle .spinner {
+      border: 2px solid rgba(3, 107, 63, 0.3);
+      border-top-color: var(--primary);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* Main Container */
     main {
       flex: 1;
@@ -285,8 +434,12 @@
       cursor: pointer;
       color: var(--text-muted);
       font-weight: 600;
+      border: none;
+      background: none;
       border-bottom: 2px solid transparent;
       transition: all 0.15s ease;
+      font-size: 0.95rem;
+      font-family: inherit;
     }
 
     .auth-tab.active {
@@ -368,15 +521,23 @@
       gap: 0.5rem;
       font-size: 0.88rem;
       color: var(--text-muted);
+      flex-wrap: wrap;
     }
 
-    .breadcrumbs a {
+    .breadcrumbs a,
+    .breadcrumbs button.breadcrumb-link {
       color: var(--primary);
       text-decoration: none;
       font-weight: 500;
       cursor: pointer;
+      background: none;
+      border: none;
+      font-size: inherit;
+      font-family: inherit;
+      padding: 0;
     }
-    .breadcrumbs a:hover {
+    .breadcrumbs a:hover,
+    .breadcrumbs button.breadcrumb-link:hover {
       text-decoration: underline;
     }
 
@@ -461,6 +622,9 @@
       justify-content: space-between;
       position: relative;
       overflow: hidden;
+      text-align: left;
+      font-family: inherit;
+      color: inherit;
     }
 
     .stat-card::before {
@@ -520,12 +684,6 @@
       align-items: start;
     }
 
-    @media (max-width: 960px) {
-      .dashboard-layout {
-        grid-template-columns: 1fr;
-      }
-    }
-
     .dash-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -541,6 +699,7 @@
       margin-bottom: 1.25rem;
       padding-bottom: 0.75rem;
       border-bottom: 1px solid var(--border-muted);
+      gap: 0.5rem;
     }
 
     .dash-panel-title {
@@ -691,6 +850,7 @@
       color: var(--text-main);
       outline: none;
       transition: border-color 0.15s ease;
+      font-family: inherit;
     }
 
     .search-input:focus {
@@ -724,6 +884,7 @@
       color: var(--text-main);
       outline: none;
       cursor: pointer;
+      font-family: inherit;
     }
 
     .filter-select:focus {
@@ -744,6 +905,7 @@
     .summary-table-wrapper {
       overflow-x: auto;
       width: 100%;
+      -webkit-overflow-scrolling: touch;
     }
 
     .summary-table {
@@ -971,6 +1133,9 @@
       justify-content: space-between;
       min-height: 180px;
       box-shadow: var(--shadow-sm);
+      text-align: left;
+      color: inherit;
+      font-family: inherit;
     }
 
     .project-card:hover {
@@ -1018,12 +1183,6 @@
       align-items: start;
     }
 
-    @media (max-width: 860px) {
-      .workspace-layout {
-        grid-template-columns: 1fr;
-      }
-    }
-
     /* Sidebar: Tracks */
     .tracks-panel {
       background: var(--surface);
@@ -1059,6 +1218,11 @@
       font-size: 0.85rem;
       margin-bottom: 0.25rem;
       transition: all 0.15s ease;
+      background: none;
+      border: 1px solid transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
     }
 
     .track-item:hover {
@@ -1117,6 +1281,7 @@
       border: 1px solid var(--border);
       color: var(--text-muted);
       transition: all 0.15s ease;
+      font-family: inherit;
     }
 
     .status-pill:hover {
@@ -1176,7 +1341,20 @@
       cursor: pointer;
     }
 
-    .hypo-title:hover {
+    .hypo-title-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      text-align: left;
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      font-family: Georgia, 'Times New Roman', 'Noto Serif KR', serif;
+    }
+
+    .hypo-title:hover,
+    .hypo-title-btn:hover {
       color: var(--primary);
       text-decoration: underline;
     }
@@ -1187,6 +1365,7 @@
       gap: 0.5rem;
       font-size: 0.75rem;
       color: var(--text-dim);
+      flex-wrap: wrap;
     }
 
     .badge-status {
@@ -1267,6 +1446,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease;
+      padding: 1rem;
     }
 
     .modal-overlay.open {
@@ -1281,6 +1461,8 @@
       border-radius: var(--radius-lg);
       width: 100%;
       max-width: 540px;
+      max-height: 90vh;
+      overflow-y: auto;
       padding: 2.25rem;
       box-shadow: var(--shadow-lg);
       transform: translateY(10px);
@@ -1311,6 +1493,12 @@
       font-size: 1.5rem;
       cursor: pointer;
       line-height: 1;
+      padding: 0.2rem 0.4rem;
+      border-radius: var(--radius-sm);
+    }
+    .modal-close:hover {
+      color: var(--text-main);
+      background: var(--surface-hover);
     }
 
     .modal-footer {
@@ -1377,6 +1565,193 @@
     .hidden {
       display: none !important;
     }
+
+    /* ==========================================================================
+       RESPONSIVE BREAKPOINTS (960px, 860px, 768px, 640px, 480px)
+       ========================================================================== */
+    @media (max-width: 960px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .workspace-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 768px: Mobile Header Hamburger Mode */
+    @media (max-width: 768px) {
+      header {
+        padding: 0 1rem;
+        height: 60px;
+      }
+
+      .nav-menu,
+      .user-profile {
+        display: none !important;
+      }
+
+      .mobile-menu-btn {
+        display: flex;
+      }
+
+      .brand {
+        font-size: 1.1rem;
+      }
+
+      .brand-badge {
+        display: none;
+      }
+    }
+
+    /* 640px: Mobile Compact Layout */
+    @media (max-width: 640px) {
+      main {
+        padding: 1.25rem 1rem 2.5rem;
+      }
+
+      .auth-container {
+        margin: 1.5rem auto;
+        padding: 1.5rem;
+      }
+
+      .dashboard-hero {
+        padding: 1.25rem;
+        gap: 1rem;
+      }
+
+      .hero-text h2 {
+        font-size: 1.2rem;
+      }
+
+      .hero-actions {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .hero-actions .btn {
+        width: 100%;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+      }
+
+      .stat-card {
+        padding: 0.85rem 1rem;
+      }
+
+      .stat-number {
+        font-size: 1.5rem;
+      }
+
+      .section-title {
+        font-size: 1.3rem;
+      }
+
+      .table-toolbar {
+        padding: 0.85rem;
+        gap: 0.75rem;
+      }
+
+      .toolbar-row-top,
+      .toolbar-filters {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 0.5rem;
+      }
+
+      .search-box {
+        max-width: 100%;
+        min-width: 100%;
+      }
+
+      .filter-select {
+        width: 100%;
+      }
+
+      .toolbar-row-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .status-pills {
+        gap: 0.3rem;
+      }
+
+      .status-pill {
+        padding: 0.3rem 0.55rem;
+        font-size: 0.72rem;
+      }
+
+      .summary-table th,
+      .summary-table td {
+        padding: 0.75rem 0.65rem;
+        font-size: 0.8rem;
+      }
+
+      .detail-card {
+        padding: 1.25rem;
+      }
+
+      .detail-title {
+        font-size: 1.3rem;
+      }
+
+      .detail-meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-card {
+        padding: 1.5rem;
+        width: 100%;
+      }
+
+      .modal-footer {
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+        width: 100%;
+      }
+
+      .modal-footer .btn {
+        width: 100%;
+      }
+
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filter-bar .btn {
+        width: 100%;
+      }
+
+      .hypo-header {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      #toast-container {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1.5rem;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1384,8 +1759,8 @@
   <!-- Top Navbar -->
   <header>
     <div class="nav-left">
-      <div class="brand" onclick="navigateToDashboard()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+      <button type="button" class="brand" onclick="navigateToDashboard()" aria-label="LabSync 대시보드 홈으로 이동">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);" aria-hidden="true">
           <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
           <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
           <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
@@ -1393,30 +1768,72 @@
         </svg>
         <span>LabSync</span>
         <span class="brand-badge">Konkuk Heritage</span>
-      </div>
+      </button>
 
-      <!-- Main Navigation Menu -->
-      <nav id="nav-main-menu" class="nav-menu hidden">
-        <a id="nav-tab-dashboard" class="nav-link active" onclick="navigateToDashboard()">
+      <!-- Main Navigation Menu (Desktop) -->
+      <nav id="nav-main-menu" class="nav-menu hidden" aria-label="메인 내비게이션">
+        <button type="button" id="nav-tab-dashboard" class="nav-link active" onclick="navigateToDashboard()">
           <span>대시보드</span>
-        </a>
-        <a id="nav-tab-summary" class="nav-link" onclick="navigateToSummaryTable()">
+        </button>
+        <button type="button" id="nav-tab-summary" class="nav-link" onclick="navigateToSummaryTable()">
           <span>가설 요약 테이블</span>
-        </a>
-        <a id="nav-tab-projects" class="nav-link" onclick="navigateToProjects()">
+        </button>
+        <button type="button" id="nav-tab-projects" class="nav-link" onclick="navigateToProjects()">
           <span>프로젝트 목록</span>
-        </a>
+        </button>
       </nav>
     </div>
 
+    <!-- Desktop User Section -->
     <div id="nav-user-section" class="user-profile hidden">
       <div class="user-info">
         <span id="nav-user-name" class="user-name">Researcher</span>
         <span id="nav-user-email" class="user-email">email@domain.com</span>
       </div>
-      <button class="btn btn-outline btn-sm" onclick="handleSignOut()">로그아웃</button>
+      <button type="button" class="btn btn-outline btn-sm" onclick="handleSignOut()">로그아웃</button>
     </div>
+
+    <!-- Mobile Hamburger Toggle Button -->
+    <button type="button" id="mobile-menu-btn" class="mobile-menu-btn hidden" onclick="toggleMobileDrawer()" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobile-drawer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
   </header>
+
+  <!-- Mobile Drawer & Overlay -->
+  <div id="mobile-drawer-overlay" class="mobile-drawer-overlay hidden" onclick="closeMobileDrawer()"></div>
+  <aside id="mobile-drawer" class="mobile-drawer hidden" aria-label="모바일 메뉴 드로어" aria-hidden="true">
+    <div>
+      <div class="mobile-drawer-header">
+        <div class="mobile-user-info">
+          <span id="mobile-user-name" class="user-name">Researcher</span>
+          <span id="mobile-user-email" class="user-email">email@domain.com</span>
+        </div>
+        <button type="button" class="modal-close" onclick="closeMobileDrawer()" aria-label="메뉴 닫기">&times;</button>
+      </div>
+
+      <nav class="mobile-drawer-nav" aria-label="모바일 메뉴">
+        <button type="button" id="mobile-tab-dashboard" class="mobile-nav-link active" onclick="navigateToDashboard(); closeMobileDrawer();">
+          <span>📊 대시보드</span>
+        </button>
+        <button type="button" id="mobile-tab-summary" class="mobile-nav-link" onclick="navigateToSummaryTable(); closeMobileDrawer();">
+          <span>📑 가설 요약 테이블</span>
+        </button>
+        <button type="button" id="mobile-tab-projects" class="mobile-nav-link" onclick="navigateToProjects(); closeMobileDrawer();">
+          <span>📁 프로젝트 목록</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="mobile-drawer-footer">
+      <button type="button" class="btn btn-outline" style="width: 100%;" onclick="handleSignOut(); closeMobileDrawer();">
+        로그아웃
+      </button>
+    </div>
+  </aside>
 
   <!-- Main Container -->
   <main id="app-container">
@@ -1425,9 +1842,9 @@
          0. AUTH SCREEN (VIEW)
          ====================================================================== -->
     <div id="auth-view" class="auth-container">
-      <div class="auth-tabs">
-        <div id="tab-login" class="auth-tab active" onclick="switchAuthTab('login')">로그인</div>
-        <div id="tab-signup" class="auth-tab" onclick="switchAuthTab('signup')">회원가입</div>
+      <div class="auth-tabs" role="tablist" aria-label="인증 모드 선택">
+        <button type="button" role="tab" id="tab-login" aria-selected="true" class="auth-tab active" onclick="switchAuthTab('login')">로그인</button>
+        <button type="button" role="tab" id="tab-signup" aria-selected="false" class="auth-tab" onclick="switchAuthTab('signup')">회원가입</button>
       </div>
 
       <form id="auth-form" onsubmit="handleAuthSubmit(event)">
@@ -1465,7 +1882,7 @@
     </div>
 
     <!-- ======================================================================
-         1. DASHBOARD VIEW (NEW: 3-TIER DRILLDOWN ENTRY)
+         1. DASHBOARD VIEW (3-TIER DRILLDOWN ENTRY)
          ====================================================================== -->
     <div id="dashboard-view" class="hidden">
       <!-- Hero Welcome Banner -->
@@ -1477,98 +1894,98 @@
           </p>
         </div>
         <div class="hero-actions">
-          <button class="btn btn-outline" onclick="navigateToProjects()">📁 프로젝트 목록 보기</button>
-          <button class="btn btn-primary" onclick="navigateToSummaryTable()">📊 가설 요약 테이블 보기</button>
+          <button type="button" class="btn btn-outline" onclick="navigateToProjects()">📁 프로젝트 목록 보기</button>
+          <button type="button" class="btn btn-primary" onclick="navigateToSummaryTable()">📊 가설 요약 테이블 보기</button>
         </div>
       </div>
 
       <!-- Statistics KPI Cards (Hypotheses by Status & Tracks) -->
-      <div class="stats-grid">
-        <div class="stat-card" style="--card-accent: #036b3f;" onclick="navigateToSummaryTable('all')">
+      <div class="stats-grid" role="region" aria-label="연구 상태 지표 카드">
+        <button type="button" class="stat-card" style="--card-accent: #036b3f;" onclick="navigateToSummaryTable('all')" aria-label="전체 가설 요약 테이블로 이동">
           <div class="stat-header">
             <span class="stat-label">전체 가설</span>
-            <span class="stat-icon">📑</span>
+            <span class="stat-icon" aria-hidden="true">📑</span>
           </div>
           <div class="stat-number" id="dash-stat-total">0</div>
           <div class="stat-hint">전체 등록 가설 명제</div>
-        </div>
+        </button>
 
-        <div class="stat-card" style="--card-accent: #246b78;" onclick="navigateToProjects()">
+        <button type="button" class="stat-card" style="--card-accent: #246b78;" onclick="navigateToProjects()" aria-label="연구 트랙 및 프로젝트 목록으로 이동">
           <div class="stat-header">
             <span class="stat-label">연구 트랙</span>
-            <span class="stat-icon">🛤️</span>
+            <span class="stat-icon" aria-hidden="true">🛤️</span>
           </div>
           <div class="stat-number" id="dash-stat-tracks">0</div>
           <div class="stat-hint">참여 프로젝트 트랙 수</div>
-        </div>
+        </button>
 
-        <div class="stat-card" style="--card-accent: var(--status-draft);" onclick="navigateToSummaryTable('draft')">
+        <button type="button" class="stat-card" style="--card-accent: var(--status-draft);" onclick="navigateToSummaryTable('draft')" aria-label="초안 가설 필터링하여 보기">
           <div class="stat-header">
             <span class="stat-label">초안 (Draft)</span>
-            <span class="stat-icon">📝</span>
+            <span class="stat-icon" aria-hidden="true">📝</span>
           </div>
           <div class="stat-number" id="dash-stat-draft" style="color: #59675f;">0</div>
           <div class="stat-hint">수립 중인 초기 가설</div>
-        </div>
+        </button>
 
-        <div class="stat-card" style="--card-accent: var(--status-testing);" onclick="navigateToSummaryTable('testing')">
+        <button type="button" class="stat-card" style="--card-accent: var(--status-testing);" onclick="navigateToSummaryTable('testing')" aria-label="검증중 가설 필터링하여 보기">
           <div class="stat-header">
             <span class="stat-label">검증중 (Testing)</span>
-            <span class="stat-icon">🔬</span>
+            <span class="stat-icon" aria-hidden="true">🔬</span>
           </div>
           <div class="stat-number" id="dash-stat-testing" style="color: #1f6270;">0</div>
           <div class="stat-hint">실험 및 데이터 검증 진행</div>
-        </div>
+        </button>
 
-        <div class="stat-card" style="--card-accent: var(--status-supported);" onclick="navigateToSummaryTable('supported')">
+        <button type="button" class="stat-card" style="--card-accent: var(--status-supported);" onclick="navigateToSummaryTable('supported')" aria-label="채택 가설 필터링하여 보기">
           <div class="stat-header">
             <span class="stat-label">채택 (Supported)</span>
-            <span class="stat-icon">✅</span>
+            <span class="stat-icon" aria-hidden="true">✅</span>
           </div>
           <div class="stat-number" id="dash-stat-supported" style="color: #036b3f;">0</div>
           <div class="stat-hint">통계적 유의성 확인 완료</div>
-        </div>
+        </button>
 
-        <div class="stat-card" style="--card-accent: var(--status-rejected);" onclick="navigateToSummaryTable('rejected')">
+        <button type="button" class="stat-card" style="--card-accent: var(--status-rejected);" onclick="navigateToSummaryTable('rejected')" aria-label="기각 가설 필터링하여 보기">
           <div class="stat-header">
             <span class="stat-label">기각 (Rejected)</span>
-            <span class="stat-icon">❌</span>
+            <span class="stat-icon" aria-hidden="true">❌</span>
           </div>
           <div class="stat-number" id="dash-stat-rejected" style="color: #9b3933;">0</div>
           <div class="stat-hint">반례 관측 및 가설 기각</div>
-        </div>
+        </button>
 
-        <div class="stat-card" style="--card-accent: var(--status-inconclusive);" onclick="navigateToSummaryTable('inconclusive')">
+        <button type="button" class="stat-card" style="--card-accent: var(--status-inconclusive);" onclick="navigateToSummaryTable('inconclusive')" aria-label="유보 가설 필터링하여 보기">
           <div class="stat-header">
             <span class="stat-label">유보 (Inconclusive)</span>
-            <span class="stat-icon">⏳</span>
+            <span class="stat-icon" aria-hidden="true">⏳</span>
           </div>
           <div class="stat-number" id="dash-stat-inconclusive" style="color: #8b5e15;">0</div>
           <div class="stat-hint">추가 데이터 확보 대기</div>
-        </div>
+        </button>
       </div>
 
       <!-- Dashboard 2-column Body -->
       <div class="dashboard-layout">
         <!-- Left Column: Recent Hypotheses Mini-List -->
-        <div class="dash-panel">
+        <section class="dash-panel" aria-label="최근 판정 및 업데이트된 가설">
           <div class="dash-panel-header">
             <div>
               <h3 class="dash-panel-title">최근 판정 및 업데이트된 가설</h3>
               <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem;">
-                가장 최근 상태 또는 판정 근거(Rationale)가 갱신된 가설 (클릭 시 상세 뷰 이동)
+                가장 최근 상태 또는 판정 근거(Rationale)가 갱신된 가설
               </p>
             </div>
-            <button class="btn btn-subtle btn-sm" onclick="navigateToSummaryTable()">전체 보기 →</button>
+            <button type="button" class="btn btn-subtle btn-sm" onclick="navigateToSummaryTable()">전체 보기 →</button>
           </div>
 
           <div id="dash-recent-hypotheses" class="mini-hypo-list">
             <!-- Rendered via JS -->
           </div>
-        </div>
+        </section>
 
         <!-- Right Column: Projects Quick Panel -->
-        <div class="dash-panel">
+        <section class="dash-panel" aria-label="내 연구 프로젝트">
           <div class="dash-panel-header">
             <div>
               <h3 class="dash-panel-title">내 연구 프로젝트</h3>
@@ -1576,7 +1993,7 @@
                 소속 워크스페이스
               </p>
             </div>
-            <button class="btn btn-outline btn-sm" onclick="openCreateProjectModal()">+ 생성</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="openCreateProjectModal(event)">+ 생성</button>
           </div>
 
           <div id="dash-projects-list" class="mini-project-list">
@@ -1584,28 +2001,28 @@
           </div>
 
           <div style="margin-top: 1.25rem; text-align: center;">
-            <button class="btn btn-outline btn-sm" style="width: 100%;" onclick="navigateToProjects()">
+            <button type="button" class="btn btn-outline btn-sm" style="width: 100%;" onclick="navigateToProjects()">
               프로젝트 전체 목록 보기 →
             </button>
           </div>
-        </div>
+        </section>
       </div>
     </div>
 
     <!-- ======================================================================
-         2. SUMMARY TABLE VIEW (NEW: COMPREHENSIVE FILTERABLE TABLE)
+         2. SUMMARY TABLE VIEW (COMPREHENSIVE FILTERABLE TABLE)
          ====================================================================== -->
     <div id="summary-table-view" class="hidden">
-      <div class="breadcrumb-bar">
+      <nav class="breadcrumb-bar" aria-label="위치 경로">
         <div class="breadcrumbs">
-          <a onclick="navigateToDashboard()">← 대시보드</a>
-          <span>/</span>
+          <button type="button" class="breadcrumb-link" onclick="navigateToDashboard()">← 대시보드</button>
+          <span aria-hidden="true">/</span>
           <strong style="color: var(--text-main);">전체 가설 요약 테이블</strong>
         </div>
         <div style="display: flex; gap: 0.5rem;">
-          <button class="btn btn-outline btn-sm" onclick="navigateToProjects()">📁 프로젝트 목록</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="navigateToProjects()">📁 프로젝트 목록</button>
         </div>
-      </div>
+      </nav>
 
       <div class="section-header">
         <div>
@@ -1621,16 +2038,16 @@
         <div class="table-toolbar">
           <div class="toolbar-row-top">
             <div class="search-box">
-              <span class="search-icon">🔍</span>
-              <input type="text" id="summary-search-input" class="search-input" placeholder="가설명, 프로젝트, 트랙, 근거 검색..." oninput="handleSummarySearch(event)">
+              <span class="search-icon" aria-hidden="true">🔍</span>
+              <input type="text" id="summary-search-input" class="search-input" placeholder="가설명, 프로젝트, 트랙, 근거 검색..." oninput="handleSummarySearch(event)" aria-label="가설 검색">
             </div>
 
             <div class="toolbar-filters">
-              <select id="summary-project-filter" class="filter-select" onchange="handleSummaryProjectFilter(event)">
+              <select id="summary-project-filter" class="filter-select" onchange="handleSummaryProjectFilter(event)" aria-label="소속 프로젝트 필터">
                 <option value="all">모든 프로젝트</option>
               </select>
 
-              <select id="summary-sort-select" class="filter-select" onchange="handleSummarySort(event)">
+              <select id="summary-sort-select" class="filter-select" onchange="handleSummarySort(event)" aria-label="정렬 기준">
                 <option value="updated_desc">최종 수정일 (최신순)</option>
                 <option value="updated_asc">최종 수정일 (과거순)</option>
                 <option value="created_desc">등록일 (최신순)</option>
@@ -1641,13 +2058,13 @@
           </div>
 
           <div class="toolbar-row-bottom">
-            <div class="status-pills">
-              <button class="status-pill active" data-status="all" onclick="filterSummaryByStatus('all')">전체 (<span id="sum-count-all">0</span>)</button>
-              <button class="status-pill" data-status="draft" onclick="filterSummaryByStatus('draft')">초안 (<span id="sum-count-draft">0</span>)</button>
-              <button class="status-pill" data-status="testing" onclick="filterSummaryByStatus('testing')">검증중 (<span id="sum-count-testing">0</span>)</button>
-              <button class="status-pill" data-status="supported" onclick="filterSummaryByStatus('supported')">채택 (<span id="sum-count-supported">0</span>)</button>
-              <button class="status-pill" data-status="rejected" onclick="filterSummaryByStatus('rejected')">기각 (<span id="sum-count-rejected">0</span>)</button>
-              <button class="status-pill" data-status="inconclusive" onclick="filterSummaryByStatus('inconclusive')">유보 (<span id="sum-count-inconclusive">0</span>)</button>
+            <div class="status-pills" role="toolbar" aria-label="상태별 필터">
+              <button type="button" class="status-pill active" data-status="all" onclick="filterSummaryByStatus('all')">전체 (<span id="sum-count-all">0</span>)</button>
+              <button type="button" class="status-pill" data-status="draft" onclick="filterSummaryByStatus('draft')">초안 (<span id="sum-count-draft">0</span>)</button>
+              <button type="button" class="status-pill" data-status="testing" onclick="filterSummaryByStatus('testing')">검증중 (<span id="sum-count-testing">0</span>)</button>
+              <button type="button" class="status-pill" data-status="supported" onclick="filterSummaryByStatus('supported')">채택 (<span id="sum-count-supported">0</span>)</button>
+              <button type="button" class="status-pill" data-status="rejected" onclick="filterSummaryByStatus('rejected')">기각 (<span id="sum-count-rejected">0</span>)</button>
+              <button type="button" class="status-pill" data-status="inconclusive" onclick="filterSummaryByStatus('inconclusive')">유보 (<span id="sum-count-inconclusive">0</span>)</button>
             </div>
 
             <div id="summary-result-count" style="font-weight: 500;">
@@ -1657,16 +2074,16 @@
         </div>
 
         <!-- Table Responsive Wrapper -->
-        <div class="summary-table-wrapper">
+        <div class="summary-table-wrapper" tabindex="0" role="region" aria-label="가설 요약 목록 테이블">
           <table class="summary-table">
             <thead>
               <tr>
-                <th style="width: 38%;">가설 명제 (Title)</th>
-                <th style="width: 18%;">소속 프로젝트</th>
-                <th style="width: 14%;">소속 트랙</th>
-                <th style="width: 12%;">상태</th>
-                <th style="width: 10%;">작성자</th>
-                <th style="width: 8%;">최종 수정일</th>
+                <th scope="col" style="width: 38%;">가설 명제 (Title)</th>
+                <th scope="col" style="width: 18%;">소속 프로젝트</th>
+                <th scope="col" style="width: 14%;">소속 트랙</th>
+                <th scope="col" style="width: 12%;">상태</th>
+                <th scope="col" style="width: 10%;">작성자</th>
+                <th scope="col" style="width: 8%;">최종 수정일</th>
               </tr>
             </thead>
             <tbody id="summary-table-body">
@@ -1678,33 +2095,33 @@
     </div>
 
     <!-- ======================================================================
-         3. HYPOTHESIS DETAIL VIEW (NEW: FULL-PAGE DRILLDOWN DETAIL)
+         3. HYPOTHESIS DETAIL VIEW (FULL-PAGE DRILLDOWN DETAIL)
          ====================================================================== -->
     <div id="hypothesis-detail-view" class="hidden">
-      <div class="breadcrumb-bar">
+      <nav class="breadcrumb-bar" aria-label="가설 상세 위치 경로">
         <div class="breadcrumbs">
-          <a id="detail-back-link" onclick="handleDetailBack()">← 이전 목록으로</a>
-          <span>/</span>
-          <span id="detail-bc-project" style="color: var(--primary); cursor: pointer;" onclick="handleDetailGoToWorkspace()">프로젝트</span>
-          <span>/</span>
+          <button type="button" class="breadcrumb-link" id="detail-back-link" onclick="handleDetailBack()">← 이전 목록으로</button>
+          <span aria-hidden="true">/</span>
+          <button type="button" class="breadcrumb-link" id="detail-bc-project" onclick="handleDetailGoToWorkspace()">프로젝트</button>
+          <span aria-hidden="true">/</span>
           <span id="detail-bc-track" style="color: var(--text-muted);">트랙</span>
-          <span>/</span>
-          <strong id="detail-bc-title" style="color: var(--text-main); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">가설명</strong>
+          <span aria-hidden="true">/</span>
+          <strong id="detail-bc-title" style="color: var(--text-main); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">가설명</strong>
         </div>
 
-        <div style="display: flex; gap: 0.5rem;">
-          <button class="btn btn-outline btn-sm" onclick="handleDetailGoToWorkspace()">
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="handleDetailGoToWorkspace()">
             🔬 프로젝트 워크스페이스 열기
           </button>
-          <button class="btn btn-primary btn-sm" onclick="openUpdateStatusModalFromDetail()">
+          <button type="button" class="btn btn-primary btn-sm" onclick="openUpdateStatusModalFromDetail(event)">
             ⚖️ 판정 / 상태 변경
           </button>
         </div>
-      </div>
+      </nav>
 
       <div class="detail-container">
         <!-- Main Detail Card -->
-        <div class="detail-card">
+        <article class="detail-card">
           <div class="detail-header-group">
             <div class="detail-tags">
               <span id="detail-badge-status" class="badge-status draft">초안</span>
@@ -1715,7 +2132,7 @@
           </div>
 
           <!-- Metadata Summary Strip -->
-          <div class="detail-meta-grid">
+          <div class="detail-meta-grid" role="region" aria-label="가설 기본 정보">
             <div class="detail-meta-item">
               <span class="detail-meta-label">작성자</span>
               <span id="detail-author-name" class="detail-meta-value">-</span>
@@ -1746,17 +2163,17 @@
 
           <!-- Rationale Section (Highlighted Heritage Box) -->
           <div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
               <h3 class="detail-section-title" style="margin-bottom: 0;">
                 <span>🔬 판정 근거 및 실험 결과 요약 (Rationale)</span>
               </h3>
-              <button class="btn btn-subtle btn-sm" onclick="openUpdateStatusModalFromDetail()">
+              <button type="button" class="btn btn-subtle btn-sm" onclick="openUpdateStatusModalFromDetail(event)">
                 근거 수정 / 판정 변경
               </button>
             </div>
             
             <div class="detail-rationale-box">
-              <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
                 <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">
                   최신 공식 판정 기록
                 </span>
@@ -1777,21 +2194,21 @@
               <!-- Rendered via JS -->
             </div>
           </div>
-        </div>
+        </article>
       </div>
     </div>
 
     <!-- ======================================================================
-         4. PROJECTS LIST VIEW (PRESERVED)
+         4. PROJECTS LIST VIEW
          ====================================================================== -->
     <div id="projects-view" class="hidden">
-      <div class="breadcrumb-bar">
+      <nav class="breadcrumb-bar" aria-label="프로젝트 위치 경로">
         <div class="breadcrumbs">
-          <a onclick="navigateToDashboard()">← 대시보드</a>
-          <span>/</span>
+          <button type="button" class="breadcrumb-link" onclick="navigateToDashboard()">← 대시보드</button>
+          <span aria-hidden="true">/</span>
           <strong style="color: var(--text-main);">프로젝트 목록</strong>
         </div>
-      </div>
+      </nav>
 
       <div class="section-header">
         <div>
@@ -1800,7 +2217,7 @@
             RLS 격리가 적용된 개인/팀 연구 워크스페이스입니다.
           </p>
         </div>
-        <button class="btn btn-primary" onclick="openCreateProjectModal()">+ 새 프로젝트</button>
+        <button type="button" class="btn btn-primary" onclick="openCreateProjectModal(event)">+ 새 프로젝트</button>
       </div>
 
       <div id="projects-list" class="projects-grid">
@@ -1809,21 +2226,21 @@
     </div>
 
     <!-- ======================================================================
-         5. PROJECT WORKSPACE VIEW (PRESERVED)
+         5. PROJECT WORKSPACE VIEW
          ====================================================================== -->
     <div id="workspace-view" class="hidden">
-      <div class="breadcrumb-bar">
+      <nav class="breadcrumb-bar" aria-label="워크스페이스 위치 경로">
         <div class="breadcrumbs">
-          <a onclick="navigateToDashboard()">대시보드</a>
-          <span>/</span>
-          <a onclick="navigateToProjects()">프로젝트 목록</a>
-          <span>/</span>
+          <button type="button" class="breadcrumb-link" onclick="navigateToDashboard()">대시보드</button>
+          <span aria-hidden="true">/</span>
+          <button type="button" class="breadcrumb-link" onclick="navigateToProjects()">프로젝트 목록</button>
+          <span aria-hidden="true">/</span>
           <strong id="ws-project-name" style="color: var(--text-main);">프로젝트명</strong>
         </div>
-        <button class="btn btn-outline btn-sm" onclick="navigateToSummaryTable()">
+        <button type="button" class="btn btn-outline btn-sm" onclick="navigateToSummaryTable()">
           📊 가설 요약 테이블 보기
         </button>
-      </div>
+      </nav>
 
       <div style="background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--primary); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
         <h2 id="ws-header-title" style="font-size: 1.35rem; margin-bottom: 0.4rem; color: #034f31; font-family: Georgia, 'Times New Roman', 'Noto Serif KR', serif;"></h2>
@@ -1832,29 +2249,29 @@
 
       <div class="workspace-layout">
         <!-- Sidebar: Tracks -->
-        <aside class="tracks-panel">
+        <aside class="tracks-panel" aria-label="연구 트랙 목록">
           <div class="tracks-header">
             <h3 class="tracks-title">연구 트랙 (Tracks)</h3>
-            <button class="btn btn-subtle btn-sm" onclick="openCreateTrackModal()">+ 트랙</button>
+            <button type="button" class="btn btn-subtle btn-sm" onclick="openCreateTrackModal(event)">+ 트랙</button>
           </div>
 
-          <div id="tracks-list">
+          <div id="tracks-list" role="navigation" aria-label="트랙 필터">
             <!-- Rendered via JS -->
           </div>
         </aside>
 
         <!-- Main Panel: Hypotheses -->
-        <section class="hypotheses-panel">
+        <section class="hypotheses-panel" aria-label="가설 목록 및 관리">
           <div class="filter-bar">
-            <div class="status-pills">
-              <button class="status-pill active" data-status="all" onclick="filterHypothesesByStatus('all')">전체 (<span id="count-all">0</span>)</button>
-              <button class="status-pill" data-status="draft" onclick="filterHypothesesByStatus('draft')">초안 (<span id="count-draft">0</span>)</button>
-              <button class="status-pill" data-status="testing" onclick="filterHypothesesByStatus('testing')">검증중 (<span id="count-testing">0</span>)</button>
-              <button class="status-pill" data-status="supported" onclick="filterHypothesesByStatus('supported')">채택 (<span id="count-supported">0</span>)</button>
-              <button class="status-pill" data-status="rejected" onclick="filterHypothesesByStatus('rejected')">기각 (<span id="count-rejected">0</span>)</button>
-              <button class="status-pill" data-status="inconclusive" onclick="filterHypothesesByStatus('inconclusive')">유보 (<span id="count-inconclusive">0</span>)</button>
+            <div class="status-pills" role="toolbar" aria-label="가설 상태 필터">
+              <button type="button" class="status-pill active" data-status="all" onclick="filterHypothesesByStatus('all')">전체 (<span id="count-all">0</span>)</button>
+              <button type="button" class="status-pill" data-status="draft" onclick="filterHypothesesByStatus('draft')">초안 (<span id="count-draft">0</span>)</button>
+              <button type="button" class="status-pill" data-status="testing" onclick="filterHypothesesByStatus('testing')">검증중 (<span id="count-testing">0</span>)</button>
+              <button type="button" class="status-pill" data-status="supported" onclick="filterHypothesesByStatus('supported')">채택 (<span id="count-supported">0</span>)</button>
+              <button type="button" class="status-pill" data-status="rejected" onclick="filterHypothesesByStatus('rejected')">기각 (<span id="count-rejected">0</span>)</button>
+              <button type="button" class="status-pill" data-status="inconclusive" onclick="filterHypothesesByStatus('inconclusive')">유보 (<span id="count-inconclusive">0</span>)</button>
             </div>
-            <button class="btn btn-primary btn-sm" onclick="openCreateHypothesisModal()">+ 가설 등록</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="openCreateHypothesisModal(event)">+ 가설 등록</button>
           </div>
 
           <div id="hypotheses-list" style="display: flex; flex-direction: column; gap: 1rem;">
@@ -1867,15 +2284,15 @@
   </main>
 
   <!-- ======================================================================
-       MODALS
+       MODALS (With Full Accessibility & Loading Feedback)
        ====================================================================== -->
 
   <!-- Modal 1: Create Project -->
-  <div id="modal-create-project" class="modal-overlay">
+  <div id="modal-create-project" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-create-project-title" aria-hidden="true" onclick="handleOverlayClick(event, 'modal-create-project')">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 class="modal-title">새 연구 프로젝트 생성</h3>
-        <button class="modal-close" onclick="closeModal('modal-create-project')">&times;</button>
+        <h3 id="modal-create-project-title" class="modal-title">새 연구 프로젝트 생성</h3>
+        <button type="button" class="modal-close" onclick="closeModal('modal-create-project')" aria-label="프로젝트 생성 모달 닫기">&times;</button>
       </div>
       <form onsubmit="handleCreateProject(event)">
         <div class="form-group">
@@ -1888,18 +2305,18 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" onclick="closeModal('modal-create-project')">취소</button>
-          <button type="submit" class="btn btn-primary">프로젝트 생성</button>
+          <button type="submit" id="btn-create-project-submit" class="btn btn-primary">프로젝트 생성</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Modal 2: Create Track -->
-  <div id="modal-create-track" class="modal-overlay">
+  <div id="modal-create-track" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-create-track-title" aria-hidden="true" onclick="handleOverlayClick(event, 'modal-create-track')">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 class="modal-title">새 연구 트랙 추가</h3>
-        <button class="modal-close" onclick="closeModal('modal-create-track')">&times;</button>
+        <h3 id="modal-create-track-title" class="modal-title">새 연구 트랙 추가</h3>
+        <button type="button" class="modal-close" onclick="closeModal('modal-create-track')" aria-label="트랙 추가 모달 닫기">&times;</button>
       </div>
       <form onsubmit="handleCreateTrack(event)">
         <div class="form-group">
@@ -1912,18 +2329,18 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" onclick="closeModal('modal-create-track')">취소</button>
-          <button type="submit" class="btn btn-primary">트랙 추가</button>
+          <button type="submit" id="btn-create-track-submit" class="btn btn-primary">트랙 추가</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Modal 3: Create Hypothesis -->
-  <div id="modal-create-hypo" class="modal-overlay">
+  <div id="modal-create-hypo" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-create-hypo-title" aria-hidden="true" onclick="handleOverlayClick(event, 'modal-create-hypo')">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 class="modal-title">새 연구 가설 등록</h3>
-        <button class="modal-close" onclick="closeModal('modal-create-hypo')">&times;</button>
+        <h3 id="modal-create-hypo-title" class="modal-title">새 연구 가설 등록</h3>
+        <button type="button" class="modal-close" onclick="closeModal('modal-create-hypo')" aria-label="가설 등록 모달 닫기">&times;</button>
       </div>
       <form onsubmit="handleCreateHypothesis(event)">
         <div class="form-group">
@@ -1949,18 +2366,18 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" onclick="closeModal('modal-create-hypo')">취소</button>
-          <button type="submit" class="btn btn-primary">가설 등록</button>
+          <button type="submit" id="btn-create-hypo-submit" class="btn btn-primary">가설 등록</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Modal 4: Update Hypothesis Status & Mandatory Rationale -->
-  <div id="modal-update-status" class="modal-overlay">
+  <div id="modal-update-status" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-update-status-title" aria-hidden="true" onclick="handleOverlayClick(event, 'modal-update-status')">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 class="modal-title">가설 판정 및 상태 변경</h3>
-        <button class="modal-close" onclick="closeModal('modal-update-status')">&times;</button>
+        <h3 id="modal-update-status-title" class="modal-title">가설 판정 및 상태 변경</h3>
+        <button type="button" class="modal-close" onclick="closeModal('modal-update-status')" aria-label="판정 변경 모달 닫기">&times;</button>
       </div>
       <form onsubmit="handleUpdateStatusSubmit(event)">
         <input type="hidden" id="update-hypo-id">
@@ -1989,14 +2406,14 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" onclick="closeModal('modal-update-status')">취소</button>
-          <button type="submit" class="btn btn-primary">판정 확정</button>
+          <button type="submit" id="btn-update-status-submit" class="btn btn-primary">판정 확정</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Toast Notification Container -->
-  <div id="toast-container"></div>
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
   <div style="position:fixed; bottom:10px; right:14px; font-size:11px; color:var(--text-muted,#888); opacity:0.7; z-index:5; pointer-events:none;">
     Developed by Solucionemos
@@ -2030,6 +2447,9 @@
     let workspaceTrackId = 'all'; // 'all' or track UUID in workspace
     let workspaceStatusFilter = 'all'; // Status filter in workspace view
 
+    // Modal Trigger Focus Tracker
+    let activeModalTrigger = null;
+
     // Summary Table Filter State
     let summaryFilterState = {
       status: 'all',
@@ -2049,6 +2469,9 @@
 
     // Initialize Application
     window.addEventListener('DOMContentLoaded', async () => {
+      // Global Keydown Handler: ESC for Modals & Mobile Drawer
+      document.addEventListener('keydown', handleGlobalKeydown);
+
       const { data: { session }, error } = await supabaseClient.auth.getSession();
       if (session && session.user) {
         await setUserSession(session.user);
@@ -2069,12 +2492,35 @@
       });
     });
 
+    // Global Keydown Handler
+    function handleGlobalKeydown(e) {
+      if (e.key === 'Escape') {
+        const openDrawer = document.getElementById('mobile-drawer');
+        if (openDrawer && !openDrawer.classList.contains('hidden')) {
+          closeMobileDrawer();
+          return;
+        }
+        const openModalEl = document.querySelector('.modal-overlay.open');
+        if (openModalEl) {
+          closeModal(openModalEl.id);
+        }
+      }
+    }
+
+    // Keyboard Accessibility Helper for custom elements
+    function handleA11yKeydown(e, callback) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        callback();
+      }
+    }
+
     // Toast Utility
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = `toast ${type}`;
-      toast.innerHTML = `<span>${type === 'error' ? '❌' : '✅'}</span> <span>${message}</span>`;
+      toast.innerHTML = `<span>${type === 'error' ? '❌' : '✅'}</span> <span>${escapeHtml(message)}</span>`;
       container.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = '0';
@@ -2082,19 +2528,91 @@
       }, 3500);
     }
 
-    // Modal Utility
-    function openModal(id) {
-      document.getElementById(id).classList.add('open');
+    // =========================================================================
+    // Accessible Modal Management
+    // =========================================================================
+    function openModal(id, triggerElement = null) {
+      activeModalTrigger = triggerElement || document.activeElement;
+      const modal = document.getElementById(id);
+      if (!modal) return;
+
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+
+      // Auto focus first interactive input or button
+      setTimeout(() => {
+        const firstInput = modal.querySelector('input:not([type="hidden"]), select, textarea');
+        if (firstInput) {
+          firstInput.focus();
+        } else {
+          const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          if (firstFocusable) firstFocusable.focus();
+        }
+      }, 50);
     }
+
     function closeModal(id) {
-      document.getElementById(id).classList.remove('open');
+      const modal = document.getElementById(id);
+      if (!modal) return;
+
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+
+      if (activeModalTrigger && typeof activeModalTrigger.focus === 'function') {
+        activeModalTrigger.focus();
+      }
+      activeModalTrigger = null;
+    }
+
+    function handleOverlayClick(e, modalId) {
+      if (e.target.id === modalId) {
+        closeModal(modalId);
+      }
+    }
+
+    // =========================================================================
+    // Mobile Drawer Navigation Management
+    // =========================================================================
+    function toggleMobileDrawer() {
+      const drawer = document.getElementById('mobile-drawer');
+      const overlay = document.getElementById('mobile-drawer-overlay');
+      const toggleBtn = document.getElementById('mobile-menu-btn');
+      const isOpen = !drawer.classList.contains('hidden');
+
+      if (isOpen) {
+        closeMobileDrawer();
+      } else {
+        drawer.classList.remove('hidden');
+        overlay.classList.remove('hidden');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('drawer-open');
+
+        const firstLink = drawer.querySelector('button');
+        if (firstLink) setTimeout(() => firstLink.focus(), 50);
+      }
+    }
+
+    function closeMobileDrawer() {
+      const drawer = document.getElementById('mobile-drawer');
+      const overlay = document.getElementById('mobile-drawer-overlay');
+      const toggleBtn = document.getElementById('mobile-menu-btn');
+      if (!drawer) return;
+
+      drawer.classList.add('hidden');
+      overlay.classList.add('hidden');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+      drawer.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('drawer-open');
     }
 
     // Auth Tab Switch
     function switchAuthTab(mode) {
       currentAuthMode = mode;
       document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('tab-login').setAttribute('aria-selected', mode === 'login');
       document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+      document.getElementById('tab-signup').setAttribute('aria-selected', mode === 'signup');
       document.getElementById('signup-name-group').classList.toggle('hidden', mode === 'login');
       document.getElementById('auth-submit-btn').textContent = mode === 'login' ? '로그인' : '회원가입';
     }
@@ -2113,8 +2631,9 @@
       const displayName = document.getElementById('auth-name').value.trim();
 
       const btn = document.getElementById('auth-submit-btn');
+      const originalText = btn.textContent;
       btn.disabled = true;
-      btn.textContent = '처리 중...';
+      btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 처리 중...';
 
       try {
         if (currentAuthMode === 'signup') {
@@ -2156,8 +2675,11 @@
       document.getElementById('hypothesis-detail-view').classList.add('hidden');
       document.getElementById('projects-view').classList.add('hidden');
       document.getElementById('workspace-view').classList.add('hidden');
+      
       document.getElementById('nav-main-menu').classList.add('hidden');
       document.getElementById('nav-user-section').classList.add('hidden');
+      document.getElementById('mobile-menu-btn').classList.add('hidden');
+      closeMobileDrawer();
     }
 
     async function setUserSession(user) {
@@ -2165,17 +2687,20 @@
       document.getElementById('auth-view').classList.add('hidden');
       document.getElementById('nav-main-menu').classList.remove('hidden');
       document.getElementById('nav-user-section').classList.remove('hidden');
+      document.getElementById('mobile-menu-btn').classList.remove('hidden');
       
       const displayName = user.user_metadata?.display_name || user.email.split('@')[0];
       document.getElementById('nav-user-name').textContent = displayName;
       document.getElementById('nav-user-email').textContent = user.email;
+      document.getElementById('mobile-user-name').textContent = displayName;
+      document.getElementById('mobile-user-email').textContent = user.email;
 
       await loadAllAppData();
       navigateToDashboard();
     }
 
     // =========================================================================
-    // Core Data Fetching: Load All App Data (Projects, Tracks, Hypotheses, Profiles)
+    // Core Data Fetching
     // =========================================================================
     async function loadAllAppData() {
       try {
@@ -2217,11 +2742,15 @@
       return '연구원';
     }
 
-    // Helper: Update Navigation Tab Active State
+    // Helper: Update Navigation Tab Active State (Desktop & Mobile Drawer)
     function updateNavTabState(activeTab) {
       document.getElementById('nav-tab-dashboard')?.classList.toggle('active', activeTab === 'dashboard');
       document.getElementById('nav-tab-summary')?.classList.toggle('active', activeTab === 'summary');
       document.getElementById('nav-tab-projects')?.classList.toggle('active', activeTab === 'projects');
+
+      document.getElementById('mobile-tab-dashboard')?.classList.toggle('active', activeTab === 'dashboard');
+      document.getElementById('mobile-tab-summary')?.classList.toggle('active', activeTab === 'summary');
+      document.getElementById('mobile-tab-projects')?.classList.toggle('active', activeTab === 'projects');
     }
 
     // =========================================================================
@@ -2379,7 +2908,7 @@
       document.getElementById('dash-stat-rejected').textContent = rejectedCount;
       document.getElementById('dash-stat-inconclusive').textContent = inconclusiveCount;
 
-      // Recent Hypotheses (Top 5~8 updated)
+      // Recent Hypotheses (Top 7 updated)
       const recentContainer = document.getElementById('dash-recent-hypotheses');
       const recentHypotheses = [...allHypotheses]
         .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
@@ -2400,7 +2929,7 @@
           const authorName = getAuthorName(h.created_by);
 
           return `
-            <div class="mini-hypo-item" onclick="navigateToHypothesisDetail('${h.id}', 'dashboard')">
+            <div class="mini-hypo-item" role="button" tabindex="0" onclick="navigateToHypothesisDetail('${h.id}', 'dashboard')" onkeydown="handleA11yKeydown(event, () => navigateToHypothesisDetail('${h.id}', 'dashboard'))" aria-label="${escapeHtml(h.title)} 가설 상세 보기">
               <div class="mini-hypo-top">
                 <span class="mini-hypo-title">${escapeHtml(h.title)}</span>
                 <span class="badge-status ${statusMeta.class}">${statusMeta.label}</span>
@@ -2439,7 +2968,7 @@
           const projectTrackCount = allTracks.filter(t => t.project_id === p.id).length;
 
           return `
-            <div class="mini-project-item" onclick="openProject('${p.id}')">
+            <div class="mini-project-item" role="button" tabindex="0" onclick="openProject('${p.id}')" onkeydown="handleA11yKeydown(event, () => openProject('${p.id}'))" aria-label="${escapeHtml(p.name)} 프로젝트 열기">
               <div class="mini-project-name">${escapeHtml(p.name)}</div>
               <div class="mini-project-stats">
                 <span>📑 가설 ${projectHypoCount}개</span>
@@ -2541,7 +3070,7 @@
         const updatedDate = new Date(h.updated_at).toLocaleDateString('ko-KR');
 
         return `
-          <tr onclick="navigateToHypothesisDetail('${h.id}', 'summary-table')">
+          <tr tabindex="0" role="button" aria-label="${escapeHtml(h.title)} 가설 상세 보기" onclick="navigateToHypothesisDetail('${h.id}', 'summary-table')" onkeydown="handleA11yKeydown(event, () => navigateToHypothesisDetail('${h.id}', 'summary-table'))">
             <td>
               <div class="table-hypo-title">${escapeHtml(h.title)}</div>
               ${h.rationale ? `<div style="font-size: 0.76rem; color: var(--text-dim); margin-top: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 420px;"><strong>근거:</strong> ${escapeHtml(h.rationale)}</div>` : ''}
@@ -2668,9 +3197,9 @@
       `;
     }
 
-    function openUpdateStatusModalFromDetail() {
+    function openUpdateStatusModalFromDetail(e) {
       if (selectedDetailHypo) {
-        openUpdateStatusModal(selectedDetailHypo.id);
+        openUpdateStatusModal(selectedDetailHypo.id, e?.currentTarget);
       }
     }
 
@@ -2694,7 +3223,7 @@
         const projectTrackCount = allTracks.filter(t => t.project_id === p.id).length;
 
         return `
-          <div class="project-card" onclick="openProject('${p.id}')">
+          <div class="project-card" role="button" tabindex="0" onclick="openProject('${p.id}')" onkeydown="handleA11yKeydown(event, () => openProject('${p.id}'))" aria-label="${escapeHtml(p.name)} 프로젝트 워크스페이스 열기">
             <div class="project-card-header">
               <h2 class="project-name">${escapeHtml(p.name)}</h2>
               <p class="project-desc">${escapeHtml(p.description || '설명 없음')}</p>
@@ -2708,16 +3237,21 @@
       }).join('');
     }
 
-    function openCreateProjectModal() {
+    function openCreateProjectModal(e) {
       document.getElementById('proj-name').value = '';
       document.getElementById('proj-desc').value = '';
-      openModal('modal-create-project');
+      openModal('modal-create-project', e?.currentTarget);
     }
 
     async function handleCreateProject(e) {
       e.preventDefault();
       const name = document.getElementById('proj-name').value.trim();
       const description = document.getElementById('proj-desc').value.trim();
+      const submitBtn = document.getElementById('btn-create-project-submit');
+
+      const originalHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 생성 중...';
 
       try {
         const { data, error } = await supabaseClient
@@ -2736,6 +3270,9 @@
         }
       } catch (err) {
         showToast('프로젝트 생성 실패: ' + err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHtml;
       }
     }
 
@@ -2748,19 +3285,19 @@
       const projectTracks = allTracks.filter(t => t.project_id === currentProject.id);
 
       let html = `
-        <div class="track-item ${workspaceTrackId === 'all' ? 'active' : ''}" onclick="selectWorkspaceTrack('all')">
+        <button type="button" class="track-item ${workspaceTrackId === 'all' ? 'active' : ''}" onclick="selectWorkspaceTrack('all')">
           <span>전체 트랙</span>
           <span class="track-count">${projectHypotheses.length}</span>
-        </div>
+        </button>
       `;
 
       projectTracks.forEach(t => {
         const count = projectHypotheses.filter(h => h.track_id === t.id).length;
         html += `
-          <div class="track-item ${workspaceTrackId === t.id ? 'active' : ''}" onclick="selectWorkspaceTrack('${t.id}')">
+          <button type="button" class="track-item ${workspaceTrackId === t.id ? 'active' : ''}" onclick="selectWorkspaceTrack('${t.id}')">
             <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(t.name)}</span>
             <span class="track-count">${count}</span>
-          </div>
+          </button>
         `;
       });
 
@@ -2773,16 +3310,21 @@
       renderHypothesesList();
     }
 
-    function openCreateTrackModal() {
+    function openCreateTrackModal(e) {
       document.getElementById('track-name').value = '';
       document.getElementById('track-desc').value = '';
-      openModal('modal-create-track');
+      openModal('modal-create-track', e?.currentTarget);
     }
 
     async function handleCreateTrack(e) {
       e.preventDefault();
       const name = document.getElementById('track-name').value.trim();
       const description = document.getElementById('track-desc').value.trim();
+      const submitBtn = document.getElementById('btn-create-track-submit');
+
+      const originalHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 추가 중...';
 
       try {
         const { error } = await supabaseClient
@@ -2797,6 +3339,9 @@
         populateTrackSelect();
       } catch (err) {
         showToast('트랙 추가 실패: ' + err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHtml;
       }
     }
 
@@ -2854,20 +3399,20 @@
         const trackName = h.tracks?.name || (allTracks.find(t => t.id === h.track_id)?.name);
         
         return `
-          <div class="hypothesis-card">
+          <article class="hypothesis-card">
             <div class="hypo-header">
               <div class="hypo-title-group">
                 <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                   <span class="badge-status ${statusMeta.class}">${statusMeta.label}</span>
                   ${trackName ? `<span class="badge-track">트랙: ${escapeHtml(trackName)}</span>` : ''}
                 </div>
-                <h3 class="hypo-title" onclick="navigateToHypothesisDetail('${h.id}', 'workspace')">${escapeHtml(h.title)}</h3>
+                <button type="button" class="hypo-title-btn" onclick="navigateToHypothesisDetail('${h.id}', 'workspace')">${escapeHtml(h.title)}</button>
               </div>
-              <div style="display: flex; gap: 0.4rem;">
-                <button class="btn btn-subtle btn-sm" onclick="navigateToHypothesisDetail('${h.id}', 'workspace')">
+              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-subtle btn-sm" onclick="navigateToHypothesisDetail('${h.id}', 'workspace')">
                   상세 보기 →
                 </button>
-                <button class="btn btn-outline btn-sm" onclick="openUpdateStatusModal('${h.id}')">
+                <button type="button" class="btn btn-outline btn-sm" onclick="openUpdateStatusModal('${h.id}', this)">
                   판정 변경
                 </button>
               </div>
@@ -2896,17 +3441,17 @@
               <span>•</span>
               <span>수정일: ${new Date(h.updated_at).toLocaleDateString('ko-KR')}</span>
             </div>
-          </div>
+          </article>
         `;
       }).join('');
     }
 
-    function openCreateHypothesisModal() {
+    function openCreateHypothesisModal(e) {
       document.getElementById('hypo-title').value = '';
       document.getElementById('hypo-desc').value = '';
       document.getElementById('hypo-track-select').value = workspaceTrackId !== 'all' ? workspaceTrackId : '';
       document.getElementById('hypo-initial-status').value = 'draft';
-      openModal('modal-create-hypo');
+      openModal('modal-create-hypo', e?.currentTarget);
     }
 
     async function handleCreateHypothesis(e) {
@@ -2915,6 +3460,11 @@
       const track_id = document.getElementById('hypo-track-select').value || null;
       const description = document.getElementById('hypo-desc').value.trim();
       const status = document.getElementById('hypo-initial-status').value;
+      const submitBtn = document.getElementById('btn-create-hypo-submit');
+
+      const originalHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 등록 중...';
 
       try {
         const { error } = await supabaseClient
@@ -2936,13 +3486,16 @@
         renderHypothesesList();
       } catch (err) {
         showToast('가설 등록 실패: ' + err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHtml;
       }
     }
 
     // =========================================================================
     // Status & Rationale Modal Update Handler
     // =========================================================================
-    function openUpdateStatusModal(hypoId) {
+    function openUpdateStatusModal(hypoId, triggerElement = null) {
       const hypo = allHypotheses.find(h => h.id === hypoId);
       if (!hypo) return;
 
@@ -2951,7 +3504,7 @@
       document.getElementById('update-target-status').value = hypo.status;
       document.getElementById('update-rationale').value = hypo.rationale || '';
       
-      openModal('modal-update-status');
+      openModal('modal-update-status', triggerElement);
     }
 
     async function handleUpdateStatusSubmit(e) {
@@ -2959,11 +3512,16 @@
       const hypoId = document.getElementById('update-hypo-id').value;
       const status = document.getElementById('update-target-status').value;
       const rationale = document.getElementById('update-rationale').value.trim();
+      const submitBtn = document.getElementById('btn-update-status-submit');
 
       if (!rationale) {
         showToast('판정 변경 시 근거(Rationale) 텍스트 입력은 필수입니다.', 'error');
         return;
       }
+
+      const originalHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 판정 확정 중...';
 
       try {
         const { error } = await supabaseClient
@@ -2995,6 +3553,9 @@
         }
       } catch (err) {
         showToast('상태 업데이트 실패: ' + err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHtml;
       }
     }
 
