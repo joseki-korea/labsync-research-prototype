@@ -1,0 +1,3013 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대학원 연구관리 시스템 (ResearchLab MVP - v2 Dashboard)</title>
+  <meta name="description" content="대학원 연구 프로젝트, 연구 트랙 및 가설 검증 3단 드릴다운 대시보드 관리 플랫폼">
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Konkuk University Heritage Green Design Tokens */
+    :root {
+      --bg: #f5f4ee;
+      --bg-subtle: #ffffff;
+      --surface: #ffffff;
+      --surface-hover: #eef5f1;
+      --surface-active: #e3eee8;
+      --border: #d6ddd8;
+      --border-muted: #e7ebe8;
+      
+      --text-main: #183129;
+      --text-muted: #5f7069;
+      --text-dim: #829089;
+      
+      --primary: #036b3f;
+      --primary-hover: #025431;
+      --primary-light: rgba(3, 107, 63, 0.10);
+      --primary-subtle: rgba(3, 107, 63, 0.05);
+      
+      --status-draft: #718078;
+      --status-draft-bg: rgba(113, 128, 120, 0.12);
+      --status-testing: #246b78;
+      --status-testing-bg: rgba(36, 107, 120, 0.12);
+      --status-supported: #036b3f;
+      --status-supported-bg: rgba(3, 107, 63, 0.12);
+      --status-rejected: #a43c35;
+      --status-rejected-bg: rgba(164, 60, 53, 0.12);
+      --status-inconclusive: #9a6818;
+      --status-inconclusive-bg: rgba(154, 104, 24, 0.12);
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-sm: 0 1px 3px rgba(24, 49, 41, 0.06);
+      --shadow-md: 0 6px 18px rgba(24, 49, 41, 0.08);
+      --shadow-lg: 0 16px 36px rgba(24, 49, 41, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(rgba(3, 107, 63, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(3, 107, 63, 0.025) 1px, transparent 1px);
+      background-size: 28px 28px;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .brand,
+    .section-title,
+    .project-name,
+    .tracks-title,
+    .hypo-title,
+    .modal-title,
+    .stat-number,
+    .detail-title {
+      font-family: Georgia, 'Times New Roman', 'Noto Serif KR', serif;
+      letter-spacing: -0.015em;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--border);
+      border-top: 4px solid var(--primary);
+      box-shadow: 0 1px 0 rgba(3, 107, 63, 0.08);
+      backdrop-filter: blur(12px);
+      padding: 0 1.5rem;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: #034f31;
+      font-weight: 700;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      border: 1px solid rgba(3, 107, 63, 0.22);
+      font-family: 'Pretendard', sans-serif;
+      font-weight: 600;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+      background: var(--primary-subtle);
+    }
+
+    .nav-link.active {
+      color: var(--primary);
+      background: var(--primary-light);
+      font-weight: 600;
+      border-color: rgba(3, 107, 63, 0.2);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-main);
+    }
+
+    .user-email {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Common Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(3, 107, 63, 0.20);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-outline {
+      background-color: #ffffff;
+      border-color: var(--border);
+      color: var(--text-main);
+    }
+    .btn-outline:hover:not(:disabled) {
+      background-color: var(--surface-hover);
+      border-color: rgba(3, 107, 63, 0.4);
+      color: var(--primary);
+    }
+
+    .btn-subtle {
+      background-color: var(--surface-hover);
+      color: var(--text-main);
+    }
+    .btn-subtle:hover:not(:disabled) {
+      background-color: var(--surface-active);
+    }
+
+    .btn-sm {
+      padding: 0.32rem 0.65rem;
+      font-size: 0.78rem;
+    }
+
+    .btn-lg {
+      padding: 0.65rem 1.25rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      padding: 2.25rem 1.5rem 3.5rem;
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Auth Card View */
+    .auth-container {
+      max-width: 440px;
+      margin: 3.5rem auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--primary);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 0.75rem 0;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .auth-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      background: #fbfcfa;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+      background: #ffffff;
+    }
+
+    textarea.form-control {
+      min-height: 85px;
+      resize: vertical;
+    }
+
+    /* Quick Test Account Box */
+    .test-accounts-box {
+      margin-top: 1.5rem;
+      padding: 1.1rem;
+      background: #f6f8f5;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+    }
+
+    .test-accounts-box p {
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .test-btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Breadcrumbs */
+    .breadcrumb-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .breadcrumbs a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .breadcrumbs a:hover {
+      text-decoration: underline;
+    }
+
+    /* Section Header */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #073f29;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin-top: 0.25rem;
+    }
+
+    /* ==========================================================================
+       1. DASHBOARD VIEW STYLES
+       ========================================================================== */
+    .dashboard-hero {
+      background: linear-gradient(135deg, #ffffff 0%, #f0f7f3 100%);
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary);
+      border-radius: var(--radius-md);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-text h2 {
+      font-family: Georgia, 'Times New Roman', 'Noto Serif KR', serif;
+      font-size: 1.4rem;
+      color: #034f31;
+      margin-bottom: 0.35rem;
+    }
+
+    .hero-text p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      max-width: 650px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.15rem 1.25rem;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--primary));
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(3, 107, 63, 0.35);
+    }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .stat-icon {
+      font-size: 0.9rem;
+      opacity: 0.75;
+    }
+
+    .stat-number {
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+
+    .stat-hint {
+      font-size: 0.74rem;
+      color: var(--text-dim);
+      margin-top: 0.4rem;
+    }
+
+    /* Dashboard 2-column Content */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .dash-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dash-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-muted);
+    }
+
+    .dash-panel-title {
+      font-family: Georgia, 'Times New Roman', 'Noto Serif KR', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #034f31;
+    }
+
+    /* Recent Hypotheses Mini List */
+    .mini-hypo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .mini-hypo-item {
+      padding: 1rem;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      background: #fdfdfc;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .mini-hypo-item:hover {
+      background: var(--surface-hover);
+      border-color: rgba(3, 107, 63, 0.35);
+      transform: translateX(2px);
+    }
+
+    .mini-hypo-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .mini-hypo-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+
+    .mini-hypo-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.76rem;
+      color: var(--text-dim);
+      flex-wrap: wrap;
+    }
+
+    .mini-hypo-rationale {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: #f6f8f5;
+      padding: 0.4rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border-left: 2px solid var(--primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Project Mini Card in Dashboard Sidebar */
+    .mini-project-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .mini-project-item {
+      padding: 0.9rem;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      background: #fdfdfc;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .mini-project-item:hover {
+      background: var(--surface-hover);
+      border-color: rgba(3, 107, 63, 0.35);
+    }
+
+    .mini-project-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .mini-project-stats {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    /* ==========================================================================
+       2. SUMMARY TABLE VIEW STYLES
+       ========================================================================== */
+    .table-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: #fbfbfa;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .toolbar-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+      max-width: 400px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem 0.5rem 2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.65rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+      font-size: 0.85rem;
+    }
+
+    .toolbar-filters {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 0.45rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      font-size: 0.82rem;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .filter-select:focus {
+      border-color: var(--primary);
+    }
+
+    .toolbar-row-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Table Element */
+    .summary-table-wrapper {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.86rem;
+    }
+
+    .summary-table th {
+      background: #f6f8f6;
+      padding: 0.85rem 1rem;
+      font-weight: 600;
+      color: #034f31;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .summary-table td {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--border-muted);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    .summary-table tbody tr {
+      cursor: pointer;
+      transition: background-color 0.12s ease;
+    }
+
+    .summary-table tbody tr:hover {
+      background-color: var(--surface-hover);
+    }
+
+    .summary-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-hypo-title {
+      font-weight: 600;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.35;
+    }
+
+    .table-project-tag {
+      font-weight: 500;
+      color: #034f31;
+    }
+
+    .table-track-tag {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    /* ==========================================================================
+       3. HYPOTHESIS DETAIL VIEW STYLES
+       ========================================================================== */
+    .detail-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .detail-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .detail-header-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-muted);
+    }
+
+    .detail-tags {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .detail-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #073f29;
+      line-height: 1.3;
+    }
+
+    .detail-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      background: #fbfcfb;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.25rem;
+    }
+
+    .detail-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .detail-meta-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .detail-meta-value {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .detail-section-title {
+      font-family: Georgia, 'Times New Roman', 'Noto Serif KR', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #034f31;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .detail-desc-box {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      background: #ffffff;
+      padding: 1.25rem;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      white-space: pre-wrap;
+    }
+
+    .detail-rationale-box {
+      background: #f6f9f7;
+      border-left: 4px solid var(--primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .detail-rationale-content {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      white-space: pre-wrap;
+      margin-top: 0.5rem;
+    }
+
+    /* Timeline Section */
+    .timeline-box {
+      border-left: 2px solid var(--border);
+      margin-left: 0.75rem;
+      padding-left: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: relative;
+    }
+
+    .timeline-item {
+      position: relative;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -1.72rem;
+      top: 0.2rem;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .timeline-time {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-bottom: 0.2rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.85rem;
+      color: var(--text-main);
+    }
+
+    /* Projects Grid */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top-color: rgba(3, 107, 63, 0.42);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 180px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .project-card:hover {
+      border-color: rgba(3, 107, 63, 0.45);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .project-card-header {
+      margin-bottom: 0.75rem;
+    }
+
+    .project-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      color: #034f31;
+    }
+
+    .project-desc {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .project-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-muted);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    /* Workspace Layout */
+    .workspace-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      .workspace-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sidebar: Tracks */
+    .tracks-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top-color: rgba(3, 107, 63, 0.42);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tracks-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .tracks-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #034f31;
+    }
+
+    .track-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.75rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+      transition: all 0.15s ease;
+    }
+
+    .track-item:hover {
+      background: var(--surface-hover);
+      color: var(--text-main);
+    }
+
+    .track-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+      box-shadow: inset 3px 0 0 var(--primary);
+    }
+
+    .track-count {
+      background: #f6f8f5;
+      font-size: 0.75rem;
+      padding: 1px 6px;
+      border-radius: 9999px;
+      color: var(--text-dim);
+    }
+
+    /* Main: Hypotheses */
+    .hypotheses-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .filter-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .status-pills {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+
+    .status-pill:hover {
+      border-color: var(--text-dim);
+      color: var(--text-main);
+    }
+
+    .status-pill.active {
+      background: var(--text-main);
+      color: #fff;
+      border-color: var(--text-main);
+    }
+
+    .status-pill.active[data-status="draft"] { background: var(--status-draft); border-color: var(--status-draft); color: #fff; }
+    .status-pill.active[data-status="testing"] { background: var(--status-testing); border-color: var(--status-testing); color: #fff; }
+    .status-pill.active[data-status="supported"] { background: var(--status-supported); border-color: var(--status-supported); color: #fff; }
+    .status-pill.active[data-status="rejected"] { background: var(--status-rejected); border-color: var(--status-rejected); color: #fff; }
+    .status-pill.active[data-status="inconclusive"] { background: var(--status-inconclusive); border-color: var(--status-inconclusive); color: #fff; }
+
+    /* Hypothesis Cards */
+    .hypothesis-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top-color: rgba(3, 107, 63, 0.42);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: all 0.15s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hypothesis-card:hover {
+      border-color: rgba(3, 107, 63, 0.45);
+      box-shadow: var(--shadow-md);
+    }
+
+    .hypo-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .hypo-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1;
+    }
+
+    .hypo-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .hypo-title:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    .hypo-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-status.draft { background: var(--status-draft-bg); color: #59675f; border: 1px solid rgba(89, 103, 95, 0.24); }
+    .badge-status.testing { background: var(--status-testing-bg); color: #1f6270; border: 1px solid rgba(31, 98, 112, 0.24); }
+    .badge-status.supported { background: var(--status-supported-bg); color: #036b3f; border: 1px solid rgba(3, 107, 63, 0.24); }
+    .badge-status.rejected { background: var(--status-rejected-bg); color: #9b3933; border: 1px solid rgba(155, 57, 51, 0.24); }
+    .badge-status.inconclusive { background: var(--status-inconclusive-bg); color: #8b5e15; border: 1px solid rgba(139, 94, 21, 0.24); }
+
+    .badge-track {
+      background: #f5f8f6;
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .badge-project {
+      background: #eef5f1;
+      border: 1px solid rgba(3, 107, 63, 0.2);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      color: #034f31;
+      font-weight: 500;
+    }
+
+    .hypo-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .hypo-rationale-box {
+      background: #f6f8f5;
+      border-left: 3px solid var(--primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .rationale-label {
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(13, 35, 27, 0.58);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--primary);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 540px;
+      padding: 2.25rem;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(10px);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-overlay.open .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #034f31;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.75rem;
+    }
+
+    /* Toast */
+    #toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      z-index: 200;
+    }
+
+    .toast {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: slideIn 0.2s ease forwards;
+    }
+
+    .toast.success { border-left: 4px solid var(--status-supported); }
+    .toast.error { border-left: 4px solid var(--status-rejected); }
+
+    @keyframes slideIn {
+      from { transform: translateX(30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+      font-family: Georgia, 'Times New Roman', 'Noto Serif KR', serif;
+      color: #034f31;
+      font-size: 1.15rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .empty-state p {
+      font-size: 0.85rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header>
+    <div class="nav-left">
+      <div class="brand" onclick="navigateToDashboard()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+          <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+          <path d="M12 9V4s3.03.55 4 2c1.08 1.62 0 5 0 5"></path>
+        </svg>
+        <span>LabSync</span>
+        <span class="brand-badge">Konkuk Heritage</span>
+      </div>
+
+      <!-- Main Navigation Menu -->
+      <nav id="nav-main-menu" class="nav-menu hidden">
+        <a id="nav-tab-dashboard" class="nav-link active" onclick="navigateToDashboard()">
+          <span>대시보드</span>
+        </a>
+        <a id="nav-tab-summary" class="nav-link" onclick="navigateToSummaryTable()">
+          <span>가설 요약 테이블</span>
+        </a>
+        <a id="nav-tab-projects" class="nav-link" onclick="navigateToProjects()">
+          <span>프로젝트 목록</span>
+        </a>
+      </nav>
+    </div>
+
+    <div id="nav-user-section" class="user-profile hidden">
+      <div class="user-info">
+        <span id="nav-user-name" class="user-name">Researcher</span>
+        <span id="nav-user-email" class="user-email">email@domain.com</span>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="handleSignOut()">로그아웃</button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main id="app-container">
+
+    <!-- ======================================================================
+         0. AUTH SCREEN (VIEW)
+         ====================================================================== -->
+    <div id="auth-view" class="auth-container">
+      <div class="auth-tabs">
+        <div id="tab-login" class="auth-tab active" onclick="switchAuthTab('login')">로그인</div>
+        <div id="tab-signup" class="auth-tab" onclick="switchAuthTab('signup')">회원가입</div>
+      </div>
+
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+        <div id="signup-name-group" class="form-group hidden">
+          <label class="form-label" for="auth-name">이름 (표시용)</label>
+          <input type="text" id="auth-name" class="form-control" placeholder="홍길동 (연구원)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="auth-email">이메일</label>
+          <input type="email" id="auth-email" class="form-control" placeholder="researcher@lab.ac.kr" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="auth-password">비밀번호</label>
+          <input type="password" id="auth-password" class="form-control" placeholder="6자 이상 입력" required minlength="6">
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+          로그인
+        </button>
+      </form>
+
+      <div class="test-accounts-box">
+        <p>⚡ 빠른 테스트용 사전 생성 계정 (원클릭 입력):</p>
+        <div class="test-btn-group">
+          <button type="button" class="btn btn-subtle btn-sm" onclick="fillTestAccount('test_user_a@research-lab.ac.kr', 'Password123!')">
+            계정 A (NLP Lead)
+          </button>
+          <button type="button" class="btn btn-subtle btn-sm" onclick="fillTestAccount('test_user_b@research-lab.ac.kr', 'Password123!')">
+            계정 B (Bio Lead)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         1. DASHBOARD VIEW (NEW: 3-TIER DRILLDOWN ENTRY)
+         ====================================================================== -->
+    <div id="dashboard-view" class="hidden">
+      <!-- Hero Welcome Banner -->
+      <div class="dashboard-hero">
+        <div class="hero-text">
+          <h2>연구 가설 및 프로젝트 대시보드</h2>
+          <p>
+            전체 연구 가설의 검증 상태, 트랙 현황을 실시간 집계하고 요약 테이블 및 상세 뷰로 빠르게 드릴다운합니다.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-outline" onclick="navigateToProjects()">📁 프로젝트 목록 보기</button>
+          <button class="btn btn-primary" onclick="navigateToSummaryTable()">📊 가설 요약 테이블 보기</button>
+        </div>
+      </div>
+
+      <!-- Statistics KPI Cards (Hypotheses by Status & Tracks) -->
+      <div class="stats-grid">
+        <div class="stat-card" style="--card-accent: #036b3f;" onclick="navigateToSummaryTable('all')">
+          <div class="stat-header">
+            <span class="stat-label">전체 가설</span>
+            <span class="stat-icon">📑</span>
+          </div>
+          <div class="stat-number" id="dash-stat-total">0</div>
+          <div class="stat-hint">전체 등록 가설 명제</div>
+        </div>
+
+        <div class="stat-card" style="--card-accent: #246b78;" onclick="navigateToProjects()">
+          <div class="stat-header">
+            <span class="stat-label">연구 트랙</span>
+            <span class="stat-icon">🛤️</span>
+          </div>
+          <div class="stat-number" id="dash-stat-tracks">0</div>
+          <div class="stat-hint">참여 프로젝트 트랙 수</div>
+        </div>
+
+        <div class="stat-card" style="--card-accent: var(--status-draft);" onclick="navigateToSummaryTable('draft')">
+          <div class="stat-header">
+            <span class="stat-label">초안 (Draft)</span>
+            <span class="stat-icon">📝</span>
+          </div>
+          <div class="stat-number" id="dash-stat-draft" style="color: #59675f;">0</div>
+          <div class="stat-hint">수립 중인 초기 가설</div>
+        </div>
+
+        <div class="stat-card" style="--card-accent: var(--status-testing);" onclick="navigateToSummaryTable('testing')">
+          <div class="stat-header">
+            <span class="stat-label">검증중 (Testing)</span>
+            <span class="stat-icon">🔬</span>
+          </div>
+          <div class="stat-number" id="dash-stat-testing" style="color: #1f6270;">0</div>
+          <div class="stat-hint">실험 및 데이터 검증 진행</div>
+        </div>
+
+        <div class="stat-card" style="--card-accent: var(--status-supported);" onclick="navigateToSummaryTable('supported')">
+          <div class="stat-header">
+            <span class="stat-label">채택 (Supported)</span>
+            <span class="stat-icon">✅</span>
+          </div>
+          <div class="stat-number" id="dash-stat-supported" style="color: #036b3f;">0</div>
+          <div class="stat-hint">통계적 유의성 확인 완료</div>
+        </div>
+
+        <div class="stat-card" style="--card-accent: var(--status-rejected);" onclick="navigateToSummaryTable('rejected')">
+          <div class="stat-header">
+            <span class="stat-label">기각 (Rejected)</span>
+            <span class="stat-icon">❌</span>
+          </div>
+          <div class="stat-number" id="dash-stat-rejected" style="color: #9b3933;">0</div>
+          <div class="stat-hint">반례 관측 및 가설 기각</div>
+        </div>
+
+        <div class="stat-card" style="--card-accent: var(--status-inconclusive);" onclick="navigateToSummaryTable('inconclusive')">
+          <div class="stat-header">
+            <span class="stat-label">유보 (Inconclusive)</span>
+            <span class="stat-icon">⏳</span>
+          </div>
+          <div class="stat-number" id="dash-stat-inconclusive" style="color: #8b5e15;">0</div>
+          <div class="stat-hint">추가 데이터 확보 대기</div>
+        </div>
+      </div>
+
+      <!-- Dashboard 2-column Body -->
+      <div class="dashboard-layout">
+        <!-- Left Column: Recent Hypotheses Mini-List -->
+        <div class="dash-panel">
+          <div class="dash-panel-header">
+            <div>
+              <h3 class="dash-panel-title">최근 판정 및 업데이트된 가설</h3>
+              <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem;">
+                가장 최근 상태 또는 판정 근거(Rationale)가 갱신된 가설 (클릭 시 상세 뷰 이동)
+              </p>
+            </div>
+            <button class="btn btn-subtle btn-sm" onclick="navigateToSummaryTable()">전체 보기 →</button>
+          </div>
+
+          <div id="dash-recent-hypotheses" class="mini-hypo-list">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Right Column: Projects Quick Panel -->
+        <div class="dash-panel">
+          <div class="dash-panel-header">
+            <div>
+              <h3 class="dash-panel-title">내 연구 프로젝트</h3>
+              <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem;">
+                소속 워크스페이스
+              </p>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="openCreateProjectModal()">+ 생성</button>
+          </div>
+
+          <div id="dash-projects-list" class="mini-project-list">
+            <!-- Rendered via JS -->
+          </div>
+
+          <div style="margin-top: 1.25rem; text-align: center;">
+            <button class="btn btn-outline btn-sm" style="width: 100%;" onclick="navigateToProjects()">
+              프로젝트 전체 목록 보기 →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         2. SUMMARY TABLE VIEW (NEW: COMPREHENSIVE FILTERABLE TABLE)
+         ====================================================================== -->
+    <div id="summary-table-view" class="hidden">
+      <div class="breadcrumb-bar">
+        <div class="breadcrumbs">
+          <a onclick="navigateToDashboard()">← 대시보드</a>
+          <span>/</span>
+          <strong style="color: var(--text-main);">전체 가설 요약 테이블</strong>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-outline btn-sm" onclick="navigateToProjects()">📁 프로젝트 목록</button>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">연구 가설 요약 테이블</h1>
+          <p class="section-subtitle">
+            접근 가능한 모든 가설의 소속 프로젝트, 트랙, 검증 상태, 작성자를 한눈에 조회하고 정렬·필터링합니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <!-- Table Toolbar -->
+        <div class="table-toolbar">
+          <div class="toolbar-row-top">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="summary-search-input" class="search-input" placeholder="가설명, 프로젝트, 트랙, 근거 검색..." oninput="handleSummarySearch(event)">
+            </div>
+
+            <div class="toolbar-filters">
+              <select id="summary-project-filter" class="filter-select" onchange="handleSummaryProjectFilter(event)">
+                <option value="all">모든 프로젝트</option>
+              </select>
+
+              <select id="summary-sort-select" class="filter-select" onchange="handleSummarySort(event)">
+                <option value="updated_desc">최종 수정일 (최신순)</option>
+                <option value="updated_asc">최종 수정일 (과거순)</option>
+                <option value="created_desc">등록일 (최신순)</option>
+                <option value="title_asc">가설명 (가나다순)</option>
+                <option value="status">상태별 정렬</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="toolbar-row-bottom">
+            <div class="status-pills">
+              <button class="status-pill active" data-status="all" onclick="filterSummaryByStatus('all')">전체 (<span id="sum-count-all">0</span>)</button>
+              <button class="status-pill" data-status="draft" onclick="filterSummaryByStatus('draft')">초안 (<span id="sum-count-draft">0</span>)</button>
+              <button class="status-pill" data-status="testing" onclick="filterSummaryByStatus('testing')">검증중 (<span id="sum-count-testing">0</span>)</button>
+              <button class="status-pill" data-status="supported" onclick="filterSummaryByStatus('supported')">채택 (<span id="sum-count-supported">0</span>)</button>
+              <button class="status-pill" data-status="rejected" onclick="filterSummaryByStatus('rejected')">기각 (<span id="sum-count-rejected">0</span>)</button>
+              <button class="status-pill" data-status="inconclusive" onclick="filterSummaryByStatus('inconclusive')">유보 (<span id="sum-count-inconclusive">0</span>)</button>
+            </div>
+
+            <div id="summary-result-count" style="font-weight: 500;">
+              조회 결과 0건
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Responsive Wrapper -->
+        <div class="summary-table-wrapper">
+          <table class="summary-table">
+            <thead>
+              <tr>
+                <th style="width: 38%;">가설 명제 (Title)</th>
+                <th style="width: 18%;">소속 프로젝트</th>
+                <th style="width: 14%;">소속 트랙</th>
+                <th style="width: 12%;">상태</th>
+                <th style="width: 10%;">작성자</th>
+                <th style="width: 8%;">최종 수정일</th>
+              </tr>
+            </thead>
+            <tbody id="summary-table-body">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         3. HYPOTHESIS DETAIL VIEW (NEW: FULL-PAGE DRILLDOWN DETAIL)
+         ====================================================================== -->
+    <div id="hypothesis-detail-view" class="hidden">
+      <div class="breadcrumb-bar">
+        <div class="breadcrumbs">
+          <a id="detail-back-link" onclick="handleDetailBack()">← 이전 목록으로</a>
+          <span>/</span>
+          <span id="detail-bc-project" style="color: var(--primary); cursor: pointer;" onclick="handleDetailGoToWorkspace()">프로젝트</span>
+          <span>/</span>
+          <span id="detail-bc-track" style="color: var(--text-muted);">트랙</span>
+          <span>/</span>
+          <strong id="detail-bc-title" style="color: var(--text-main); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">가설명</strong>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-outline btn-sm" onclick="handleDetailGoToWorkspace()">
+            🔬 프로젝트 워크스페이스 열기
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="openUpdateStatusModalFromDetail()">
+            ⚖️ 판정 / 상태 변경
+          </button>
+        </div>
+      </div>
+
+      <div class="detail-container">
+        <!-- Main Detail Card -->
+        <div class="detail-card">
+          <div class="detail-header-group">
+            <div class="detail-tags">
+              <span id="detail-badge-status" class="badge-status draft">초안</span>
+              <span id="detail-badge-project" class="badge-project">프로젝트명</span>
+              <span id="detail-badge-track" class="badge-track">트랙명</span>
+            </div>
+            <h1 id="detail-hypothesis-title" class="detail-title">가설 명제</h1>
+          </div>
+
+          <!-- Metadata Summary Strip -->
+          <div class="detail-meta-grid">
+            <div class="detail-meta-item">
+              <span class="detail-meta-label">작성자</span>
+              <span id="detail-author-name" class="detail-meta-value">-</span>
+            </div>
+            <div class="detail-meta-item">
+              <span class="detail-meta-label">소속 프로젝트</span>
+              <span id="detail-project-name" class="detail-meta-value">-</span>
+            </div>
+            <div class="detail-meta-item">
+              <span class="detail-meta-label">소속 연구 트랙</span>
+              <span id="detail-track-name" class="detail-meta-value">-</span>
+            </div>
+            <div class="detail-meta-item">
+              <span class="detail-meta-label">최종 판정 갱신일</span>
+              <span id="detail-updated-at" class="detail-meta-value">-</span>
+            </div>
+          </div>
+
+          <!-- Description Section -->
+          <div>
+            <h3 class="detail-section-title">
+              <span>📖 가설 상세 및 검증 계획 (Description)</span>
+            </h3>
+            <div id="detail-description-box" class="detail-desc-box">
+              등록된 가설 상세 설명이 없습니다.
+            </div>
+          </div>
+
+          <!-- Rationale Section (Highlighted Heritage Box) -->
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+              <h3 class="detail-section-title" style="margin-bottom: 0;">
+                <span>🔬 판정 근거 및 실험 결과 요약 (Rationale)</span>
+              </h3>
+              <button class="btn btn-subtle btn-sm" onclick="openUpdateStatusModalFromDetail()">
+                근거 수정 / 판정 변경
+              </button>
+            </div>
+            
+            <div class="detail-rationale-box">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase;">
+                  최신 공식 판정 기록
+                </span>
+                <span id="detail-rationale-time" style="font-size: 0.75rem; color: var(--text-dim);">-</span>
+              </div>
+              <div id="detail-rationale-box" class="detail-rationale-content">
+                아직 등록된 판정 근거가 없습니다. 상단의 '판정 / 상태 변경' 버튼을 눌러 실험 수치 및 근거를 작성하십시오.
+              </div>
+            </div>
+          </div>
+
+          <!-- Status & History Timeline Section -->
+          <div>
+            <h3 class="detail-section-title">
+              <span>⏱️ 판정 및 상태 이력 (Status Timeline)</span>
+            </h3>
+            <div class="timeline-box" id="detail-timeline-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         4. PROJECTS LIST VIEW (PRESERVED)
+         ====================================================================== -->
+    <div id="projects-view" class="hidden">
+      <div class="breadcrumb-bar">
+        <div class="breadcrumbs">
+          <a onclick="navigateToDashboard()">← 대시보드</a>
+          <span>/</span>
+          <strong style="color: var(--text-main);">프로젝트 목록</strong>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">내 연구 프로젝트</h1>
+          <p class="section-subtitle">
+            RLS 격리가 적용된 개인/팀 연구 워크스페이스입니다.
+          </p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateProjectModal()">+ 새 프로젝트</button>
+      </div>
+
+      <div id="projects-list" class="projects-grid">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         5. PROJECT WORKSPACE VIEW (PRESERVED)
+         ====================================================================== -->
+    <div id="workspace-view" class="hidden">
+      <div class="breadcrumb-bar">
+        <div class="breadcrumbs">
+          <a onclick="navigateToDashboard()">대시보드</a>
+          <span>/</span>
+          <a onclick="navigateToProjects()">프로젝트 목록</a>
+          <span>/</span>
+          <strong id="ws-project-name" style="color: var(--text-main);">프로젝트명</strong>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="navigateToSummaryTable()">
+          📊 가설 요약 테이블 보기
+        </button>
+      </div>
+
+      <div style="background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--primary); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+        <h2 id="ws-header-title" style="font-size: 1.35rem; margin-bottom: 0.4rem; color: #034f31; font-family: Georgia, 'Times New Roman', 'Noto Serif KR', serif;"></h2>
+        <p id="ws-header-desc" style="color: var(--text-muted); font-size: 0.9rem;"></p>
+      </div>
+
+      <div class="workspace-layout">
+        <!-- Sidebar: Tracks -->
+        <aside class="tracks-panel">
+          <div class="tracks-header">
+            <h3 class="tracks-title">연구 트랙 (Tracks)</h3>
+            <button class="btn btn-subtle btn-sm" onclick="openCreateTrackModal()">+ 트랙</button>
+          </div>
+
+          <div id="tracks-list">
+            <!-- Rendered via JS -->
+          </div>
+        </aside>
+
+        <!-- Main Panel: Hypotheses -->
+        <section class="hypotheses-panel">
+          <div class="filter-bar">
+            <div class="status-pills">
+              <button class="status-pill active" data-status="all" onclick="filterHypothesesByStatus('all')">전체 (<span id="count-all">0</span>)</button>
+              <button class="status-pill" data-status="draft" onclick="filterHypothesesByStatus('draft')">초안 (<span id="count-draft">0</span>)</button>
+              <button class="status-pill" data-status="testing" onclick="filterHypothesesByStatus('testing')">검증중 (<span id="count-testing">0</span>)</button>
+              <button class="status-pill" data-status="supported" onclick="filterHypothesesByStatus('supported')">채택 (<span id="count-supported">0</span>)</button>
+              <button class="status-pill" data-status="rejected" onclick="filterHypothesesByStatus('rejected')">기각 (<span id="count-rejected">0</span>)</button>
+              <button class="status-pill" data-status="inconclusive" onclick="filterHypothesesByStatus('inconclusive')">유보 (<span id="count-inconclusive">0</span>)</button>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openCreateHypothesisModal()">+ 가설 등록</button>
+          </div>
+
+          <div id="hypotheses-list" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Rendered via JS -->
+          </div>
+        </section>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======================================================================
+       MODALS
+       ====================================================================== -->
+
+  <!-- Modal 1: Create Project -->
+  <div id="modal-create-project" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">새 연구 프로젝트 생성</h3>
+        <button class="modal-close" onclick="closeModal('modal-create-project')">&times;</button>
+      </div>
+      <form onsubmit="handleCreateProject(event)">
+        <div class="form-group">
+          <label class="form-label" for="proj-name">프로젝트명 *</label>
+          <input type="text" id="proj-name" class="form-control" placeholder="예: Graph Neural Networks for Drug Discovery" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="proj-desc">연구 개요 / 설명</label>
+          <textarea id="proj-desc" class="form-control" placeholder="프로젝트 목표 및 주요 연구 범위"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-create-project')">취소</button>
+          <button type="submit" class="btn btn-primary">프로젝트 생성</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Create Track -->
+  <div id="modal-create-track" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">새 연구 트랙 추가</h3>
+        <button class="modal-close" onclick="closeModal('modal-create-track')">&times;</button>
+      </div>
+      <form onsubmit="handleCreateTrack(event)">
+        <div class="form-group">
+          <label class="form-label" for="track-name">트랙명 *</label>
+          <input type="text" id="track-name" class="form-control" placeholder="예: Track A - 모델 아키텍처 탐색" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="track-desc">트랙 설명</label>
+          <textarea id="track-desc" class="form-control" placeholder="해당 트랙의 세부 연구 과제"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-create-track')">취소</button>
+          <button type="submit" class="btn btn-primary">트랙 추가</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Create Hypothesis -->
+  <div id="modal-create-hypo" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">새 연구 가설 등록</h3>
+        <button class="modal-close" onclick="closeModal('modal-create-hypo')">&times;</button>
+      </div>
+      <form onsubmit="handleCreateHypothesis(event)">
+        <div class="form-group">
+          <label class="form-label" for="hypo-title">가설 명제 (Title) *</label>
+          <input type="text" id="hypo-title" class="form-control" placeholder="예: 3D 동변 합성곱 신경망이 분자 결합 예측 오차를 15% 이상 감소시킨다" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="hypo-track-select">소속 트랙</label>
+          <select id="hypo-track-select" class="form-control">
+            <option value="">-- 트랙 미지정 --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="hypo-desc">가설 상세 및 검증 계획</label>
+          <textarea id="hypo-desc" class="form-control" placeholder="검증 방법론, 사용 데이터셋, 베이스라인 대조 계획"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="hypo-initial-status">초기 상태</label>
+          <select id="hypo-initial-status" class="form-control">
+            <option value="draft">초안 (Draft)</option>
+            <option value="testing">검증 진행중 (Testing)</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-create-hypo')">취소</button>
+          <button type="submit" class="btn btn-primary">가설 등록</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 4: Update Hypothesis Status & Mandatory Rationale -->
+  <div id="modal-update-status" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">가설 판정 및 상태 변경</h3>
+        <button class="modal-close" onclick="closeModal('modal-update-status')">&times;</button>
+      </div>
+      <form onsubmit="handleUpdateStatusSubmit(event)">
+        <input type="hidden" id="update-hypo-id">
+        <div class="form-group">
+          <label class="form-label">가설 명제</label>
+          <div id="update-hypo-title-preview" style="font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem; line-height: 1.4;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="update-target-status">변경할 상태 *</label>
+          <select id="update-target-status" class="form-control" required>
+            <option value="draft">초안 (Draft)</option>
+            <option value="testing">검증 진행중 (Testing)</option>
+            <option value="supported">채택 / 지지 (Supported)</option>
+            <option value="rejected">기각 (Rejected)</option>
+            <option value="inconclusive">판정 유보 (Inconclusive)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="update-rationale" style="color: var(--primary); font-weight: 600;">
+            판정 근거 및 실험 결과 요약 (필수 입력) *
+          </label>
+          <textarea id="update-rationale" class="form-control" placeholder="상태 변경 사유, 실험 수치, 통계적 유의성, 또는 관측된 반례를 반드시 기술하십시오." required style="min-height: 110px;"></textarea>
+          <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.35rem;">
+            * 학술적 엄밀성을 위해 판정 변경 시 구체적 근거 작성이 필수입니다.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-update-status')">취소</button>
+          <button type="submit" class="btn btn-primary">판정 확정</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <div style="position:fixed; bottom:10px; right:14px; font-size:11px; color:var(--text-muted,#888); opacity:0.7; z-index:5; pointer-events:none;">
+    Developed by Solucionemos
+  </div>
+
+  <!-- ======================================================================
+       SUPABASE & APPLICATION LOGIC
+       ====================================================================== -->
+  <script>
+    // Supabase Project Credentials (apwjwaryrlpqmdabilvu)
+    const SUPABASE_URL = "https://apwjwaryrlpqmdabilvu.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwd2p3YXJ5cmxwcW1kYWJpbHZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0OTY2NjcsImV4cCI6MjEwMjA3MjY2N30.LLz1pxuo70srzLGRckNAPLIvgzb9rDeP8ZjWLx7ZH08";
+
+    // Initialize Supabase Client
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Global State
+    let currentUser = null;
+    let currentAuthMode = 'login'; // 'login' | 'signup'
+    let currentView = 'auth'; // 'dashboard' | 'summary-table' | 'hypothesis-detail' | 'projects' | 'workspace' | 'auth'
+    let previousView = 'dashboard';
+    
+    let allProjects = [];
+    let allTracks = [];
+    let allHypotheses = [];
+    let allProfiles = {}; // Map of user_id -> profile object
+
+    let currentProject = null; // Active project in workspace view
+    let selectedDetailHypo = null; // Active hypothesis in detail view
+
+    let workspaceTrackId = 'all'; // 'all' or track UUID in workspace
+    let workspaceStatusFilter = 'all'; // Status filter in workspace view
+
+    // Summary Table Filter State
+    let summaryFilterState = {
+      status: 'all',
+      projectId: 'all',
+      searchQuery: '',
+      sortBy: 'updated_desc'
+    };
+
+    // Status Names & Classes Mapping
+    const STATUS_MAP = {
+      draft: { label: '초안 (Draft)', shortLabel: '초안', class: 'draft' },
+      testing: { label: '검증중 (Testing)', shortLabel: '검증중', class: 'testing' },
+      supported: { label: '채택 (Supported)', shortLabel: '채택', class: 'supported' },
+      rejected: { label: '기각 (Rejected)', shortLabel: '기각', class: 'rejected' },
+      inconclusive: { label: '유보 (Inconclusive)', shortLabel: '유보', class: 'inconclusive' }
+    };
+
+    // Initialize Application
+    window.addEventListener('DOMContentLoaded', async () => {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (session && session.user) {
+        await setUserSession(session.user);
+      } else {
+        showAuthView();
+      }
+
+      // Auth state change listener
+      supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (session && session.user) {
+          if (!currentUser || currentUser.id !== session.user.id) {
+            await setUserSession(session.user);
+          }
+        } else {
+          currentUser = null;
+          showAuthView();
+        }
+      });
+    });
+
+    // Toast Utility
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<span>${type === 'error' ? '❌' : '✅'}</span> <span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Modal Utility
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    // Auth Tab Switch
+    function switchAuthTab(mode) {
+      currentAuthMode = mode;
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+      document.getElementById('signup-name-group').classList.toggle('hidden', mode === 'login');
+      document.getElementById('auth-submit-btn').textContent = mode === 'login' ? '로그인' : '회원가입';
+    }
+
+    function fillTestAccount(email, password) {
+      document.getElementById('auth-email').value = email;
+      document.getElementById('auth-password').value = password;
+      switchAuthTab('login');
+    }
+
+    // Auth Submission
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value.trim();
+      const displayName = document.getElementById('auth-name').value.trim();
+
+      const btn = document.getElementById('auth-submit-btn');
+      btn.disabled = true;
+      btn.textContent = '처리 중...';
+
+      try {
+        if (currentAuthMode === 'signup') {
+          const { data, error } = await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { display_name: displayName || email.split('@')[0] }
+            }
+          });
+          if (error) throw error;
+          showToast('회원가입이 완료되었습니다.', 'success');
+        } else {
+          const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+          if (error) throw error;
+          showToast('성공적으로 로그인되었습니다.', 'success');
+        }
+      } catch (err) {
+        showToast(err.message || '인증에 실패했습니다.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = currentAuthMode === 'login' ? '로그인' : '회원가입';
+      }
+    }
+
+    async function handleSignOut() {
+      await supabaseClient.auth.signOut();
+      showToast('로그아웃되었습니다.');
+    }
+
+    function showAuthView() {
+      currentView = 'auth';
+      document.getElementById('auth-view').classList.remove('hidden');
+      document.getElementById('dashboard-view').classList.add('hidden');
+      document.getElementById('summary-table-view').classList.add('hidden');
+      document.getElementById('hypothesis-detail-view').classList.add('hidden');
+      document.getElementById('projects-view').classList.add('hidden');
+      document.getElementById('workspace-view').classList.add('hidden');
+      document.getElementById('nav-main-menu').classList.add('hidden');
+      document.getElementById('nav-user-section').classList.add('hidden');
+    }
+
+    async function setUserSession(user) {
+      currentUser = user;
+      document.getElementById('auth-view').classList.add('hidden');
+      document.getElementById('nav-main-menu').classList.remove('hidden');
+      document.getElementById('nav-user-section').classList.remove('hidden');
+      
+      const displayName = user.user_metadata?.display_name || user.email.split('@')[0];
+      document.getElementById('nav-user-name').textContent = displayName;
+      document.getElementById('nav-user-email').textContent = user.email;
+
+      await loadAllAppData();
+      navigateToDashboard();
+    }
+
+    // =========================================================================
+    // Core Data Fetching: Load All App Data (Projects, Tracks, Hypotheses, Profiles)
+    // =========================================================================
+    async function loadAllAppData() {
+      try {
+        const [projRes, trackRes, hypoRes, profRes] = await Promise.all([
+          supabaseClient.from('projects').select('*').order('created_at', { ascending: false }),
+          supabaseClient.from('tracks').select('*').order('created_at', { ascending: true }),
+          supabaseClient.from('hypotheses').select('*, projects(name), tracks(name)').order('updated_at', { ascending: false }),
+          supabaseClient.from('profiles').select('*')
+        ]);
+
+        if (projRes.error) throw projRes.error;
+        if (trackRes.error) throw trackRes.error;
+        if (hypoRes.error) throw hypoRes.error;
+
+        allProjects = projRes.data || [];
+        allTracks = trackRes.data || [];
+        allHypotheses = hypoRes.data || [];
+
+        if (profRes.data) {
+          allProfiles = {};
+          profRes.data.forEach(p => {
+            allProfiles[p.id] = p;
+          });
+        }
+      } catch (err) {
+        showToast('데이터 조회 중 오류 발생: ' + err.message, 'error');
+      }
+    }
+
+    // Helper: Get Author Name
+    function getAuthorName(userId) {
+      if (!userId) return '익명 연구원';
+      if (allProfiles[userId]) {
+        return allProfiles[userId].display_name || allProfiles[userId].email.split('@')[0];
+      }
+      if (currentUser && currentUser.id === userId) {
+        return currentUser.user_metadata?.display_name || currentUser.email.split('@')[0];
+      }
+      return '연구원';
+    }
+
+    // Helper: Update Navigation Tab Active State
+    function updateNavTabState(activeTab) {
+      document.getElementById('nav-tab-dashboard')?.classList.toggle('active', activeTab === 'dashboard');
+      document.getElementById('nav-tab-summary')?.classList.toggle('active', activeTab === 'summary');
+      document.getElementById('nav-tab-projects')?.classList.toggle('active', activeTab === 'projects');
+    }
+
+    // =========================================================================
+    // View Navigation Handlers
+    // =========================================================================
+    function hideAllViews() {
+      document.getElementById('dashboard-view').classList.add('hidden');
+      document.getElementById('summary-table-view').classList.add('hidden');
+      document.getElementById('hypothesis-detail-view').classList.add('hidden');
+      document.getElementById('projects-view').classList.add('hidden');
+      document.getElementById('workspace-view').classList.add('hidden');
+      document.getElementById('auth-view').classList.add('hidden');
+    }
+
+    // 1. Dashboard View
+    async function navigateToDashboard() {
+      if (currentView !== 'dashboard' && currentView !== 'auth') {
+        previousView = currentView;
+      }
+      currentView = 'dashboard';
+      hideAllViews();
+      document.getElementById('dashboard-view').classList.remove('hidden');
+      updateNavTabState('dashboard');
+
+      await loadAllAppData();
+      renderDashboard();
+    }
+
+    // 2. Summary Table View
+    async function navigateToSummaryTable(initialStatusFilter) {
+      if (currentView !== 'summary-table' && currentView !== 'auth') {
+        previousView = currentView;
+      }
+      currentView = 'summary-table';
+      hideAllViews();
+      document.getElementById('summary-table-view').classList.remove('hidden');
+      updateNavTabState('summary');
+
+      if (initialStatusFilter) {
+        summaryFilterState.status = initialStatusFilter;
+      }
+
+      await loadAllAppData();
+      renderSummaryTable();
+    }
+
+    // 3. Hypothesis Detail View (3-Tier Drilldown)
+    async function navigateToHypothesisDetail(hypoId, fromView) {
+      if (fromView) {
+        previousView = fromView;
+      } else if (currentView !== 'hypothesis-detail') {
+        previousView = currentView;
+      }
+
+      selectedDetailHypo = allHypotheses.find(h => h.id === hypoId);
+      if (!selectedDetailHypo) {
+        await loadAllAppData();
+        selectedDetailHypo = allHypotheses.find(h => h.id === hypoId);
+      }
+
+      if (!selectedDetailHypo) {
+        showToast('해당 가설을 찾을 수 없습니다.', 'error');
+        return;
+      }
+
+      currentView = 'hypothesis-detail';
+      hideAllViews();
+      document.getElementById('hypothesis-detail-view').classList.remove('hidden');
+      updateNavTabState('');
+
+      renderHypothesisDetail();
+    }
+
+    // 4. Projects View
+    async function navigateToProjects() {
+      if (currentView !== 'projects' && currentView !== 'auth') {
+        previousView = currentView;
+      }
+      currentView = 'projects';
+      hideAllViews();
+      document.getElementById('projects-view').classList.remove('hidden');
+      updateNavTabState('projects');
+
+      await loadAllAppData();
+      renderProjectsList();
+    }
+
+    // 5. Workspace View
+    async function openProject(projectId) {
+      currentProject = allProjects.find(p => p.id === projectId);
+      if (!currentProject) {
+        await loadAllAppData();
+        currentProject = allProjects.find(p => p.id === projectId);
+      }
+      if (!currentProject) return;
+
+      if (currentView !== 'workspace') {
+        previousView = currentView;
+      }
+      currentView = 'workspace';
+      hideAllViews();
+      document.getElementById('workspace-view').classList.remove('hidden');
+      updateNavTabState('');
+
+      document.getElementById('ws-project-name').textContent = currentProject.name;
+      document.getElementById('ws-header-title').textContent = currentProject.name;
+      document.getElementById('ws-header-desc').textContent = currentProject.description || '등록된 프로젝트 설명이 없습니다.';
+
+      workspaceTrackId = 'all';
+      workspaceStatusFilter = 'all';
+
+      await loadAllAppData();
+      renderTracksList();
+      populateTrackSelect();
+      renderHypothesesList();
+    }
+
+    // Detail Back Handler
+    function handleDetailBack() {
+      if (previousView === 'summary-table') {
+        navigateToSummaryTable();
+      } else if (previousView === 'workspace' && selectedDetailHypo?.project_id) {
+        openProject(selectedDetailHypo.project_id);
+      } else if (previousView === 'projects') {
+        navigateToProjects();
+      } else {
+        navigateToDashboard();
+      }
+    }
+
+    function handleDetailGoToWorkspace() {
+      if (selectedDetailHypo && selectedDetailHypo.project_id) {
+        openProject(selectedDetailHypo.project_id);
+      }
+    }
+
+    // =========================================================================
+    // 1. DASHBOARD RENDERING
+    // =========================================================================
+    function renderDashboard() {
+      // Statistics Calculation
+      const totalHypo = allHypotheses.length;
+      const totalTracks = allTracks.length;
+      const draftCount = allHypotheses.filter(h => h.status === 'draft').length;
+      const testingCount = allHypotheses.filter(h => h.status === 'testing').length;
+      const supportedCount = allHypotheses.filter(h => h.status === 'supported').length;
+      const rejectedCount = allHypotheses.filter(h => h.status === 'rejected').length;
+      const inconclusiveCount = allHypotheses.filter(h => h.status === 'inconclusive').length;
+
+      document.getElementById('dash-stat-total').textContent = totalHypo;
+      document.getElementById('dash-stat-tracks').textContent = totalTracks;
+      document.getElementById('dash-stat-draft').textContent = draftCount;
+      document.getElementById('dash-stat-testing').textContent = testingCount;
+      document.getElementById('dash-stat-supported').textContent = supportedCount;
+      document.getElementById('dash-stat-rejected').textContent = rejectedCount;
+      document.getElementById('dash-stat-inconclusive').textContent = inconclusiveCount;
+
+      // Recent Hypotheses (Top 5~8 updated)
+      const recentContainer = document.getElementById('dash-recent-hypotheses');
+      const recentHypotheses = [...allHypotheses]
+        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+        .slice(0, 7);
+
+      if (recentHypotheses.length === 0) {
+        recentContainer.innerHTML = `
+          <div class="empty-state">
+            <h3>등록된 연구 가설이 없습니다</h3>
+            <p>프로젝트 워크스페이스에서 첫 번째 가설을 등록해보세요.</p>
+          </div>
+        `;
+      } else {
+        recentContainer.innerHTML = recentHypotheses.map(h => {
+          const statusMeta = STATUS_MAP[h.status] || { label: h.status, class: 'draft' };
+          const projName = h.projects?.name || (allProjects.find(p => p.id === h.project_id)?.name) || '프로젝트';
+          const trackName = h.tracks?.name || (allTracks.find(t => t.id === h.track_id)?.name) || '트랙 미지정';
+          const authorName = getAuthorName(h.created_by);
+
+          return `
+            <div class="mini-hypo-item" onclick="navigateToHypothesisDetail('${h.id}', 'dashboard')">
+              <div class="mini-hypo-top">
+                <span class="mini-hypo-title">${escapeHtml(h.title)}</span>
+                <span class="badge-status ${statusMeta.class}">${statusMeta.label}</span>
+              </div>
+
+              ${h.rationale ? `
+                <div class="mini-hypo-rationale">
+                  <strong>최신 근거:</strong> ${escapeHtml(h.rationale)}
+                </div>
+              ` : ''}
+
+              <div class="mini-hypo-meta">
+                <span class="badge-project">${escapeHtml(projName)}</span>
+                <span class="badge-track">${escapeHtml(trackName)}</span>
+                <span>•</span>
+                <span>작성: ${escapeHtml(authorName)}</span>
+                <span>•</span>
+                <span>수정: ${new Date(h.updated_at).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Projects Quick Mini List
+      const projectListContainer = document.getElementById('dash-projects-list');
+      if (allProjects.length === 0) {
+        projectListContainer.innerHTML = `
+          <div class="empty-state">
+            <p>등록된 프로젝트가 없습니다.</p>
+          </div>
+        `;
+      } else {
+        projectListContainer.innerHTML = allProjects.slice(0, 5).map(p => {
+          const projectHypoCount = allHypotheses.filter(h => h.project_id === p.id).length;
+          const projectTrackCount = allTracks.filter(t => t.project_id === p.id).length;
+
+          return `
+            <div class="mini-project-item" onclick="openProject('${p.id}')">
+              <div class="mini-project-name">${escapeHtml(p.name)}</div>
+              <div class="mini-project-stats">
+                <span>📑 가설 ${projectHypoCount}개</span>
+                <span>🛤️ 트랙 ${projectTrackCount}개</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // =========================================================================
+    // 2. SUMMARY TABLE RENDERING & FILTERING
+    // =========================================================================
+    function renderSummaryTable() {
+      // Update Project Filter Options
+      const projSelect = document.getElementById('summary-project-filter');
+      const currentProjVal = summaryFilterState.projectId;
+      projSelect.innerHTML = `<option value="all">모든 프로젝트 (${allProjects.length})</option>` +
+        allProjects.map(p => `<option value="${p.id}" ${currentProjVal === p.id ? 'selected' : ''}>${escapeHtml(p.name)}</option>`).join('');
+
+      // Update Filter Pills
+      document.querySelectorAll('#summary-table-view .status-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-status') === summaryFilterState.status);
+      });
+
+      // Update Counts on Pills
+      document.getElementById('sum-count-all').textContent = allHypotheses.length;
+      document.getElementById('sum-count-draft').textContent = allHypotheses.filter(h => h.status === 'draft').length;
+      document.getElementById('sum-count-testing').textContent = allHypotheses.filter(h => h.status === 'testing').length;
+      document.getElementById('sum-count-supported').textContent = allHypotheses.filter(h => h.status === 'supported').length;
+      document.getElementById('sum-count-rejected').textContent = allHypotheses.filter(h => h.status === 'rejected').length;
+      document.getElementById('sum-count-inconclusive').textContent = allHypotheses.filter(h => h.status === 'inconclusive').length;
+
+      // Filtering
+      let filtered = [...allHypotheses];
+
+      // 1. Status Filter
+      if (summaryFilterState.status !== 'all') {
+        filtered = filtered.filter(h => h.status === summaryFilterState.status);
+      }
+
+      // 2. Project Filter
+      if (summaryFilterState.projectId !== 'all') {
+        filtered = filtered.filter(h => h.project_id === summaryFilterState.projectId);
+      }
+
+      // 3. Search Query Filter
+      if (summaryFilterState.searchQuery.trim() !== '') {
+        const q = summaryFilterState.searchQuery.toLowerCase().trim();
+        filtered = filtered.filter(h => {
+          const titleMatch = h.title?.toLowerCase().includes(q);
+          const descMatch = h.description?.toLowerCase().includes(q);
+          const rationaleMatch = h.rationale?.toLowerCase().includes(q);
+          const projName = (h.projects?.name || (allProjects.find(p => p.id === h.project_id)?.name) || '').toLowerCase();
+          const trackName = (h.tracks?.name || (allTracks.find(t => t.id === h.track_id)?.name) || '').toLowerCase();
+          return titleMatch || descMatch || rationaleMatch || projName.includes(q) || trackName.includes(q);
+        });
+      }
+
+      // 4. Sorting
+      filtered.sort((a, b) => {
+        if (summaryFilterState.sortBy === 'updated_desc') {
+          return new Date(b.updated_at) - new Date(a.updated_at);
+        } else if (summaryFilterState.sortBy === 'updated_asc') {
+          return new Date(a.updated_at) - new Date(b.updated_at);
+        } else if (summaryFilterState.sortBy === 'created_desc') {
+          return new Date(b.created_at) - new Date(a.created_at);
+        } else if (summaryFilterState.sortBy === 'title_asc') {
+          return a.title.localeCompare(b.title, 'ko');
+        } else if (summaryFilterState.sortBy === 'status') {
+          return a.status.localeCompare(b.status);
+        }
+        return 0;
+      });
+
+      document.getElementById('summary-result-count').textContent = `조회 결과 ${filtered.length}건 (전체 ${allHypotheses.length}건)`;
+
+      const tbody = document.getElementById('summary-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 3rem 1rem;">
+              <div class="empty-state" style="border: none; background: transparent; padding: 0;">
+                <h3>조건에 일치하는 가설이 없습니다</h3>
+                <p>필터 조건을 변경하거나 검색어를 재설정하세요.</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(h => {
+        const statusMeta = STATUS_MAP[h.status] || { label: h.status, class: 'draft' };
+        const projName = h.projects?.name || (allProjects.find(p => p.id === h.project_id)?.name) || '프로젝트';
+        const trackName = h.tracks?.name || (allTracks.find(t => t.id === h.track_id)?.name) || '-';
+        const authorName = getAuthorName(h.created_by);
+        const updatedDate = new Date(h.updated_at).toLocaleDateString('ko-KR');
+
+        return `
+          <tr onclick="navigateToHypothesisDetail('${h.id}', 'summary-table')">
+            <td>
+              <div class="table-hypo-title">${escapeHtml(h.title)}</div>
+              ${h.rationale ? `<div style="font-size: 0.76rem; color: var(--text-dim); margin-top: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 420px;"><strong>근거:</strong> ${escapeHtml(h.rationale)}</div>` : ''}
+            </td>
+            <td>
+              <span class="table-project-tag">${escapeHtml(projName)}</span>
+            </td>
+            <td>
+              <span class="table-track-tag">${escapeHtml(trackName)}</span>
+            </td>
+            <td>
+              <span class="badge-status ${statusMeta.class}">${statusMeta.label}</span>
+            </td>
+            <td>
+              <span style="font-size: 0.82rem; color: var(--text-main);">${escapeHtml(authorName)}</span>
+            </td>
+            <td>
+              <span style="font-size: 0.78rem; color: var(--text-dim);">${updatedDate}</span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterSummaryByStatus(status) {
+      summaryFilterState.status = status;
+      renderSummaryTable();
+    }
+
+    function handleSummaryProjectFilter(e) {
+      summaryFilterState.projectId = e.target.value;
+      renderSummaryTable();
+    }
+
+    function handleSummarySearch(e) {
+      summaryFilterState.searchQuery = e.target.value;
+      renderSummaryTable();
+    }
+
+    function handleSummarySort(e) {
+      summaryFilterState.sortBy = e.target.value;
+      renderSummaryTable();
+    }
+
+    // =========================================================================
+    // 3. HYPOTHESIS DETAIL VIEW RENDERING (3-TIER DRILLDOWN FULL PAGE)
+    // =========================================================================
+    function renderHypothesisDetail() {
+      const h = selectedDetailHypo;
+      if (!h) return;
+
+      const statusMeta = STATUS_MAP[h.status] || { label: h.status, class: 'draft' };
+      const proj = allProjects.find(p => p.id === h.project_id);
+      const track = allTracks.find(t => t.id === h.track_id);
+      const projName = h.projects?.name || proj?.name || '소속 프로젝트';
+      const trackName = h.tracks?.name || track?.name || '트랙 미지정';
+      const authorName = getAuthorName(h.created_by);
+
+      // Breadcrumbs
+      document.getElementById('detail-bc-project').textContent = projName;
+      document.getElementById('detail-bc-track').textContent = trackName;
+      document.getElementById('detail-bc-title').textContent = h.title;
+
+      // Badges & Title
+      const badgeStatus = document.getElementById('detail-badge-status');
+      badgeStatus.className = `badge-status ${statusMeta.class}`;
+      badgeStatus.textContent = statusMeta.label;
+
+      document.getElementById('detail-badge-project').textContent = `📁 ${projName}`;
+      document.getElementById('detail-badge-track').textContent = `🛤️ ${trackName}`;
+      document.getElementById('detail-hypothesis-title').textContent = h.title;
+
+      // Meta Grid
+      document.getElementById('detail-author-name').textContent = authorName;
+      document.getElementById('detail-project-name').textContent = projName;
+      document.getElementById('detail-track-name').textContent = trackName;
+      document.getElementById('detail-updated-at').textContent = new Date(h.updated_at).toLocaleString('ko-KR');
+
+      // Description
+      const descBox = document.getElementById('detail-description-box');
+      if (h.description && h.description.trim()) {
+        descBox.textContent = h.description;
+        descBox.style.color = 'var(--text-main)';
+        descBox.style.fontStyle = 'normal';
+      } else {
+        descBox.textContent = '등록된 가설 상세 설명이 없습니다.';
+        descBox.style.color = 'var(--text-dim)';
+        descBox.style.fontStyle = 'italic';
+      }
+
+      // Rationale Box
+      const rationaleBox = document.getElementById('detail-rationale-box');
+      const rationaleTime = document.getElementById('detail-rationale-time');
+      if (h.rationale && h.rationale.trim()) {
+        rationaleBox.textContent = h.rationale;
+        rationaleBox.style.color = 'var(--text-main)';
+        rationaleBox.style.fontStyle = 'normal';
+        rationaleTime.textContent = `최근 판정 기록 시각: ${new Date(h.updated_at).toLocaleString('ko-KR')}`;
+      } else {
+        rationaleBox.textContent = '아직 등록된 판정 근거가 없습니다. 상단의 [판정 / 상태 변경] 버튼을 눌러 실험 수치 및 근거를 작성하십시오.';
+        rationaleBox.style.color = 'var(--text-dim)';
+        rationaleBox.style.fontStyle = 'italic';
+        rationaleTime.textContent = '판정 대기중';
+      }
+
+      // Timeline Section
+      const timelineContainer = document.getElementById('detail-timeline-container');
+      timelineContainer.innerHTML = `
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">${new Date(h.updated_at).toLocaleString('ko-KR')}</div>
+          <div class="timeline-desc">
+            <strong>현재 상태:</strong> <span class="badge-status ${statusMeta.class}" style="font-size: 0.7rem; padding: 1px 6px;">${statusMeta.label}</span>
+            ${h.rationale ? `<div style="margin-top: 0.35rem; font-size: 0.82rem; color: var(--text-muted); background: #fdfdfc; padding: 0.4rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-muted);"><em>" ${escapeHtml(h.rationale)} "</em></div>` : ''}
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot" style="background: var(--text-dim);"></div>
+          <div class="timeline-time">${new Date(h.created_at).toLocaleString('ko-KR')}</div>
+          <div class="timeline-desc">
+            <strong>가설 최초 등록:</strong> 작성자 ${escapeHtml(authorName)}
+          </div>
+        </div>
+      `;
+    }
+
+    function openUpdateStatusModalFromDetail() {
+      if (selectedDetailHypo) {
+        openUpdateStatusModal(selectedDetailHypo.id);
+      }
+    }
+
+    // =========================================================================
+    // 4. PROJECTS VIEW RENDERING
+    // =========================================================================
+    function renderProjectsList() {
+      const container = document.getElementById('projects-list');
+      if (allProjects.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <h3>등록된 연구 프로젝트가 없습니다</h3>
+            <p>우측 상단의 '+ 새 프로젝트' 버튼을 눌러 연구 워크스페이스를 시작하세요.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = allProjects.map(p => {
+        const projectHypoCount = allHypotheses.filter(h => h.project_id === p.id).length;
+        const projectTrackCount = allTracks.filter(t => t.project_id === p.id).length;
+
+        return `
+          <div class="project-card" onclick="openProject('${p.id}')">
+            <div class="project-card-header">
+              <h2 class="project-name">${escapeHtml(p.name)}</h2>
+              <p class="project-desc">${escapeHtml(p.description || '설명 없음')}</p>
+            </div>
+            <div class="project-card-footer">
+              <span>가설 ${projectHypoCount}개 · 트랙 ${projectTrackCount}개</span>
+              <span class="btn btn-outline btn-sm">워크스페이스 열기 →</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openCreateProjectModal() {
+      document.getElementById('proj-name').value = '';
+      document.getElementById('proj-desc').value = '';
+      openModal('modal-create-project');
+    }
+
+    async function handleCreateProject(e) {
+      e.preventDefault();
+      const name = document.getElementById('proj-name').value.trim();
+      const description = document.getElementById('proj-desc').value.trim();
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('projects')
+          .insert([{ name, description, created_by: currentUser.id }])
+          .select();
+
+        if (error) throw error;
+        closeModal('modal-create-project');
+        showToast('프로젝트가 성공적으로 생성되었습니다.', 'success');
+        await loadAllAppData();
+        if (data && data[0]) {
+          openProject(data[0].id);
+        } else {
+          navigateToProjects();
+        }
+      } catch (err) {
+        showToast('프로젝트 생성 실패: ' + err.message, 'error');
+      }
+    }
+
+    // =========================================================================
+    // 5. WORKSPACE & TRACKS & HYPOTHESES OPERATIONS
+    // =========================================================================
+    function renderTracksList() {
+      const container = document.getElementById('tracks-list');
+      const projectHypotheses = allHypotheses.filter(h => h.project_id === currentProject.id);
+      const projectTracks = allTracks.filter(t => t.project_id === currentProject.id);
+
+      let html = `
+        <div class="track-item ${workspaceTrackId === 'all' ? 'active' : ''}" onclick="selectWorkspaceTrack('all')">
+          <span>전체 트랙</span>
+          <span class="track-count">${projectHypotheses.length}</span>
+        </div>
+      `;
+
+      projectTracks.forEach(t => {
+        const count = projectHypotheses.filter(h => h.track_id === t.id).length;
+        html += `
+          <div class="track-item ${workspaceTrackId === t.id ? 'active' : ''}" onclick="selectWorkspaceTrack('${t.id}')">
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(t.name)}</span>
+            <span class="track-count">${count}</span>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function selectWorkspaceTrack(trackId) {
+      workspaceTrackId = trackId;
+      renderTracksList();
+      renderHypothesesList();
+    }
+
+    function openCreateTrackModal() {
+      document.getElementById('track-name').value = '';
+      document.getElementById('track-desc').value = '';
+      openModal('modal-create-track');
+    }
+
+    async function handleCreateTrack(e) {
+      e.preventDefault();
+      const name = document.getElementById('track-name').value.trim();
+      const description = document.getElementById('track-desc').value.trim();
+
+      try {
+        const { error } = await supabaseClient
+          .from('tracks')
+          .insert([{ project_id: currentProject.id, name, description, created_by: currentUser.id }]);
+
+        if (error) throw error;
+        closeModal('modal-create-track');
+        showToast('연구 트랙이 추가되었습니다.', 'success');
+        await loadAllAppData();
+        renderTracksList();
+        populateTrackSelect();
+      } catch (err) {
+        showToast('트랙 추가 실패: ' + err.message, 'error');
+      }
+    }
+
+    function populateTrackSelect() {
+      const select = document.getElementById('hypo-track-select');
+      const projectTracks = allTracks.filter(t => t.project_id === currentProject?.id);
+      select.innerHTML = '<option value="">-- 트랙 미지정 --</option>' + 
+        projectTracks.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+    }
+
+    function updateWorkspaceStatusCounts(projectHypotheses) {
+      document.getElementById('count-all').textContent = projectHypotheses.length;
+      document.getElementById('count-draft').textContent = projectHypotheses.filter(h => h.status === 'draft').length;
+      document.getElementById('count-testing').textContent = projectHypotheses.filter(h => h.status === 'testing').length;
+      document.getElementById('count-supported').textContent = projectHypotheses.filter(h => h.status === 'supported').length;
+      document.getElementById('count-rejected').textContent = projectHypotheses.filter(h => h.status === 'rejected').length;
+      document.getElementById('count-inconclusive').textContent = projectHypotheses.filter(h => h.status === 'inconclusive').length;
+    }
+
+    function filterHypothesesByStatus(status) {
+      workspaceStatusFilter = status;
+      document.querySelectorAll('#workspace-view .status-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-status') === status);
+      });
+      renderHypothesesList();
+    }
+
+    function renderHypothesesList() {
+      const container = document.getElementById('hypotheses-list');
+      let projectHypotheses = allHypotheses.filter(h => h.project_id === currentProject.id);
+      updateWorkspaceStatusCounts(projectHypotheses);
+
+      let filtered = projectHypotheses;
+
+      if (workspaceTrackId !== 'all') {
+        filtered = filtered.filter(h => h.track_id === workspaceTrackId);
+      }
+
+      if (workspaceStatusFilter !== 'all') {
+        filtered = filtered.filter(h => h.status === workspaceStatusFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>해당 조건의 가설이 없습니다</h3>
+            <p>우측 상단의 '+ 가설 등록' 버튼을 눌러 새로운 가설을 작성하세요.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(h => {
+        const statusMeta = STATUS_MAP[h.status] || { label: h.status, class: 'draft' };
+        const trackName = h.tracks?.name || (allTracks.find(t => t.id === h.track_id)?.name);
+        
+        return `
+          <div class="hypothesis-card">
+            <div class="hypo-header">
+              <div class="hypo-title-group">
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <span class="badge-status ${statusMeta.class}">${statusMeta.label}</span>
+                  ${trackName ? `<span class="badge-track">트랙: ${escapeHtml(trackName)}</span>` : ''}
+                </div>
+                <h3 class="hypo-title" onclick="navigateToHypothesisDetail('${h.id}', 'workspace')">${escapeHtml(h.title)}</h3>
+              </div>
+              <div style="display: flex; gap: 0.4rem;">
+                <button class="btn btn-subtle btn-sm" onclick="navigateToHypothesisDetail('${h.id}', 'workspace')">
+                  상세 보기 →
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="openUpdateStatusModal('${h.id}')">
+                  판정 변경
+                </button>
+              </div>
+            </div>
+
+            ${h.description ? `<p class="hypo-desc">${escapeHtml(h.description)}</p>` : ''}
+
+            ${h.rationale ? `
+              <div class="hypo-rationale-box">
+                <div class="rationale-label">
+                  <span>최신 판정 근거 (Rationale)</span>
+                  <span>${new Date(h.updated_at).toLocaleString('ko-KR')}</span>
+                </div>
+                <div style="color: var(--text-main); white-space: pre-wrap;">${escapeHtml(h.rationale)}</div>
+              </div>
+            ` : `
+              <div style="font-size: 0.75rem; color: var(--text-dim); font-style: italic;">
+                * 아직 등록된 판정 근거가 없습니다. 상태 변경 시 근거를 작성할 수 있습니다.
+              </div>
+            `}
+
+            <div class="hypo-meta">
+              <span>작성자: ${escapeHtml(getAuthorName(h.created_by))}</span>
+              <span>•</span>
+              <span>작성일: ${new Date(h.created_at).toLocaleDateString('ko-KR')}</span>
+              <span>•</span>
+              <span>수정일: ${new Date(h.updated_at).toLocaleDateString('ko-KR')}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openCreateHypothesisModal() {
+      document.getElementById('hypo-title').value = '';
+      document.getElementById('hypo-desc').value = '';
+      document.getElementById('hypo-track-select').value = workspaceTrackId !== 'all' ? workspaceTrackId : '';
+      document.getElementById('hypo-initial-status').value = 'draft';
+      openModal('modal-create-hypo');
+    }
+
+    async function handleCreateHypothesis(e) {
+      e.preventDefault();
+      const title = document.getElementById('hypo-title').value.trim();
+      const track_id = document.getElementById('hypo-track-select').value || null;
+      const description = document.getElementById('hypo-desc').value.trim();
+      const status = document.getElementById('hypo-initial-status').value;
+
+      try {
+        const { error } = await supabaseClient
+          .from('hypotheses')
+          .insert([{
+            project_id: currentProject.id,
+            track_id,
+            title,
+            description,
+            status,
+            created_by: currentUser.id
+          }]);
+
+        if (error) throw error;
+        closeModal('modal-create-hypo');
+        showToast('연구 가설이 성공적으로 등록되었습니다.', 'success');
+        await loadAllAppData();
+        renderTracksList();
+        renderHypothesesList();
+      } catch (err) {
+        showToast('가설 등록 실패: ' + err.message, 'error');
+      }
+    }
+
+    // =========================================================================
+    // Status & Rationale Modal Update Handler
+    // =========================================================================
+    function openUpdateStatusModal(hypoId) {
+      const hypo = allHypotheses.find(h => h.id === hypoId);
+      if (!hypo) return;
+
+      document.getElementById('update-hypo-id').value = hypo.id;
+      document.getElementById('update-hypo-title-preview').textContent = hypo.title;
+      document.getElementById('update-target-status').value = hypo.status;
+      document.getElementById('update-rationale').value = hypo.rationale || '';
+      
+      openModal('modal-update-status');
+    }
+
+    async function handleUpdateStatusSubmit(e) {
+      e.preventDefault();
+      const hypoId = document.getElementById('update-hypo-id').value;
+      const status = document.getElementById('update-target-status').value;
+      const rationale = document.getElementById('update-rationale').value.trim();
+
+      if (!rationale) {
+        showToast('판정 변경 시 근거(Rationale) 텍스트 입력은 필수입니다.', 'error');
+        return;
+      }
+
+      try {
+        const { error } = await supabaseClient
+          .from('hypotheses')
+          .update({
+            status,
+            rationale,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', hypoId);
+
+        if (error) throw error;
+        closeModal('modal-update-status');
+        showToast('가설 상태 및 판정 근거가 업데이트되었습니다.', 'success');
+        
+        await loadAllAppData();
+
+        // Refresh current active view
+        if (currentView === 'dashboard') {
+          renderDashboard();
+        } else if (currentView === 'summary-table') {
+          renderSummaryTable();
+        } else if (currentView === 'hypothesis-detail') {
+          selectedDetailHypo = allHypotheses.find(h => h.id === hypoId);
+          renderHypothesisDetail();
+        } else if (currentView === 'workspace') {
+          renderTracksList();
+          renderHypothesesList();
+        }
+      } catch (err) {
+        showToast('상태 업데이트 실패: ' + err.message, 'error');
+      }
+    }
+
+    // Utility: HTML Escaping
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
