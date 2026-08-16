@@ -1615,6 +1615,24 @@
       border-color: var(--primary);
     }
 
+    .paper-insight-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .ai-insight-status {
+      min-height: 1.1rem;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .ai-insight-status.error {
+      color: var(--status-rejected);
+    }
+
     /* Modal Styling */
     .modal-overlay {
       position: fixed;
@@ -4510,15 +4528,21 @@
 
             <!-- Insight Summary Editable Area -->
             <div class="paper-insight-box">
-              <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
                 <label class="form-label" style="font-size: 0.78rem; color: #034f31; margin-bottom: 0; font-weight: 700;">
                   💡 연구 인사이트 & 메모 (Insight Summary)
                 </label>
-                <button type="button" id="btn-save-insight-${paper.id}" class="btn btn-primary btn-sm" style="padding: 2px 8px; font-size: 0.72rem;" onclick="handleUpdatePaperInsight('${paper.id}')">
-                  메모 저장
-                </button>
+                <div class="paper-insight-actions">
+                  <button type="button" id="btn-ai-insight-${paper.id}" class="btn btn-outline btn-sm" style="padding: 2px 8px; font-size: 0.72rem;" onclick="handleGenerateAiInsight('${paper.id}')">
+                    ✨ AI 인사이트 생성
+                  </button>
+                  <button type="button" id="btn-save-insight-${paper.id}" class="btn btn-primary btn-sm" style="padding: 2px 8px; font-size: 0.72rem;" onclick="handleUpdatePaperInsight('${paper.id}')">
+                    메모 저장
+                  </button>
+                </div>
               </div>
               <textarea id="insight-text-${paper.id}" class="paper-insight-textarea" placeholder="이 논문에서 도출한 핵심 연구 인사이트, 가설과의 연관성, 실험 아이디어 등을 기록하세요...">${escapeHtml(paper.insight_summary || '')}</textarea>
+              <div id="ai-insight-status-${paper.id}" class="ai-insight-status" role="status" aria-live="polite"></div>
             </div>
           </article>
         `;
@@ -4545,6 +4569,60 @@
     function handleSavedPapersSort(e) {
       savedPapersFilterState.sortBy = e.target.value;
       renderSavedPapersList();
+    }
+
+    async function handleGenerateAiInsight(paperId) {
+      const paper = allPapers.find(item => String(item.id) === String(paperId));
+      const textarea = document.getElementById(`insight-text-${paperId}`);
+      const btn = document.getElementById(`btn-ai-insight-${paperId}`);
+      const status = document.getElementById(`ai-insight-status-${paperId}`);
+      if (!paper || !textarea || !btn || !status) return;
+
+      const hypothesis = allHypotheses.find(item => item.id === paper.hypothesis_id);
+      const hypothesisTitle = paper.hypotheses?.title || hypothesis?.title;
+      if (!hypothesisTitle) {
+        status.classList.add('error');
+        status.textContent = 'AI 인사이트를 생성하려면 먼저 논문을 특정 가설에 연결해 주세요.';
+        return;
+      }
+
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner spinner-dark" aria-hidden="true"></span> 생성 중...';
+      status.classList.remove('error');
+      status.textContent = '로컬 Claude가 논문과 가설의 연관성을 분석하고 있습니다.';
+
+      try {
+        const response = await fetch('http://localhost:8787/api/ai-insight', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paperTitle: paper.title || '',
+            paperAbstract: paper.abstract || '',
+            hypothesisTitle,
+            hypothesisDescription: hypothesis?.description || ''
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || `로컬 AI 서버 오류 (${response.status})`);
+        if (!data.insight) throw new Error('로컬 AI 서버가 인사이트를 반환하지 않았습니다.');
+
+        textarea.value = data.insight;
+        textarea.focus();
+        status.textContent = 'AI 인사이트를 메모에 채웠습니다. 내용을 검토·수정한 뒤 메모 저장을 눌러 반영하세요.';
+        showToast('AI 인사이트가 생성되었습니다. 검토 후 저장해 주세요.', 'success');
+      } catch (error) {
+        const connectionMessage = '로컬 AI서버가 꺼져있습니다. local-ai-server-codex 폴더에서 npm install && node server.js 실행 후 다시 시도하세요';
+        const isConnectionFailure = error instanceof TypeError;
+        const message = isConnectionFailure ? connectionMessage : error.message;
+        status.classList.add('error');
+        status.textContent = message;
+        showToast(message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
     }
 
     async function handleUpdatePaperInsight(paperId) {
