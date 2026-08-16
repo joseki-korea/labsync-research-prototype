@@ -63,6 +63,44 @@ app.post('/api/ai-insight', (req, res) => {
   });
 });
 
+app.post('/api/ai-chat', (req, res) => {
+  const { context, question } = req.body || {};
+
+  if (!String(context || '').trim() || !String(question || '').trim()) {
+    return res.status(400).json({ success: false, error: 'context와 question은 필수입니다.' });
+  }
+
+  const prompt = [
+    `다음은 현재 연구프로젝트 맥락입니다: ${String(context).trim()}`,
+    '',
+    `질문: ${String(question).trim()}`,
+    '',
+    '연구자에게 도움되는 답변을 한국어로 작성해줘'
+  ].join('\n');
+
+  execFile('claude', ['-p', prompt], {
+    timeout: 120000,
+    maxBuffer: 1024 * 1024,
+    encoding: 'utf8'
+  }, (error, stdout, stderr) => {
+    if (error) {
+      const isMissing = error.code === 'ENOENT';
+      return res.status(500).json({
+        success: false,
+        error: isMissing
+          ? 'claude CLI를 찾을 수 없습니다. Claude Code를 설치하고 claude 명령이 PATH에 등록되었는지 확인하세요.'
+          : `claude CLI 실행에 실패했습니다: ${(stderr || error.message).trim()}`
+      });
+    }
+
+    const answer = stdout.trim();
+    if (!answer) {
+      return res.status(502).json({ success: false, error: 'claude CLI가 빈 응답을 반환했습니다.' });
+    }
+    return res.json({ success: true, answer });
+  });
+});
+
 app.use((error, req, res, next) => {
   if (error instanceof SyntaxError && 'body' in error) {
     return res.status(400).json({ error: '요청 본문이 올바른 JSON 형식이 아닙니다.' });

@@ -2437,6 +2437,28 @@
     .readonly-notice.show { display:block; }
     .comment-body { white-space:pre-wrap; margin-top:.3rem; color:var(--text-main); }
     @media(max-width:760px){.collab-grid{grid-template-columns:1fr}}
+    /* Shared AI research assistant drawer */
+    .ai-drawer-trigger { position: fixed; right: 24px; bottom: 36px; z-index: 90; display: inline-flex; align-items: center; gap: .4rem; padding: .72rem 1rem; border: 0; border-radius: 999px; background: var(--primary); color: #fff; box-shadow: 0 8px 24px rgba(3,79,49,.26); font: 700 .9rem Pretendard, sans-serif; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease; }
+    .ai-drawer-trigger:hover { transform: translateY(-2px); box-shadow: 0 11px 28px rgba(3,79,49,.32); }
+    .ai-drawer-trigger:focus-visible, .ai-drawer-close:focus-visible { outline: 3px solid rgba(3,107,63,.25); outline-offset: 3px; }
+    .ai-drawer { position: fixed; top: 0; right: 0; z-index: 100; width: min(380px, calc(100vw - 20px)); height: 100dvh; display: flex; flex-direction: column; background: var(--surface); border-left: 1px solid var(--border); box-shadow: -12px 0 32px rgba(20,35,28,.14); transform: translateX(105%); visibility: hidden; transition: transform .25s ease, visibility 0s linear .25s; }
+    .ai-drawer.open { transform: translateX(0); visibility: visible; transition-delay: 0s; }
+    .ai-drawer-header { padding: 1.15rem 1.2rem 1rem; color: #fff; background: #034f31; }
+    .ai-drawer-title-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .ai-drawer-title { margin: 0; font-size: 1rem; }
+    .ai-drawer-close { width: 32px; height: 32px; border: 0; border-radius: 50%; background: rgba(255,255,255,.12); color: #fff; font-size: 1.45rem; line-height: 1; cursor: pointer; }
+    .ai-context-label { margin-top: .85rem; font-size: .7rem; font-weight: 700; opacity: .72; letter-spacing: .04em; }
+    .ai-context-summary { margin: .25rem 0 0; font-size: .82rem; line-height: 1.5; color: #eef7f2; }
+    .ai-drawer-form { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); }
+    .ai-drawer-form textarea { min-height: 92px; resize: vertical; }
+    .ai-drawer-actions { display: flex; justify-content: flex-end; margin-top: .65rem; }
+    .ai-drawer-answer { flex: 1; min-height: 0; overflow-y: auto; padding: 1.1rem 1.2rem 1.5rem; }
+    .ai-answer-label { margin-bottom: .55rem; color: var(--text-muted); font-size: .75rem; font-weight: 700; }
+    .ai-answer-content { min-height: 92px; padding: 1rem; border: 1px solid var(--border-muted); border-left: 3px solid var(--primary); border-radius: var(--radius-sm); background: #fafbfa; color: var(--text-main); font-size: .86rem; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .ai-answer-content.placeholder { color: var(--text-dim); }
+    .ai-answer-content.error { color: #9d2a2a; border-left-color: #b93838; background: #fff7f7; }
+    .ai-loading { display: flex; align-items: center; gap: .55rem; color: var(--primary); }
+    @media(max-width:560px){ .ai-drawer-trigger { right: 14px; bottom: 22px; } .ai-drawer { width: calc(100vw - 10px); } }
   </style>
 </head>
 <body>
@@ -4029,6 +4051,27 @@
   <!-- Toast Notification Container -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
+  <button type="button" id="ai-drawer-trigger" class="ai-drawer-trigger hidden" onclick="openAiDrawer()" aria-controls="ai-drawer" aria-expanded="false">✨ AI</button>
+  <aside id="ai-drawer" class="ai-drawer" aria-hidden="true" aria-labelledby="ai-drawer-title">
+    <div class="ai-drawer-header">
+      <div class="ai-drawer-title-row">
+        <h2 id="ai-drawer-title" class="ai-drawer-title">✨ AI 연구 도우미</h2>
+        <button type="button" class="ai-drawer-close" onclick="closeAiDrawer()" aria-label="AI 드로어 닫기">&times;</button>
+      </div>
+      <div class="ai-context-label">현재 맥락</div>
+      <p id="ai-context-summary" class="ai-context-summary">현재 화면의 연구 맥락을 불러오는 중입니다.</p>
+    </div>
+    <form class="ai-drawer-form" onsubmit="handleAiChatSubmit(event)">
+      <label class="form-label" for="ai-chat-question">무엇을 도와드릴까요?</label>
+      <textarea id="ai-chat-question" class="form-control" placeholder="예: 이 가설의 검증 설계를 더 엄밀하게 만들려면?" required></textarea>
+      <div class="ai-drawer-actions"><button type="submit" id="ai-chat-submit" class="btn btn-primary">질문 보내기</button></div>
+    </form>
+    <div class="ai-drawer-answer" aria-live="polite">
+      <div class="ai-answer-label">AI 답변</div>
+      <div id="ai-chat-answer" class="ai-answer-content placeholder">현재 화면을 바탕으로 궁금한 점을 질문해 보세요.</div>
+    </div>
+  </aside>
+
   <div style="position:fixed; bottom:10px; right:14px; font-size:11px; color:var(--text-muted,#888); opacity:0.7; z-index:5; pointer-events:none;">
     Developed by Solucionemos
   </div>
@@ -4106,6 +4149,7 @@
     window.addEventListener('DOMContentLoaded', async () => {
       // Global Keydown Handler: ESC for Modals & Mobile Drawer
       document.addEventListener('keydown', handleGlobalKeydown);
+      document.addEventListener('pointerdown', handleAiDrawerOutsidePointer);
 
       const { data: { session }, error } = await supabaseClient.auth.getSession();
       if (session && session.user) {
@@ -4130,6 +4174,10 @@
     // Global Keydown Handler
     function handleGlobalKeydown(e) {
       if (e.key === 'Escape') {
+        if (document.getElementById('ai-drawer')?.classList.contains('open')) {
+          closeAiDrawer();
+          return;
+        }
         const openDrawer = document.getElementById('mobile-drawer');
         if (openDrawer && !openDrawer.classList.contains('hidden')) {
           closeMobileDrawer();
@@ -4331,6 +4379,8 @@
       document.getElementById('nav-main-menu').classList.add('hidden');
       document.getElementById('nav-user-section').classList.add('hidden');
       document.getElementById('mobile-menu-btn').classList.add('hidden');
+      document.getElementById('ai-drawer-trigger')?.classList.add('hidden');
+      closeAiDrawer();
       closeMobileDrawer();
     }
 
@@ -4340,6 +4390,7 @@
       document.getElementById('nav-main-menu').classList.remove('hidden');
       document.getElementById('nav-user-section').classList.remove('hidden');
       document.getElementById('mobile-menu-btn').classList.remove('hidden');
+      document.getElementById('ai-drawer-trigger')?.classList.remove('hidden');
       
       const displayName = user.user_metadata?.display_name || user.email.split('@')[0];
       document.getElementById('nav-user-name').textContent = displayName;
@@ -4448,6 +4499,7 @@
       document.getElementById('thesis-toc-view')?.classList.add('hidden');
       document.getElementById('manual-view')?.classList.add('hidden');
       document.getElementById('auth-view')?.classList.add('hidden');
+      updateAiDrawerContext();
     }
 
     // 1. Dashboard View
@@ -6369,6 +6421,120 @@
       await loadAllAppData();
       if (currentView === 'hypothesis-detail') renderHypothesisDetail(); else renderSavedPapersList();
       showToast('논문을 다른 가설에도 연결했습니다.', 'success');
+    }
+
+    // =========================================================================
+    // Shared AI research assistant drawer
+    // =========================================================================
+    function getAiDrawerContext() {
+      const projectName = project => project?.name || '이름 없는 프로젝트';
+      const counts = allHypotheses.reduce((result, hypothesis) => {
+        result[hypothesis.status] = (result[hypothesis.status] || 0) + 1;
+        return result;
+      }, {});
+      const statusSummary = `전체 가설 ${allHypotheses.length}건 · 검증중 ${counts.testing || 0}건 · 채택 ${counts.supported || 0}건 · 기각 ${counts.rejected || 0}건`;
+
+      if (currentView === 'hypothesis-detail' && selectedDetailHypo) {
+        const hypothesis = selectedDetailHypo;
+        const project = allProjects.find(item => item.id === hypothesis.project_id);
+        const status = STATUS_MAP[hypothesis.status]?.shortLabel || hypothesis.status || '상태 미지정';
+        return {
+          summary: `가설 상세 · ${hypothesis.title} (${status})`,
+          context: [
+            `화면: 가설 상세`,
+            `프로젝트: ${projectName(project)}`,
+            `가설 제목: ${hypothesis.title}`,
+            `상태: ${status}`,
+            `가설 설명: ${hypothesis.description || '등록된 설명 없음'}`,
+            `판정 근거: ${hypothesis.rationale || '등록된 근거 없음'}`
+          ].join('\n')
+        };
+      }
+      if (currentView === 'workspace' && currentProject) {
+        const projectHypotheses = allHypotheses.filter(item => item.project_id === currentProject.id);
+        return {
+          summary: `프로젝트 · ${projectName(currentProject)} · 가설 ${projectHypotheses.length}건`,
+          context: `화면: 프로젝트 워크스페이스\n프로젝트: ${projectName(currentProject)}\n설명: ${currentProject.description || '등록된 설명 없음'}\n가설 수: ${projectHypotheses.length}건`
+        };
+      }
+      if (currentView === 'summary-table') return { summary: `가설 요약 테이블 · ${statusSummary}`, context: `화면: 가설 요약 테이블\n${statusSummary}` };
+      if (currentView === 'projects') return { summary: `프로젝트 목록 · 프로젝트 ${allProjects.length}개`, context: `화면: 프로젝트 목록\n프로젝트 수: ${allProjects.length}개\n프로젝트: ${allProjects.map(projectName).join(', ') || '없음'}` };
+      if (currentView === 'papers') return { summary: `논문 조사 · ${papersSubTab === 'saved' ? '저장된 논문' : '논문 검색'} · 저장 ${allPapers.length}건`, context: `화면: 논문 조사 (${papersSubTab === 'saved' ? '저장된 논문' : '논문 검색'})\n저장 논문 수: ${allPapers.length}건\n${statusSummary}` };
+      if (currentView === 'thesis-toc') {
+        const project = allProjects.find(item => item.id === tocProjectId);
+        const chapters = allThesisChapters.filter(item => !tocProjectId || item.project_id === tocProjectId);
+        return { summary: `논문 완성도 · ${projectName(project)} · 챕터 ${chapters.length}개`, context: `화면: 논문 완성도\n프로젝트: ${projectName(project)}\n챕터 수: ${chapters.length}개` };
+      }
+      if (currentView === 'manual') return { summary: '사용법 매뉴얼 · LabSync 연구관리 안내', context: '화면: 사용법 매뉴얼\nLabSync 연구관리 기능의 사용법을 확인하고 있음' };
+      return { summary: `대시보드 · ${statusSummary}`, context: `화면: 연구 대시보드\n프로젝트 ${allProjects.length}개\n${statusSummary}` };
+    }
+
+    function updateAiDrawerContext() {
+      const summary = document.getElementById('ai-context-summary');
+      if (summary) summary.textContent = getAiDrawerContext().summary;
+    }
+
+    function openAiDrawer() {
+      if (!currentUser) return;
+      const drawer = document.getElementById('ai-drawer');
+      const trigger = document.getElementById('ai-drawer-trigger');
+      updateAiDrawerContext();
+      drawer.classList.add('open');
+      drawer.setAttribute('aria-hidden', 'false');
+      trigger.setAttribute('aria-expanded', 'true');
+      setTimeout(() => document.getElementById('ai-chat-question')?.focus(), 180);
+    }
+
+    function closeAiDrawer() {
+      const drawer = document.getElementById('ai-drawer');
+      const trigger = document.getElementById('ai-drawer-trigger');
+      if (!drawer) return;
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden', 'true');
+      trigger?.setAttribute('aria-expanded', 'false');
+    }
+
+    function handleAiDrawerOutsidePointer(event) {
+      const drawer = document.getElementById('ai-drawer');
+      const trigger = document.getElementById('ai-drawer-trigger');
+      if (!drawer?.classList.contains('open') || drawer.contains(event.target) || trigger?.contains(event.target)) return;
+      closeAiDrawer();
+    }
+
+    async function handleAiChatSubmit(event) {
+      event.preventDefault();
+      const questionInput = document.getElementById('ai-chat-question');
+      const submitButton = document.getElementById('ai-chat-submit');
+      const answerBox = document.getElementById('ai-chat-answer');
+      const question = questionInput.value.trim();
+      if (!question || submitButton.disabled) return;
+
+      const originalLabel = submitButton.textContent;
+      submitButton.disabled = true;
+      submitButton.textContent = '답변 생성 중...';
+      answerBox.className = 'ai-answer-content';
+      answerBox.innerHTML = '<div class="ai-loading"><span class="spinner spinner-dark" aria-hidden="true"></span><span>현재 연구 맥락을 분석하고 있습니다.</span></div>';
+
+      try {
+        const response = await fetch('http://localhost:8787/api/ai-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ context: getAiDrawerContext().context, question })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.success) throw new Error(data.error || `로컬 AI 서버 오류 (${response.status})`);
+        if (!data.answer) throw new Error('로컬 AI 서버가 답변을 반환하지 않았습니다.');
+        answerBox.textContent = data.answer;
+      } catch (error) {
+        const message = error instanceof TypeError
+          ? '로컬 AI서버가 꺼져있습니다. local-ai-server 켜주세요.'
+          : error.message;
+        answerBox.className = 'ai-answer-content error';
+        answerBox.textContent = message;
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = originalLabel;
+      }
     }
 
     // Utility: HTML Escaping
