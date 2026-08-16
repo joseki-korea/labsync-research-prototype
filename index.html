@@ -1664,6 +1664,86 @@
       color: var(--status-rejected);
     }
 
+    /* Paper PDF Attachment Box (Konkuk Theme & Flat Card) */
+    .paper-pdf-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: #f8faf8;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.55rem 0.85rem;
+      margin-top: 0.2rem;
+      flex-wrap: wrap;
+    }
+
+    .paper-pdf-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+      min-width: 180px;
+      overflow: hidden;
+    }
+
+    .paper-pdf-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: #eef5f1;
+      border: 1px solid rgba(3, 107, 63, 0.25);
+      color: #034f31;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .paper-pdf-name {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 320px;
+    }
+
+    .paper-pdf-size {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .paper-pdf-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .paper-pdf-upload-form {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .paper-pdf-input {
+      font-size: 0.76rem;
+      padding: 0.2rem 0.4rem;
+      max-width: 250px;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+
+
     /* Modal Styling */
     .modal-overlay {
       position: fixed;
@@ -3758,7 +3838,7 @@
                   <span>3. 저장된 논문 보관함 & 인사이트 메모</span>
                 </div>
                 <div class="manual-feature-desc">
-                  <strong>저장된 논문 보관함</strong> 탭에서는 프로젝트별/가설별로 수집된 논문들을 한눈에 모아보고, 연구원이 직접 읽고 분석한 요약 및 실험 아이디어를 <strong>인사이트 메모 (Insight Summary)</strong>에 기록하여 동료들과 공유할 수 있습니다.
+                  <strong>저장된 논문 보관함</strong> 탭에서는 프로젝트별/가설별로 수집된 논문들을 한눈에 모아보고, 연구원이 직접 읽고 분석한 요약 및 실험 아이디어를 <strong>인사이트 메모 (Insight Summary)</strong>에 기록하여 동료들과 공유할 수 있습니다. 또한 각 논문 카드에 <strong>PDF 원문 파일(최대 25MB)을 직접 첨부</strong>하여 안전한 Supabase Private Storage에 저장하고, 보안 Signed URL로 새 창에서 즉시 열람하거나 삭제 관리할 수 있습니다.
                 </div>
               </div>
             </section>
@@ -5223,6 +5303,14 @@
                 </div>
                 <div class="collab-row">${fitBadge}<button type="button" class="btn btn-subtle btn-sm collab-write" onclick="linkPaperToAnotherHypothesis('${paper.id}')">다른 가설에도 연결</button></div>
               </div>
+              ${paper.file_path ? `
+                <div style="display: flex; align-items: center; justify-content: space-between; background: #f8faf8; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.4rem 0.65rem; font-size: 0.78rem; margin-top: 0.25rem;">
+                  <span style="display: flex; align-items: center; gap: 0.35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <strong style="color: #034f31;">📄 PDF:</strong> ${escapeHtml(paper.file_name || '첨부문서.pdf')} <span style="color: var(--text-dim);">(${formatBytes(paper.file_size_bytes)})</span>
+                  </span>
+                  <button type="button" class="btn btn-outline btn-sm" style="padding: 1px 7px; font-size: 0.72rem; flex-shrink: 0;" onclick="handleOpenPdf('${paper.id}')">📖 열기</button>
+                </div>
+              ` : ''}
               ${paper.insight_summary ? `
                 <div style="font-size: 0.82rem; color: var(--primary); background: #f2f7f4; padding: 0.4rem 0.6rem; border-radius: 3px; border: 1px solid rgba(3, 107, 63, 0.15);">
                   <strong>💡 핵심 인사이트 메모:</strong> ${escapeHtml(paper.insight_summary)}
@@ -5906,6 +5994,14 @@
               <div style="margin-top: 0.25rem;">
                 <input type="text" id="save-insight-${idx}" class="form-control" style="font-size: 0.8rem; padding: 0.4rem 0.6rem;" placeholder="인사이트 메모 (선택사항: 이 논문의 핵심 기여점, 가설 연관 근거 등)">
               </div>
+
+              <!-- PDF File Upload (Optional) -->
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.2rem;">
+                <label class="form-label" style="font-size: 0.74rem; margin-bottom: 0; color: #034f31; font-weight: 600;">
+                  📎 PDF 원문 첨부 (선택, 최대 25MB):
+                </label>
+                <input type="file" id="save-pdf-file-${idx}" accept="application/pdf,.pdf" class="paper-pdf-input" style="flex: 1; min-width: 180px;">
+              </div>
             </div>
           </article>
         `;
@@ -5970,15 +6066,29 @@
       const projSelect = document.getElementById(`save-proj-select-${idx}`);
       const hypoSelect = document.getElementById(`save-hypo-select-${idx}`);
       const insightInput = document.getElementById(`save-insight-${idx}`);
+      const pdfInput = document.getElementById(`save-pdf-file-${idx}`);
       const saveBtn = document.getElementById(`btn-save-paper-${idx}`);
 
       const projectId = projSelect?.value;
       const hypoId = hypoSelect?.value || null;
       const insightSummary = insightInput?.value.trim() || null;
+      const attachedPdf = pdfInput?.files?.[0] || null;
 
       if (!projectId) {
         showToast('저장할 프로젝트를 선택해 주세요.', 'error');
         return;
+      }
+
+      if (attachedPdf) {
+        if (attachedPdf.type !== 'application/pdf' || !attachedPdf.name.toLowerCase().endsWith('.pdf')) {
+          showToast('PDF 파일(.pdf)만 업로드할 수 있습니다.', 'error');
+          return;
+        }
+        const MAX_SIZE = 25 * 1024 * 1024;
+        if (attachedPdf.size > MAX_SIZE) {
+          showToast('PDF 파일 크기는 최대 25MB까지 업로드 가능합니다.', 'error');
+          return;
+        }
       }
 
       let fitScore = null;
@@ -6013,8 +6123,33 @@
           .select();
 
         if (error) throw error;
+        const newPaperId = data?.[0]?.id;
 
-        await logActivity(projectId, 'paper_saved', 'paper', data?.[0]?.id || null, `논문 “${paper.title}”을 저장`);
+        // If a PDF was attached, upload it now to storage
+        if (attachedPdf && newPaperId) {
+          saveBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> PDF 업로드 중...';
+          const filePath = `${projectId}/${newPaperId}/${attachedPdf.name}`;
+          const { error: uploadErr } = await supabaseClient.storage
+            .from('paper-files')
+            .upload(filePath, attachedPdf, { upsert: true });
+
+          if (uploadErr) {
+            console.error('Storage upload error:', uploadErr);
+            showToast('논문 정보는 저장되었으나 PDF 업로드에 실패했습니다: ' + uploadErr.message, 'warning');
+          } else {
+            await supabaseClient
+              .from('papers')
+              .update({
+                file_path: filePath,
+                file_name: attachedPdf.name,
+                file_size_bytes: attachedPdf.size,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', newPaperId);
+          }
+        }
+
+        await logActivity(projectId, 'paper_saved', 'paper', newPaperId || null, `논문 “${paper.title}”${attachedPdf ? ' (PDF 첨부)' : ''}을 저장`);
 
         showToast('논문이 보관함에 성공적으로 저장되었습니다.', 'success');
         saveBtn.innerHTML = '✓ 저장 완료';
@@ -6155,6 +6290,35 @@
               </div>
             ` : ''}
 
+            <!-- PDF File Attachment Box -->
+            <div class="paper-pdf-box">
+              ${paper.file_path ? `
+                <div class="paper-pdf-info">
+                  <span class="paper-pdf-badge">📄 PDF</span>
+                  <span class="paper-pdf-name" title="${escapeHtml(paper.file_name || '첨부문서.pdf')}">${escapeHtml(paper.file_name || '첨부문서.pdf')}</span>
+                  <span class="paper-pdf-size">(${formatBytes(paper.file_size_bytes)})</span>
+                </div>
+                <div class="paper-pdf-actions">
+                  <button type="button" class="btn btn-outline btn-sm" style="padding: 2px 9px; font-size: 0.74rem;" onclick="handleOpenPdf('${paper.id}')" title="새 탭에서 PDF 열기">
+                    📖 PDF 열기
+                  </button>
+                  <button type="button" class="btn btn-danger-outline btn-sm collab-write" ${canWrite(paper.project_id) ? '' : 'disabled title="읽기 전용"'} style="padding: 2px 8px; font-size: 0.74rem;" onclick="handleDeletePaperPdf('${paper.id}')">
+                    PDF 삭제
+                  </button>
+                </div>
+              ` : `
+                <div class="paper-pdf-upload-form">
+                  <span style="font-size: 0.78rem; font-weight: 600; color: #034f31; display: inline-flex; align-items: center; gap: 3px;">
+                    📎 PDF 첨부:
+                  </span>
+                  <input type="file" id="pdf-file-${paper.id}" accept="application/pdf,.pdf" class="paper-pdf-input" ${canWrite(paper.project_id) ? '' : 'disabled'}>
+                  <button type="button" id="btn-upload-pdf-${paper.id}" class="btn btn-primary btn-sm collab-write" ${canWrite(paper.project_id) ? '' : 'disabled'} style="padding: 2px 9px; font-size: 0.74rem;" onclick="handleUploadPaperPdf('${paper.id}')">
+                    ⬆ 업로드
+                  </button>
+                </div>
+              `}
+            </div>
+
             <!-- Insight Summary Editable Area -->
             <div class="paper-insight-box">
               <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
@@ -6287,12 +6451,176 @@
       }
     }
 
+    // =========================================================================
+    // PDF File Attachment & Storage API Handlers (Supabase Storage 'paper-files')
+    // =========================================================================
+    function formatBytes(bytes, decimals = 1) {
+      if (!bytes || bytes === 0) return '0 B';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    async function handleUploadPaperPdf(paperId) {
+      const fileInput = document.getElementById(`pdf-file-${paperId}`);
+      const btn = document.getElementById(`btn-upload-pdf-${paperId}`);
+      const file = fileInput?.files?.[0];
+
+      if (!file) {
+        showToast('업로드할 PDF 파일을 선택해 주세요.', 'error');
+        return;
+      }
+
+      if (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf')) {
+        showToast('PDF 파일(.pdf)만 업로드할 수 있습니다.', 'error');
+        return;
+      }
+
+      const MAX_SIZE = 25 * 1024 * 1024; // 25MB limit
+      if (file.size > MAX_SIZE) {
+        showToast('PDF 파일 크기는 최대 25MB까지 업로드 가능합니다.', 'error');
+        return;
+      }
+
+      const paper = allPapers.find(p => String(p.id) === String(paperId));
+      if (!paper) return;
+      if (!canWrite(paper.project_id)) {
+        showToast('읽기 전용 사용자는 업로드할 수 없습니다.', 'error');
+        return;
+      }
+
+      const originalHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> 업로드 중...';
+      }
+
+      try {
+        const filePath = `${paper.project_id}/${paper.id}/${file.name}`;
+        const { error: uploadErr } = await supabaseClient.storage
+          .from('paper-files')
+          .upload(filePath, file, { upsert: true });
+
+        if (uploadErr) throw uploadErr;
+
+        const { error: updateErr } = await supabaseClient
+          .from('papers')
+          .update({
+            file_path: filePath,
+            file_name: file.name,
+            file_size_bytes: file.size,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', paper.id);
+
+        if (updateErr) throw updateErr;
+
+        await logActivity(paper.project_id, 'paper_file_uploaded', 'paper', paper.id, `논문 “${paper.title}”에 PDF 파일(${file.name}) 업로드`);
+        showToast('PDF 파일이 성공적으로 업로드되었습니다.', 'success');
+
+        await loadAllAppData();
+        renderSavedPapersList();
+        if (currentView === 'hypothesis-detail' && selectedDetailHypo) {
+          renderHypothesisDetail();
+        }
+      } catch (err) {
+        showToast('PDF 업로드 실패: ' + err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
+      }
+    }
+
+    async function handleOpenPdf(paperId) {
+      const paper = allPapers.find(p => String(p.id) === String(paperId));
+      if (!paper || !paper.file_path) {
+        showToast('첨부된 PDF 파일이 없습니다.', 'error');
+        return;
+      }
+
+      try {
+        // Create signed URL for 1 hour
+        const { data, error } = await supabaseClient.storage
+          .from('paper-files')
+          .createSignedUrl(paper.file_path, 3600);
+
+        if (error) throw error;
+        if (data?.signedUrl) {
+          window.open(data.signedUrl, '_blank');
+          return;
+        }
+        throw new Error('Signed URL 생성 실패');
+      } catch (err) {
+        console.warn('createSignedUrl failed, falling back to download blob:', err.message);
+        try {
+          const { data: blobData, error: dlErr } = await supabaseClient.storage
+            .from('paper-files')
+            .download(paper.file_path);
+          if (dlErr) throw dlErr;
+          const blobUrl = URL.createObjectURL(blobData);
+          window.open(blobUrl, '_blank');
+        } catch (fallbackErr) {
+          showToast('PDF 파일 열기 실패: ' + fallbackErr.message, 'error');
+        }
+      }
+    }
+
+    async function handleDeletePaperPdf(paperId) {
+      const paper = allPapers.find(p => String(p.id) === String(paperId));
+      if (!paper || !paper.file_path) return;
+      if (!canWrite(paper.project_id)) {
+        showToast('읽기 전용 사용자는 삭제할 수 없습니다.', 'error');
+        return;
+      }
+
+      if (!confirm(`첨부된 PDF 파일 "${paper.file_name || '문서'}"을 삭제하시겠습니까?`)) {
+        return;
+      }
+
+      try {
+        const filePath = paper.file_path;
+        const { error: removeErr } = await supabaseClient.storage
+          .from('paper-files')
+          .remove([filePath]);
+
+        if (removeErr) console.warn('Storage remove warning:', removeErr.message);
+
+        const { error: updateErr } = await supabaseClient
+          .from('papers')
+          .update({
+            file_path: null,
+            file_name: null,
+            file_size_bytes: null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', paper.id);
+
+        if (updateErr) throw updateErr;
+
+        await logActivity(paper.project_id, 'paper_file_deleted', 'paper', paper.id, `논문 “${paper.title}”의 PDF 파일 삭제`);
+        showToast('PDF 파일이 삭제되었습니다.', 'success');
+
+        await loadAllAppData();
+        renderSavedPapersList();
+        if (currentView === 'hypothesis-detail' && selectedDetailHypo) {
+          renderHypothesisDetail();
+        }
+      } catch (err) {
+        showToast('PDF 파일 삭제 실패: ' + err.message, 'error');
+      }
+    }
+
     async function handleDeletePaper(paperId) {
       const paper = allPapers.find(p => String(p.id) === String(paperId));
       if (!paper || !canWrite(paper.project_id)) return showToast('읽기 전용 사용자는 삭제할 수 없습니다.', 'error');
       if (!confirm('이 논문을 보관함에서 삭제하시겠습니까?')) return;
 
       try {
+        // DB 행 삭제를 먼저 확정 — 실패시 Storage는 그대로 남아 파일 참조가 깨지지 않도록 함
         const { error } = await supabaseClient
           .from('papers')
           .delete()
@@ -6300,9 +6628,17 @@
 
         if (error) throw error;
 
+        if (paper.file_path) {
+          const { error: storageErr } = await supabaseClient.storage.from('paper-files').remove([paper.file_path]);
+          if (storageErr) console.warn('Storage remove on paper delete notice:', storageErr.message);
+        }
+
         showToast('논문이 보관함에서 삭제되었습니다.', 'success');
         await loadAllAppData();
         renderSavedPapersList();
+        if (currentView === 'hypothesis-detail' && selectedDetailHypo) {
+          renderHypothesisDetail();
+        }
       } catch (err) {
         showToast('삭제 실패: ' + err.message, 'error');
       }
