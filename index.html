@@ -2539,6 +2539,533 @@
     .ai-answer-content.error { color: #9d2a2a; border-left-color: #b93838; background: #fff7f7; }
     .ai-loading { display: flex; align-items: center; gap: .55rem; color: var(--primary); }
     @media(max-width:560px){ .ai-drawer-trigger { right: 14px; bottom: 22px; } .ai-drawer { width: calc(100vw - 10px); } }
+
+    /* =========================================================================
+       8. Writing Checklist View (좋은 논문 작성 조건 체크리스트) Styles
+       ========================================================================= */
+    .checklist-container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    .checklist-hero {
+      background: linear-gradient(135deg, #034f31 0%, #036b3f 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 2rem 2.2rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 4px 16px rgba(3, 79, 49, 0.16);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .checklist-hero::after {
+      content: '';
+      position: absolute;
+      right: -30px;
+      bottom: -40px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .checklist-hero-left {
+      flex: 1;
+      z-index: 1;
+    }
+
+    .checklist-hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 0.8rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .checklist-hero-title {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.6rem;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    .checklist-hero-desc {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 720px;
+    }
+
+    .checklist-hero-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.75rem;
+      z-index: 1;
+    }
+
+    /* Overall Progress Card */
+    .checklist-progress-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--primary);
+      border-radius: var(--radius-md);
+      padding: 1.4rem 1.6rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .checklist-progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .checklist-progress-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .checklist-progress-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .checklist-progress-badge {
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .checklist-progress-percent {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+      font-feature-settings: 'tnum';
+    }
+
+    .checklist-progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: var(--surface-active);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .checklist-progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 0%, #0db772 100%);
+      width: 0%;
+      transition: width 0.35s ease;
+      border-radius: 999px;
+    }
+
+    .checklist-progress-status-msg {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Checklist Toolbar */
+    .checklist-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .checklist-filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .checklist-filter-pill {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .checklist-filter-pill:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--surface-hover);
+    }
+
+    .checklist-filter-pill.active {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .checklist-filter-pill-count {
+      font-size: 0.72rem;
+      opacity: 0.85;
+      background: rgba(0,0,0,0.06);
+      padding: 1px 5px;
+      border-radius: 999px;
+    }
+
+    .checklist-filter-pill.active .checklist-filter-pill-count {
+      background: rgba(255,255,255,0.25);
+    }
+
+    .checklist-toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Category Accordion Card */
+    .checklist-category-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .checklist-category-card:hover {
+      border-color: #b7c7be;
+      box-shadow: var(--shadow-md);
+    }
+
+    .checklist-category-card.completed {
+      border-color: rgba(3, 107, 63, 0.35);
+      background: #fcfefd;
+    }
+
+    .checklist-category-header {
+      width: 100%;
+      padding: 1.1rem 1.4rem;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s ease;
+    }
+
+    .checklist-category-header:hover {
+      background: var(--surface-hover);
+    }
+
+    .checklist-category-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex: 1;
+    }
+
+    .checklist-category-num-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-active);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.86rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid rgba(3, 107, 63, 0.2);
+    }
+
+    .checklist-category-card.completed .checklist-category-num-badge {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .checklist-category-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .checklist-category-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .checklist-category-icon {
+      font-size: 1.05rem;
+    }
+
+    .checklist-category-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .checklist-category-title-en {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
+    }
+
+    .checklist-category-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .checklist-category-header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .checklist-category-progress-pill {
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      background: var(--surface-active);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .checklist-category-card.completed .checklist-category-progress-pill {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: rgba(3, 107, 63, 0.3);
+    }
+
+    .checklist-accordion-chevron {
+      width: 20px;
+      height: 20px;
+      color: var(--text-dim);
+      transition: transform 0.25s ease;
+    }
+
+    .checklist-category-card.open .checklist-accordion-chevron {
+      transform: rotate(180deg);
+    }
+
+    /* Category Body / Items */
+    .checklist-category-body {
+      display: none;
+      padding: 0.5rem 1.4rem 1.25rem;
+      border-top: 1px solid var(--border-muted);
+      background: #fafbfa;
+    }
+
+    .checklist-category-card.open .checklist-category-body {
+      display: block;
+    }
+
+    .checklist-items-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-top: 0.5rem;
+    }
+
+    .checklist-item-row {
+      background: var(--surface);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      position: relative;
+    }
+
+    .checklist-item-row:hover {
+      border-color: #b7c7be;
+      background: #ffffff;
+      box-shadow: 0 1px 4px rgba(24, 49, 41, 0.05);
+    }
+
+    .checklist-item-row.checked {
+      background: #f7faf8;
+      border-color: rgba(3, 107, 63, 0.25);
+    }
+
+    .checklist-item-row.filtered-out {
+      display: none !important;
+    }
+
+    /* Custom Checkbox Input */
+    .checklist-checkbox-wrap {
+      padding-top: 0.15rem;
+      flex-shrink: 0;
+    }
+
+    .checklist-custom-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #a5b4ac;
+      border-radius: 4px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .checklist-item-row:hover .checklist-custom-checkbox {
+      border-color: var(--primary);
+    }
+
+    .checklist-item-row.checked .checklist-custom-checkbox {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .checklist-custom-checkbox svg {
+      width: 13px;
+      height: 13px;
+      stroke: #ffffff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.15s ease;
+    }
+
+    .checklist-item-row.checked .checklist-custom-checkbox svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Item Content */
+    .checklist-item-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .checklist-item-text {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+      transition: color 0.15s ease;
+    }
+
+    .checklist-item-row.checked .checklist-item-text {
+      color: var(--primary-hover);
+    }
+
+    .checklist-why-box {
+      font-size: 0.81rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      background: var(--surface-active);
+      border-left: 3px solid rgba(3, 107, 63, 0.4);
+      padding: 0.4rem 0.65rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-top: 0.2rem;
+    }
+
+    .checklist-why-box strong {
+      color: #034f31;
+      font-weight: 600;
+      margin-right: 0.25rem;
+    }
+
+    /* Quick category anchor pills in hero or toolbar */
+    .checklist-cat-pills {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .checklist-hero {
+        flex-direction: column;
+        padding: 1.5rem;
+      }
+      .checklist-hero-actions {
+        align-items: flex-start;
+        width: 100%;
+      }
+      .checklist-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .checklist-toolbar-actions {
+        justify-content: flex-end;
+      }
+      .checklist-category-header {
+        padding: 0.9rem 1rem;
+      }
+      .checklist-category-body {
+        padding: 0.5rem 1rem 1rem;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2573,6 +3100,9 @@
         </button>
         <button type="button" id="nav-tab-toc" class="nav-link" onclick="navigateToThesisToc()">
           <span>논문 완성도</span>
+        </button>
+        <button type="button" id="nav-tab-checklist" class="nav-link" onclick="navigateToWritingChecklist()">
+          <span>논문 체크리스트</span>
         </button>
         <button type="button" id="nav-tab-manual" class="nav-link" onclick="navigateToManual()">
           <span>사용법</span>
@@ -2626,6 +3156,9 @@
         </button>
         <button type="button" id="mobile-tab-toc" class="mobile-nav-link" onclick="navigateToThesisToc(); closeMobileDrawer();">
           <span>📑 논문 완성도</span>
+        </button>
+        <button type="button" id="mobile-tab-checklist" class="mobile-nav-link" onclick="navigateToWritingChecklist(); closeMobileDrawer();">
+          <span>✅ 논문 체크리스트</span>
         </button>
         <button type="button" id="mobile-tab-manual" class="mobile-nav-link" onclick="navigateToManual(); closeMobileDrawer();">
           <span>📖 사용법 매뉴얼</span>
@@ -3301,6 +3834,95 @@
         <button type="button" class="btn btn-primary btn-sm" onclick="handleAddChapter()">+ 챕터 추가</button>
       </div>
       <div id="toc-content"></div>
+    </div>
+
+    <!-- ======================================================================
+         7.5. WRITING CHECKLIST VIEW (좋은 논문 작성 조건 체크리스트)
+         ====================================================================== -->
+    <div id="checklist-view" class="hidden">
+      <!-- Breadcrumbs -->
+      <nav class="breadcrumb-bar" aria-label="논문 작성 체크리스트 위치 경로">
+        <div class="breadcrumbs">
+          <button type="button" class="breadcrumb-link" onclick="navigateToDashboard()">← 대시보드</button>
+          <span aria-hidden="true">/</span>
+          <strong style="color: var(--text-main);">논문 작성 체크리스트 (Good Paper Checklist)</strong>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="navigateToThesisToc()">📑 논문 완성도</button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="navigateToManual()">📖 사용법 매뉴얼</button>
+        </div>
+      </nav>
+
+      <div class="checklist-container">
+        <!-- Hero Header -->
+        <div class="checklist-hero">
+          <div class="checklist-hero-left">
+            <div class="checklist-hero-tag">🎓 학술 논문 품질 가이드 · 6대 핵심 영역 20대 요건</div>
+            <h1 class="checklist-hero-title">좋은 논문을 쓰기 위한 조건 체크리스트</h1>
+            <p class="checklist-hero-desc">
+              학술지 투고 및 피어 리뷰(Peer Review) 통과를 위한 핵심 과학적 연구 요건입니다. 연구 설계부터 방법론, 결과 보고, 문헌 검토, 글쓰기 구조, 윤리·투명성까지 6개 카테고리의 20개 항목을 점검하세요.
+            </p>
+          </div>
+          <div class="checklist-hero-actions">
+            <button type="button" class="btn btn-light btn-sm" onclick="copyWritingChecklistMarkdown()" style="background: rgba(255,255,255,0.95); color: #034f31; font-weight: 700;">
+              📋 체크리스트 마크다운 복사
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="resetWritingChecklist()" style="border-color: rgba(255,255,255,0.4); color: #ffffff;">
+              🔄 초기화
+            </button>
+          </div>
+        </div>
+
+        <!-- Overall Progress Card -->
+        <section class="checklist-progress-card" aria-label="전체 점검 진행률">
+          <div class="checklist-progress-header">
+            <div class="checklist-progress-title-row">
+              <span class="checklist-progress-title">전체 작성 요건 충족률</span>
+              <span id="checklist-progress-badge" class="checklist-progress-badge">0 / 20 완료</span>
+            </div>
+            <div id="checklist-progress-percent" class="checklist-progress-percent">0%</div>
+          </div>
+          <div class="checklist-progress-bar-bg" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="checklist-progress-bar-aria">
+            <div id="checklist-progress-bar-fill" class="checklist-progress-bar-fill"></div>
+          </div>
+          <div id="checklist-progress-status-msg" class="checklist-progress-status-msg">
+            <span>💡</span>
+            <span id="checklist-status-msg-text">체크리스트 점검을 시작하세요. 6개 영역의 핵심 조건을 차례로 확인합니다.</span>
+          </div>
+        </section>
+
+        <!-- Interactive Toolbar / Filter -->
+        <div class="checklist-toolbar">
+          <div class="checklist-filter-group" id="checklist-filter-group">
+            <button type="button" class="checklist-filter-pill active" data-filter="all" onclick="filterWritingChecklist('all')">
+              <span>전체 보기</span>
+              <span class="checklist-filter-pill-count">20</span>
+            </button>
+            <button type="button" class="checklist-filter-pill" data-filter="uncompleted" onclick="filterWritingChecklist('uncompleted')">
+              <span>미완료 항목만</span>
+              <span class="checklist-filter-pill-count" id="checklist-uncompleted-count">20</span>
+            </button>
+            <button type="button" class="checklist-filter-pill" data-filter="completed" onclick="filterWritingChecklist('completed')">
+              <span>완료된 항목만</span>
+              <span class="checklist-filter-pill-count" id="checklist-completed-count">0</span>
+            </button>
+          </div>
+          <div class="checklist-toolbar-actions">
+            <button type="button" class="btn btn-outline btn-sm" onclick="expandAllChecklistCategories()">
+              ▼ 모두 펼치기
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="collapseAllChecklistCategories()">
+              ▲ 모두 접기
+            </button>
+          </div>
+        </div>
+
+        <!-- Checklist Categories Container (Rendered dynamically) -->
+        <div id="checklist-categories-container">
+          <!-- Categories & Items will be dynamically generated by renderWritingChecklist() -->
+        </div>
+
+      </div>
     </div>
 
     <div id="manual-view" class="hidden">
@@ -4454,6 +5076,7 @@
       document.getElementById('workspace-view').classList.add('hidden');
       document.getElementById('papers-view').classList.add('hidden');
       document.getElementById('thesis-toc-view')?.classList.add('hidden');
+      document.getElementById('checklist-view')?.classList.add('hidden');
       document.getElementById('manual-view')?.classList.add('hidden');
       
       document.getElementById('nav-main-menu').classList.add('hidden');
@@ -4556,6 +5179,7 @@
       document.getElementById('nav-tab-projects')?.classList.toggle('active', activeTab === 'projects');
       document.getElementById('nav-tab-papers')?.classList.toggle('active', activeTab === 'papers');
       document.getElementById('nav-tab-toc')?.classList.toggle('active', activeTab === 'toc');
+      document.getElementById('nav-tab-checklist')?.classList.toggle('active', activeTab === 'checklist');
       document.getElementById('nav-tab-manual')?.classList.toggle('active', activeTab === 'manual');
 
       document.getElementById('mobile-tab-dashboard')?.classList.toggle('active', activeTab === 'dashboard');
@@ -4563,6 +5187,7 @@
       document.getElementById('mobile-tab-projects')?.classList.toggle('active', activeTab === 'projects');
       document.getElementById('mobile-tab-papers')?.classList.toggle('active', activeTab === 'papers');
       document.getElementById('mobile-tab-toc')?.classList.toggle('active', activeTab === 'toc');
+      document.getElementById('mobile-tab-checklist')?.classList.toggle('active', activeTab === 'checklist');
       document.getElementById('mobile-tab-manual')?.classList.toggle('active', activeTab === 'manual');
     }
 
@@ -4866,7 +5491,468 @@
     async function normalizeTocOrder() { await persistTocOrder(getTocProjectChapters()); }
 
     // =========================================================================
-    // 8. User Manual Navigation & Helpers
+
+    // =========================================================================
+    // 7.5. Writing Checklist Data & Controller
+    // =========================================================================
+    const WRITING_CHECKLIST_CATEGORIES = [
+      {
+        id: "design",
+        number: "01",
+        icon: "🔬",
+        title: "연구설계",
+        titleEn: "Research Design",
+        description: "명확한 연구 질문과 검증 가능한 가설 및 사전등록 기반의 연구 기획 요건",
+        items: [
+          {
+            id: "design_1",
+            text: "명확한 연구질문 하나로 압축돼있는가",
+            why: "연구가 다루고자 하는 핵심 질문이 명확하고 단순할수록 논문의 초점과 학술적 기여도가 선명해집니다."
+          },
+          {
+            id: "design_2",
+            text: "가설이 H1/H0 형태로 검증가능하게 정의됐는가(예: \"ΔCER≥0.03\" 처럼 수치화된 기준)",
+            why: "구체적이고 정량적인 판단 기준이 있어야 사후 주관적 해석의 왜곡 없이 통계적으로 객관적인 가설 검증이 가능합니다."
+          },
+          {
+            id: "design_3",
+            text: "사전등록(관측 전에 분석법·임계값 확정) 했는가 — 결과 보고 나서 기준 바꾸지 않기",
+            why: "결과 확인 후 가설을 끼워맞추는 HARKing(Hypothesizing After Results are Known)과 데이터 드레징을 원천 차단합니다."
+          },
+          {
+            id: "design_4",
+            text: "독립변수·종속변수·통제조건이 명시됐는가",
+            why: "변수 간 인과관계를 입증하고 외생 변수의 간섭을 철저히 제어하기 위해 필수적인 과학적 실험 요건입니다."
+          }
+        ]
+      },
+      {
+        id: "methodology",
+        number: "02",
+        icon: "⚙️",
+        title: "방법론",
+        titleEn: "Methodology",
+        description: "제3자가 동일하게 재현할 수 있는 실험 프로토콜 및 통계적 검정력 확보",
+        items: [
+          {
+            id: "method_1",
+            text: "재현 가능한 실험설계인가(다른 사람이 그대로 따라할 수 있는지)",
+            why: "하드웨어 환경, OS, 랜덤 시드, 데이터 전처리 단계 및 파라미터를 누락 없이 기록해야 신뢰성 있는 재현이 가능합니다."
+          },
+          {
+            id: "method_2",
+            text: "베이스라인/대조군이 명확한가",
+            why: "제안 기법의 순수한 개선 효과를 객관적으로 증명할 수 있는 표준적이고 공정한 비교 기준(SOTA Baseline)이 필수적입니다."
+          },
+          {
+            id: "method_3",
+            text: "표본크기가 정당화됐는가(왜 N=8이 아니라 N=50이어야 하는지 등)",
+            why: "검정력(Statistical Power) 분석이나 도메인 표준에 근거하여 표본 수의 통계적 대표성과 타당성을 입증해야 합니다."
+          },
+          {
+            id: "method_4",
+            text: "통계적 유의성 기준(p-value, effect size)을 실험 전에 정했는가",
+            why: "유의수준(α)과 효과 크기 기준을 사전에 고정함으로써 p-hacking 및 선택적 유의성 보고의 오류를 방지합니다."
+          }
+        ]
+      },
+      {
+        id: "results",
+        number: "03",
+        icon: "📊",
+        title: "결과보고",
+        titleEn: "Results Reporting",
+        description: "체리피킹 없는 사전 지표 전수 공개와 불확실성 및 실패 사례의 투명한 기록",
+        items: [
+          {
+            id: "results_1",
+            text: "사전에 정한 지표대로만 보고했는가(유리한 지표만 골라쓰지 않기)",
+            why: "유리한 결과만 취사선택하는 체리피킹을 배제하고 계획된 모든 평가지표를 가감 없이 투명하게 공개해야 합니다."
+          },
+          {
+            id: "results_2",
+            text: "실패하거나 예상과 다른 결과도 보고했는가",
+            why: "예상 밖의 실패 결과나 이상치(Outlier) 분석은 연구의 신뢰도를 높이고 후속 연구자들에게 중요한 시행착오를 방지해 줍니다."
+          },
+          {
+            id: "results_3",
+            text: "불확실성(신뢰구간, 표준오차)을 명시했는가",
+            why: "단순 점 추정치(Point Estimate)를 넘어 95% 신뢰구간(CI)과 표준편차/표준오차를 병기해야 결과의 안정성을 판단할 수 있습니다."
+          }
+        ]
+      },
+      {
+        id: "literature",
+        number: "04",
+        icon: "📚",
+        title: "문헌 검토",
+        titleEn: "Literature Review",
+        description: "최신 SOTA 동향 분석, 제안 연구의 차별성(Novelty) 확립 및 1차 인용 원칙",
+        items: [
+          {
+            id: "lit_1",
+            text: "관련연구를 충분히 다뤘는가(최신 SOTA 포함)",
+            why: "최근 2~3년 내 주요 탑티어 학회/저널의 최신 연구 흐름(SOTA)을 빠짐없이 포괄하여 연구의 현주소를 명시해야 합니다."
+          },
+          {
+            id: "lit_2",
+            text: "본인 연구의 기여가 기존 연구와 어떻게 다른지 명확한가",
+            why: "기존 연구의 한계점과 본 연구가 제시하는 핵심 기여(Contribution & Novelty)를 1:1로 선명하게 대비시켜야 합니다."
+          },
+          {
+            id: "lit_3",
+            text: "인용이 정확한가(직접 확인한 논문만 인용)",
+            why: "2차 인용에 따른 오역·왜곡을 차단하고, 저자가 직접 원문을 읽고 확인한 1차 출처만 엄밀하게 인용해야 합니다."
+          }
+        ]
+      },
+      {
+        id: "writing",
+        number: "05",
+        icon: "✍️",
+        title: "글쓰기 구조",
+        titleEn: "Writing Structure",
+        description: "명확한 논리적 서사 흐름, 자기완결적 도표 캡션 및 구현 디테일 완성도",
+        items: [
+          {
+            id: "write_1",
+            text: "논증 흐름이 명확한가(서론→관련연구→방법→결과→논의→결론)",
+            why: "서론에서 제기한 문제의식부터 결론의 시사점까지 문단 간 논리적 필연성과 스토리라인이 흠잡을 데 없이 연결되어야 합니다."
+          },
+          {
+            id: "write_2",
+            text: "그림/표가 캡션만 봐도 이해되는가(자기완결적인지)",
+            why: "본문을 일일이 찾아보지 않아도 그림·표와 그 캡션만으로 축, 범례, 단위, 핵심 결론을 완전히 파악할 수 있어야 합니다."
+          },
+          {
+            id: "write_3",
+            text: "재현에 필요한 디테일이 충분한가",
+            why: "주요 알고리즘 의사코드(Pseudocode), 손실함수 수식, 하이퍼파라미터 세팅 등 독자가 직접 구현할 수 있는 디테일이 갖춰져야 합니다."
+          }
+        ]
+      },
+      {
+        id: "ethics",
+        number: "06",
+        icon: "⚖️",
+        title: "윤리·투명성",
+        titleEn: "Ethics & Transparency",
+        description: "이해상충 명시, 데이터·코드 오픈 사이언스 실천 및 연구 한계의 정직한 기술",
+        items: [
+          {
+            id: "ethics_1",
+            text: "이해상충(funding, 소속 등)을 명시했는가",
+            why: "연구비 지원처, 산업체 협력 관계, 특허 출원 여부 등 연구 결과의 객관성에 영향을 줄 수 있는 요소를 투명하게 선언해야 합니다."
+          },
+          {
+            id: "ethics_2",
+            text: "데이터·코드 공개 여부를 밝혔는가",
+            why: "재현용 코드 및 데이터셋의 저장소(GitHub/Zenodo) 링크와 라이선스를 명시하여 오픈 사이언스 표준을 준수합니다."
+          },
+          {
+            id: "ethics_3",
+            text: "연구의 한계점을 정직하게 서술했는가",
+            why: "가정의 제약, 데이터 편향, 일반화 한계를 숨김없이 기술함으로써 연구의 진실성을 높이고 후속 연구의 방향성을 제시합니다."
+          }
+        ]
+      }
+    ];
+
+    const CHECKLIST_STORAGE_KEY = 'labsync_writing_checklist_state_v1';
+    let writingChecklistState = {};
+    let writingChecklistOpenCategories = {
+      design: true,
+      methodology: true,
+      results: true,
+      literature: true,
+      writing: true,
+      ethics: true
+    };
+    let currentChecklistFilter = 'all';
+
+    function loadWritingChecklistState() {
+      try {
+        const raw = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+        if (raw) {
+          writingChecklistState = JSON.parse(raw);
+        } else {
+          writingChecklistState = {};
+        }
+      } catch (err) {
+        console.warn('Failed to load writing checklist state from localStorage:', err);
+        writingChecklistState = {};
+      }
+    }
+
+    function saveWritingChecklistState() {
+      try {
+        localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(writingChecklistState));
+      } catch (err) {
+        console.warn('Failed to save writing checklist state to localStorage:', err);
+      }
+    }
+
+    function navigateToWritingChecklist() {
+      if (currentView !== 'checklist' && currentView !== 'auth') {
+        previousView = currentView;
+      }
+      currentView = 'checklist';
+      hideAllViews();
+      const checklistEl = document.getElementById('checklist-view');
+      if (checklistEl) {
+        checklistEl.classList.remove('hidden');
+      }
+      updateNavTabState('checklist');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      loadWritingChecklistState();
+      renderWritingChecklist();
+    }
+
+    function toggleWritingChecklistItem(itemId, event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      writingChecklistState[itemId] = !writingChecklistState[itemId];
+      saveWritingChecklistState();
+      updateChecklistItemDOM(itemId);
+      updateWritingChecklistProgressDOM();
+      updateAiDrawerContext();
+    }
+
+    function updateChecklistItemDOM(itemId) {
+      const row = document.getElementById(`checklist-item-row-${itemId}`);
+      const isChecked = !!writingChecklistState[itemId];
+      if (row) {
+        row.classList.toggle('checked', isChecked);
+        const checkbox = row.querySelector('.checklist-custom-checkbox');
+        if (checkbox) {
+          checkbox.setAttribute('aria-checked', isChecked ? 'true' : 'false');
+        }
+        if (currentChecklistFilter === 'uncompleted') {
+          row.classList.toggle('filtered-out', isChecked);
+        } else if (currentChecklistFilter === 'completed') {
+          row.classList.toggle('filtered-out', !isChecked);
+        } else {
+          row.classList.remove('filtered-out');
+        }
+      }
+
+      // Update the parent category card
+      for (const cat of WRITING_CHECKLIST_CATEGORIES) {
+        if (cat.items.some(it => it.id === itemId)) {
+          updateCategoryProgressDOM(cat);
+          break;
+        }
+      }
+    }
+
+    function updateCategoryProgressDOM(cat) {
+      const catCard = document.getElementById(`checklist-cat-card-${cat.id}`);
+      if (!catCard) return;
+      let catTotal = cat.items.length;
+      let catCompleted = 0;
+      cat.items.forEach(it => {
+        if (writingChecklistState[it.id]) catCompleted++;
+      });
+      const isCatComplete = catCompleted === catTotal && catTotal > 0;
+
+      catCard.classList.toggle('completed', isCatComplete);
+      const numBadge = catCard.querySelector('.checklist-category-num-badge');
+      if (numBadge) numBadge.textContent = isCatComplete ? '✓' : cat.number;
+      const progressPill = catCard.querySelector('.checklist-category-progress-pill');
+      if (progressPill) progressPill.textContent = isCatComplete ? '완료 ✓' : `${catCompleted} / ${catTotal}`;
+    }
+
+    function updateWritingChecklistProgressDOM() {
+      const stats = getWritingChecklistStats();
+      const progressBadge = document.getElementById('checklist-progress-badge');
+      const progressPercent = document.getElementById('checklist-progress-percent');
+      const progressBarFill = document.getElementById('checklist-progress-bar-fill');
+      const progressBarAria = document.getElementById('checklist-progress-bar-aria');
+      const statusMsgText = document.getElementById('checklist-status-msg-text');
+      const uncompletedCountEl = document.getElementById('checklist-uncompleted-count');
+      const completedCountEl = document.getElementById('checklist-completed-count');
+
+      if (progressBadge) progressBadge.textContent = `${stats.completed} / ${stats.total} 완료`;
+      if (progressPercent) progressPercent.textContent = `${stats.percent}%`;
+      if (progressBarFill) progressBarFill.style.width = `${stats.percent}%`;
+      if (progressBarAria) progressBarAria.setAttribute('aria-valuenow', stats.percent);
+      if (uncompletedCountEl) uncompletedCountEl.textContent = stats.uncompleted;
+      if (completedCountEl) completedCountEl.textContent = stats.completed;
+
+      if (statusMsgText) {
+        if (stats.completed === 0) {
+          statusMsgText.textContent = '체크리스트 점검을 시작하세요. 6개 영역의 핵심 조건을 차례로 확인합니다.';
+        } else if (stats.completed < stats.total) {
+          statusMsgText.textContent = `현재 ${stats.completed}개 요건 충족 완료! 남은 ${stats.uncompleted}개 항목도 꼼꼼히 점검하여 논문 품질을 높이세요.`;
+        } else {
+          statusMsgText.textContent = '🎉 완벽합니다! 좋은 논문의 20대 핵심 조건을 모두 충족했습니다. 안심하고 논문을 투고하세요!';
+        }
+      }
+    }
+
+    function toggleChecklistCategoryAccordion(categoryId) {
+      writingChecklistOpenCategories[categoryId] = !writingChecklistOpenCategories[categoryId];
+      const card = document.getElementById(`checklist-cat-card-${categoryId}`);
+      if (card) {
+        card.classList.toggle('open', !!writingChecklistOpenCategories[categoryId]);
+      }
+    }
+
+    function expandAllChecklistCategories() {
+      WRITING_CHECKLIST_CATEGORIES.forEach(cat => {
+        writingChecklistOpenCategories[cat.id] = true;
+        const card = document.getElementById(`checklist-cat-card-${cat.id}`);
+        if (card) card.classList.add('open');
+      });
+    }
+
+    function collapseAllChecklistCategories() {
+      WRITING_CHECKLIST_CATEGORIES.forEach(cat => {
+        writingChecklistOpenCategories[cat.id] = false;
+        const card = document.getElementById(`checklist-cat-card-${cat.id}`);
+        if (card) card.classList.remove('open');
+      });
+    }
+
+    function filterWritingChecklist(filterType) {
+      currentChecklistFilter = filterType;
+      document.querySelectorAll('#checklist-filter-group .checklist-filter-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-filter') === filterType);
+      });
+      renderWritingChecklist();
+    }
+
+    function resetWritingChecklist() {
+      if (!confirm('체크리스트의 모든 점검 표시를 초기화하시겠습니까?')) {
+        return;
+      }
+      writingChecklistState = {};
+      saveWritingChecklistState();
+      renderWritingChecklist();
+      updateAiDrawerContext();
+      showToast('체크리스트가 초기화되었습니다.', 'info');
+    }
+
+    function getWritingChecklistStats() {
+      let total = 0;
+      let completed = 0;
+      WRITING_CHECKLIST_CATEGORIES.forEach(cat => {
+        cat.items.forEach(item => {
+          total++;
+          if (writingChecklistState[item.id]) {
+            completed++;
+          }
+        });
+      });
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+      return { total, completed, percent, uncompleted: total - completed };
+    }
+
+    function renderWritingChecklist() {
+      const container = document.getElementById('checklist-categories-container');
+      if (!container) return;
+
+      updateWritingChecklistProgressDOM();
+
+      // Render Category Cards
+      let html = '';
+      WRITING_CHECKLIST_CATEGORIES.forEach(cat => {
+        let catTotal = cat.items.length;
+        let catCompleted = 0;
+        cat.items.forEach(item => {
+          if (writingChecklistState[item.id]) catCompleted++;
+        });
+        const isCatComplete = catCompleted === catTotal && catTotal > 0;
+        const isOpen = !!writingChecklistOpenCategories[cat.id];
+
+        const itemsHtml = cat.items.map(item => {
+          const isChecked = !!writingChecklistState[item.id];
+          let isFilteredOut = false;
+          if (currentChecklistFilter === 'uncompleted' && isChecked) isFilteredOut = true;
+          if (currentChecklistFilter === 'completed' && !isChecked) isFilteredOut = true;
+
+          return `
+            <li class="checklist-item-row ${isChecked ? 'checked' : ''} ${isFilteredOut ? 'filtered-out' : ''}" id="checklist-item-row-${item.id}" onclick="toggleWritingChecklistItem('${item.id}', event)">
+              <div class="checklist-checkbox-wrap">
+                <div class="checklist-custom-checkbox" role="checkbox" aria-checked="${isChecked}" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ') { toggleWritingChecklistItem('${item.id}', event); event.preventDefault(); }">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+              </div>
+              <div class="checklist-item-content">
+                <span class="checklist-item-text">${escapeHtml(item.text)}</span>
+                ${item.why ? `
+                  <div class="checklist-why-box">
+                    <strong>💡 왜 중요한가:</strong> ${escapeHtml(item.why)}
+                  </div>
+                ` : ''}
+              </div>
+            </li>
+          `;
+        }).join('');
+
+        html += `
+          <div class="checklist-category-card ${isCatComplete ? 'completed' : ''} ${isOpen ? 'open' : ''}" id="checklist-cat-card-${cat.id}">
+            <button type="button" class="checklist-category-header" onclick="toggleChecklistCategoryAccordion('${cat.id}')" aria-expanded="${isOpen}">
+              <div class="checklist-category-header-left">
+                <div class="checklist-category-num-badge">${isCatComplete ? '✓' : cat.number}</div>
+                <div class="checklist-category-title-wrap">
+                  <div class="checklist-category-title-row">
+                    <span class="checklist-category-icon">${cat.icon}</span>
+                    <span class="checklist-category-title">${cat.title}</span>
+                    <span class="checklist-category-title-en">${cat.titleEn}</span>
+                  </div>
+                  <span class="checklist-category-desc">${cat.description}</span>
+                </div>
+              </div>
+              <div class="checklist-category-header-right">
+                <span class="checklist-category-progress-pill">
+                  ${isCatComplete ? '완료 ✓' : `${catCompleted} / ${catTotal}`}
+                </span>
+                <svg class="checklist-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </button>
+            <div class="checklist-category-body">
+              <ul class="checklist-items-list">
+                ${itemsHtml}
+              </ul>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function copyWritingChecklistMarkdown() {
+      const stats = getWritingChecklistStats();
+      let md = `# 좋은 논문 작성을 위한 조건 체크리스트 (Good Paper Checklist)\n\n`;
+      md += `> **진행률:** ${stats.completed} / ${stats.total} 완료 (${stats.percent}%)\n\n`;
+
+      WRITING_CHECKLIST_CATEGORIES.forEach(cat => {
+        md += `### ${cat.number}. ${cat.title} (${cat.titleEn})\n`;
+        cat.items.forEach(item => {
+          const checked = !!writingChecklistState[item.id];
+          md += `- [${checked ? 'x' : ' '}] ${item.text}\n`;
+        });
+        md += `\n`;
+      });
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(md).then(() => {
+          showToast('체크리스트 마크다운이 클립보드에 복사되었습니다.', 'success');
+        }).catch(() => {
+          fallbackCopyText(md, null);
+        });
+      } else {
+        fallbackCopyText(md, null);
+      }
+    }
+
+        // 8. User Manual Navigation & Helpers
     // =========================================================================
     function navigateToManual(targetSectionId = null) {
       if (currentView !== 'manual' && currentView !== 'auth') {
@@ -6800,6 +7886,10 @@
         const project = allProjects.find(item => item.id === tocProjectId);
         const chapters = allThesisChapters.filter(item => !tocProjectId || item.project_id === tocProjectId);
         return { summary: `논문 완성도 · ${projectName(project)} · 챕터 ${chapters.length}개`, context: `화면: 논문 완성도\n프로젝트: ${projectName(project)}\n챕터 수: ${chapters.length}개` };
+      }
+      if (currentView === 'checklist') {
+        const stats = getWritingChecklistStats();
+        return { summary: `논문 체크리스트 · ${stats.completed}/${stats.total} 완료 (${stats.percent}%)`, context: `화면: 좋은 논문 작성 조건 체크리스트\n6대 핵심 영역(연구설계, 방법론, 결과보고, 문헌검토, 글쓰기구조, 윤리투명성) 자가진단 화면\n점검 현황: ${stats.completed}/${stats.total} 완료 (${stats.percent}%)` };
       }
       if (currentView === 'manual') return { summary: '사용법 매뉴얼 · LabSync 연구관리 안내', context: '화면: 사용법 매뉴얼\nLabSync 연구관리 기능의 사용법을 확인하고 있음' };
       return { summary: `대시보드 · ${statusSummary}`, context: `화면: 연구 대시보드\n프로젝트 ${allProjects.length}개\n${statusSummary}` };
