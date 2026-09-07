@@ -3095,6 +3095,9 @@
         <button type="button" id="nav-tab-projects" class="nav-link" onclick="navigateToProjects()">
           <span>프로젝트 목록</span>
         </button>
+        <button type="button" id="nav-tab-wbs" class="nav-link" onclick="navigateToWBS()">
+          <span>과제 WBS 마일스톤</span>
+        </button>
         <button type="button" id="nav-tab-papers" class="nav-link" onclick="navigateToPapers()">
           <span>논문 조사</span>
         </button>
@@ -3579,6 +3582,96 @@
     <!-- ======================================================================
          4. PROJECTS LIST VIEW
          ====================================================================== -->
+    
+    <!-- ======================================================================
+         4-B. WBS MILESTONE VIEW (건국대 연구과제 관리)
+         ====================================================================== -->
+    <div id="wbs-view" class="hidden">
+      <nav class="breadcrumb-bar" aria-label="WBS 위치 경로">
+        <div class="breadcrumbs">
+          <button type="button" class="breadcrumb-link" onclick="navigateToDashboard()">← 대시보드</button>
+          <span aria-hidden="true">/</span>
+          <strong style="color: var(--text-main);">과제 WBS 마일스톤</strong>
+        </div>
+      </nav>
+
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">연구 과제 WBS 마일스톤 관리</h1>
+          <p class="section-subtitle">
+            건국대학교 연구실 과제별 마감 D-Day 및 WBS 단계별 진척률(%) 통합 대시보드입니다.
+          </p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <span style="display: inline-flex; align-items: center; padding: 4px 10px; font-size: 12px; font-weight: 700; color: #005a36; background: #f0fdf4; border: 1px solid #86efac; border-radius: 4px;">건국대 산학협력단 공정 기준</span>
+        </div>
+      </div>
+
+      <!-- KPI Grid -->
+      <div class="stats-grid" style="margin-bottom: 1.5rem;">
+        <div class="stat-card" style="cursor: default;">
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">총 수행 과제</span>
+          <span style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-top: 4px;">3 <small style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted);">건</small></span>
+          <span style="font-size: 0.75rem; color: #005a36; margin-top: 4px;">● 진행중 2건 / 완료 1건</span>
+        </div>
+        <div class="stat-card" style="cursor: default;">
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">연구실 평균 공정률</span>
+          <span style="font-size: 1.6rem; font-weight: 800; color: #005a36; margin-top: 4px;">68.5%</span>
+          <div style="width: 100%; background: #e2e8f0; height: 6px; border-radius: 9999px; margin-top: 8px; overflow: hidden;">
+            <div style="background: #005a36; height: 100%; width: 68.5%;"></div>
+          </div>
+        </div>
+        <div class="stat-card" style="cursor: default;">
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">가장 임박한 마감 (D-Day)</span>
+          <span style="font-size: 1.6rem; font-weight: 800; color: #f65810; margin-top: 4px;">D-14</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">중간 연구보고서 제출</span>
+        </div>
+      </div>
+
+      <!-- Task Cards -->
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <!-- 과제 1 -->
+        <div style="background: var(--surface); border: 1.5px solid #f65810; border-radius: var(--radius-md); padding: 1.25rem 1.5rem; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <div>
+              <span style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 700; color: #f65810; background: rgba(246,88,16,0.1); border-radius: 4px; margin-bottom: 4px;">산학협력 핵심과제</span>
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">온프레미스 멀티 에이전트 자율 업무 협업 플랫폼 개발</h3>
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">주관: 건국대학교 산학협력단 · 기간: 2026.03 ~ 2026.11 · 책임연구원: 김정석</p>
+            </div>
+            <span style="font-size: 0.95rem; font-weight: 800; color: #f65810; background: rgba(246,88,16,0.08); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(246,88,16,0.25);">공정률 85%</span>
+          </div>
+          <div style="width: 100%; background: #f1f5f9; height: 8px; border-radius: 9999px; overflow: hidden; margin-bottom: 0.85rem;">
+            <div style="background: #f65810; height: 100%; width: 85%;"></div>
+          </div>
+          <div style="display: flex; gap: 1.5rem; font-size: 0.8rem; color: var(--text-body); flex-wrap: wrap; border-top: 1px dashed var(--border); padding-top: 0.75rem;">
+            <span>✔ <strong>WBS 1단계:</strong> 멀티 에이전트 아키텍처 설계 (완료)</span>
+            <span>✔ <strong>WBS 2단계:</strong> 3-way 상호검증 파이프라인 엔진 구현 (완료)</span>
+            <span style="color: #f65810; font-weight: 700;">▶ <strong>WBS 3단계:</strong> 연구실 온프레미스 통합 실측 검증 (진행중, D-14)</span>
+          </div>
+        </div>
+
+        <!-- 과제 2 -->
+        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <div>
+              <span style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 700; color: #005a36; background: #f0fdf4; border-radius: 4px; margin-bottom: 4px;">대학원 연구과제</span>
+              <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">학술 논문 및 PDF 메타데이터 지능형 아카이빙 엔진 연구</h3>
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">주관: 건국대학교 대학원 · 기간: 2026.06 ~ 2026.12 · 책임연구원: 연구팀</p>
+            </div>
+            <span style="font-size: 0.95rem; font-weight: 800; color: #005a36; background: #f0fdf4; padding: 4px 10px; border-radius: 6px; border: 1px solid #86efac;">공정률 52%</span>
+          </div>
+          <div style="width: 100%; background: #f1f5f9; height: 8px; border-radius: 9999px; overflow: hidden; margin-bottom: 0.85rem;">
+            <div style="background: #005a36; height: 100%; width: 52%;"></div>
+          </div>
+          <div style="display: flex; gap: 1.5rem; font-size: 0.8rem; color: var(--text-body); flex-wrap: wrap; border-top: 1px dashed var(--border); padding-top: 0.75rem;">
+            <span>✔ <strong>WBS 1단계:</strong> DOI/arXiv 자동 스크래퍼 모듈 (완료)</span>
+            <span style="color: #005a36; font-weight: 700;">▶ <strong>WBS 2단계:</strong> 로컬 벡터 임베딩 및 논문 연결 인덱싱 (진행중, D-28)</span>
+            <span style="color: var(--text-muted);">⏱ <strong>WBS 3단계:</strong> 논문 완성도 및 학위논문 연계 (대기)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="projects-view" class="hidden">
       <nav class="breadcrumb-bar" aria-label="프로젝트 위치 경로">
         <div class="breadcrumbs">
