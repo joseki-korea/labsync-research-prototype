@@ -3215,6 +3215,9 @@
         <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
           로그인
         </button>
+        <button type="button" id="auth-guest-btn" class="btn btn-outline" style="width: 100%; margin-top: 0.5rem; border-color: var(--primary); color: var(--primary); font-weight: 700; background: #f0fdf4;" onclick="handleGuestLogin()">
+          ⚡ 로그인 없이 바로 둘러보기 (체험 모드)
+        </button>
       </form>
 
       <div class="test-accounts-box">
@@ -5110,6 +5113,17 @@
       document.getElementById('auth-email').value = email;
       document.getElementById('auth-password').value = password;
       showToast('테스트 계정 정보가 입력되었습니다. 로그인 버튼을 누르세요.');
+    }
+
+    
+    async function handleGuestLogin() {
+      const mockUser = {
+        id: 'guest-researcher-001',
+        email: 'researcher@konkuk.ac.kr',
+        user_metadata: { display_name: '건국대 연구원 (체험)' }
+      };
+      showToast('체험 모드로 바로 진입합니다.', 'success');
+      await setUserSession(mockUser);
     }
 
     async function handleAuthSubmit(e) {
